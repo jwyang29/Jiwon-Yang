@@ -59,18 +59,6 @@ floor.rotation.x = -Math.PI / 2;
 floor.position.y = -0.8;
 scene.add(floor);
 
-// ─── Shadow Catcher ───────────────────────────────────────────────────────────
-// ShadowMaterial is transparent except where shadows fall → shows object silhouettes
-// on the floor, visible through the transparent water layer above
-const shadowPlane = new THREE.Mesh(
-  new THREE.PlaneGeometry(22, 22),
-  new THREE.ShadowMaterial({ opacity: 0.28, depthWrite: false }),
-);
-shadowPlane.rotation.x    = -Math.PI / 2;
-shadowPlane.position.y    = -0.79;
-shadowPlane.receiveShadow = true;
-scene.add(shadowPlane);
-
 // ─── Water Surface (Gerstner + Fresnel) ───────────────────────────────────────
 const sunDir = new THREE.Vector3(5, 12, 8).normalize();
 
