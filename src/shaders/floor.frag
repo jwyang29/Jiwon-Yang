@@ -42,18 +42,27 @@ float gerstnerHeight(vec2 xz, float t) {
 // The discrete Laplacian of wave height approximates surface curvature:
 //   positive Laplacian → concave → light converges → bright spot
 //   negative Laplacian → convex  → light diverges → dark region
-float waveCaustic(vec2 xz, float t) {
-  const float eps = 0.18;
+//
+// We sample at 2 scales: primary (main wave pattern) + secondary (finer detail).
+float waveCausticAt(vec2 xz, float t) {
+  const float eps = 0.09;
   float h00 = gerstnerHeight(xz, t);
   float hpx = gerstnerHeight(xz + vec2(eps, 0.0), t);
   float hmx = gerstnerHeight(xz - vec2(eps, 0.0), t);
   float hpz = gerstnerHeight(xz + vec2(0.0, eps), t);
   float hmz = gerstnerHeight(xz - vec2(0.0, eps), t);
   float laplacian = (hpx + hmx + hpz + hmz - 4.0*h00) / (eps*eps);
+  float cv = clamp(laplacian * 3.5 + 0.28, 0.0, 1.0);
+  return pow(cv, 2.2);
+}
 
-  // Scale so that bright spots reach ~1, dark regions reach ~0
-  float cv = clamp(laplacian * 4.0 + 0.30, 0.0, 1.0);
-  return pow(cv, 1.8); // slight gamma to punch up highlights
+float waveCaustic(vec2 xz, float t) {
+  // Primary scale — matches wave periodicity
+  float c1 = waveCausticAt(xz, t);
+  // Secondary scale — ~2x higher frequency, offset in time for shimmer
+  float c2 = waveCausticAt(xz * 2.1 + vec2(3.7, 1.3), t * 0.85);
+  // Blend: primary drives overall shape, secondary adds fine grain
+  return mix(c1, c1 * c2, 0.55);
 }
 
 void main() {
@@ -66,7 +75,7 @@ void main() {
   // ── Wave-linked caustic ───────────────────────────────────────────────
   float cv = waveCaustic(vWorldXZ, uTime);
   // Warm sunlight color for the bright patches
-  vec3 causticColor = vec3(1.0, 0.96, 0.88) * cv * 0.42;
+  vec3 causticColor = vec3(1.0, 0.95, 0.80) * cv * 0.52;
 
   // ── Depth vignette (centre of pool slightly brighter) ────────────────
   float depth = 1.0 - length(vUv - 0.5) * 0.48;
