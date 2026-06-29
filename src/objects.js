@@ -1,6 +1,5 @@
 import * as THREE from 'three';
 
-// Project metadata – add more entries here as the portfolio grows
 export const PROJECTS = [
   {
     id: 'playground',
@@ -8,6 +7,7 @@ export const PROJECTS = [
     conf: '94',
     sub: 'touch × sand  ·  physical computing',
     rx: -3.2, rz: -1.2,
+    rippleStrength: 0.8,
   },
   {
     id: 'chorus',
@@ -15,6 +15,7 @@ export const PROJECTS = [
     conf: '88',
     sub: 'light × sound  ·  interactive installation',
     rx:  2.8, rz: -2.0,
+    rippleStrength: 0.5,
   },
   {
     id: 'sendlove',
@@ -22,6 +23,7 @@ export const PROJECTS = [
     conf: '96',
     sub: 'voice waveform  ·  acrylic sculpture',
     rx: -1.0, rz:  2.2,
+    rippleStrength: 0.4,
   },
   {
     id: 'iml',
@@ -29,10 +31,10 @@ export const PROJECTS = [
     conf: '91',
     sub: 'sound → motion graphics  ·  WebGL + ML',
     rx:  3.4, rz:  1.6,
+    rippleStrength: 1.0,
   },
 ];
 
-// Build placeholder meshes. Replace geometry/material per project as artwork is ready.
 export function buildObjects(scene) {
   const meshes = [];
 
@@ -40,17 +42,15 @@ export function buildObjects(scene) {
     let mesh;
 
     if (p.id === 'playground') {
-      // Sandy oval stone
-      const geo  = new THREE.SphereGeometry(0.55, 32, 16);
+      const geo = new THREE.SphereGeometry(0.55, 32, 16);
       geo.scale(1.6, 0.55, 1.1);
-      const mat  = new THREE.MeshStandardMaterial({
+      const mat = new THREE.MeshStandardMaterial({
         color: 0xc8a882, roughness: 0.85, metalness: 0.0,
       });
       mesh = new THREE.Mesh(geo, mat);
     }
 
     else if (p.id === 'chorus') {
-      // Four dark rectangular pipes grouped
       const group = new THREE.Group();
       [-0.3, -0.1, 0.1, 0.3].forEach((xOff, i) => {
         const h   = 0.7 + i * 0.08;
@@ -66,7 +66,6 @@ export function buildObjects(scene) {
     }
 
     else if (p.id === 'sendlove') {
-      // Stacked thin acrylic slabs
       const group = new THREE.Group();
       for (let i = 0; i < 5; i++) {
         const geo = new THREE.BoxGeometry(1.1, 0.06, 0.38);
@@ -88,7 +87,6 @@ export function buildObjects(scene) {
     }
 
     else if (p.id === 'iml') {
-      // Sphere with emissive rings
       const group = new THREE.Group();
       const geo  = new THREE.SphereGeometry(0.42, 32, 32);
       const mat  = new THREE.MeshPhysicalMaterial({
@@ -97,7 +95,6 @@ export function buildObjects(scene) {
       });
       group.add(new THREE.Mesh(geo, mat));
 
-      // Orbit rings
       [0, Math.PI / 3, Math.PI * 2 / 3].forEach((rot) => {
         const rGeo = new THREE.TorusGeometry(0.55, 0.018, 8, 64);
         const rMat = new THREE.MeshStandardMaterial({ color: 0x88d4e8, roughness: 0.4 });
@@ -109,11 +106,23 @@ export function buildObjects(scene) {
       mesh = group;
     }
 
-    // Enable shadow casting on every mesh/child
-    mesh.traverse((child) => { if (child.isMesh) { child.castShadow = true; child.receiveShadow = false; } });
+    mesh.traverse((child) => {
+      if (child.isMesh) {
+        child.castShadow = true;
+        child.receiveShadow = false;
+      }
+    });
 
     mesh.position.set(p.rx, 0.18, p.rz);
-    mesh.userData = { project: p, bobPhase: Math.random() * Math.PI * 2 };
+    mesh.userData = {
+      project: p,
+      bobPhase:    Math.random() * Math.PI * 2,
+      // Slow elliptical drift — different freq/radius per object so they move independently
+      driftFreqX:  0.10 + Math.random() * 0.05,
+      driftFreqZ:  0.08 + Math.random() * 0.05,
+      driftRadius: 0.35 + Math.random() * 0.20,
+      rotSpeed:    (Math.random() < 0.5 ? 1 : -1) * (0.0008 + Math.random() * 0.0012),
+    };
     scene.add(mesh);
     meshes.push(mesh);
   });
@@ -121,11 +130,18 @@ export function buildObjects(scene) {
   return meshes;
 }
 
-// Called every frame – gentle bobbing on the water surface
 export function animateObjects(meshes, time) {
   meshes.forEach((m) => {
-    const { bobPhase } = m.userData;
+    const { bobPhase, driftFreqX, driftFreqZ, driftRadius, rotSpeed, project } = m.userData;
+
+    // Drift: slow Lissajous around the resting position
+    m.position.x = project.rx + Math.sin(time * driftFreqX + bobPhase)        * driftRadius;
+    m.position.z = project.rz + Math.cos(time * driftFreqZ + bobPhase * 1.37) * driftRadius;
+
+    // Vertical bob on the water surface
     m.position.y = 0.15 + Math.sin(time * 0.7 + bobPhase) * 0.06;
-    m.rotation.y += 0.002;
+
+    // Slow yaw rotation (speed and direction vary per object)
+    m.rotation.y += rotSpeed;
   });
 }

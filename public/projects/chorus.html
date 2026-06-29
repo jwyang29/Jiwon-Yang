@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chorus — Jiwon Yang</title>
+  <link rel="stylesheet" href="./_layout.css" />
+</head>
+<body>
+  <nav>
+    <a class="nav-back" href="../index.html">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M10 3L5 8l5 5"/>
+      </svg>
+      Portfolio
+    </a>
+    <span class="nav-name">Jiwon Yang</span>
+  </nav>
+
+  <main>
+    <div class="hero">
+      <p class="hero-tag">Interactive Installation · 2024</p>
+      <h1 class="hero-title">CHORUS</h1>
+      <div class="hero-meta">
+        <div class="meta-item">
+          <label>Year</label>
+          <span>2024</span>
+        </div>
+        <div class="meta-item">
+          <label>Role</label>
+          <span>Designer / Engineer</span>
+        </div>
+        <div class="meta-item">
+          <label>Medium</label>
+          <span>Light & Sound</span>
+        </div>
+        <div class="meta-item">
+          <label>Tools</label>
+          <span>Max/MSP, LED Array</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="img-hero">[ Hero Image ]</div>
+
+    <div class="section">
+      <p class="section-label">Overview</p>
+      <h2>Light × Sound: A Responsive Architecture</h2>
+      <p>
+        Chorus is an interactive installation that treats sound and light as a single,
+        unified material. A column of vertical tubes responds to ambient audio — each
+        pipe independently lit, its brightness and color shifting as the collective
+        soundscape in the room evolves.
+      </p>
+      <p>
+        The installation transforms passive listening into a visible, spatial phenomenon.
+        When voices overlap, the light overlaps. When silence falls, the light breathes.
+      </p>
+      <div class="tags">
+        <span class="tag">Installation</span>
+        <span class="tag">Sound-Reactive</span>
+        <span class="tag">Spatial Design</span>
+        <span class="tag">Max/MSP</span>
+      </div>
+    </div>
+
+    <div class="img-grid">
+      <div>
+        <div class="img-grid-item">[ Detail 01 ]</div>
+        <p class="img-caption">Individual pipe module with diffused LED strip</p>
+      </div>
+      <div>
+        <div class="img-grid-item">[ Detail 02 ]</div>
+        <p class="img-caption">Frequency-to-brightness mapping interface</p>
+      </div>
+    </div>
+
+    <div class="section">
+      <p class="section-label">Technical Approach</p>
+      <h2>Frequency as Form</h2>
+      <p>
+        Audio is analyzed in real time using FFT in Max/MSP. The frequency spectrum
+        is divided into four bands — sub-bass, bass, mid, high — each mapped to one
+        of the four pipe columns. Amplitude drives brightness; sustained tones create
+        a slow wash of color that peaks and decays with the room's energy.
+      </p>
+      <p>
+        The diffusion material on each tube was selected after testing twelve different
+        densities to find the balance between color fidelity and softness.
+      </p>
+    </div>
+
+    <div class="img-full">[ Full Installation View ]</div>
+
+    <div class="section">
+      <p class="section-label">Context</p>
+      <h2>Designed for Social Space</h2>
+      <p>
+        Chorus was exhibited in a gallery foyer — a transitional space where people
+        pause briefly before entering an exhibition. The work is designed to reward
+        attention without demanding it: it functions as ambient environment or, for
+        those who notice, as an invitation to listen differently.
+      </p>
+    </div>
+
+    <div class="next-project">
+      <div>
+        <p class="next-label">Next Project</p>
+        <a class="next-name" href="sendlove.html">SEND LOVE →</a>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

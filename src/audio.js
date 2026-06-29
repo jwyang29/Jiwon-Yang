@@ -14,22 +14,33 @@ export class AudioAnalyser {
       const source = ctx.createMediaStreamSource(stream);
       this._analyser = ctx.createAnalyser();
       this._analyser.fftSize = 256;
-      this._analyser.smoothingTimeConstant = 0.75;
+      this._analyser.smoothingTimeConstant = 0.5; // less internal smoothing → faster response
       source.connect(this._analyser);
       this._dataArray = new Uint8Array(this._analyser.frequencyBinCount);
       this.active = true;
     } catch {
-      // Mic not granted; fall through gracefully
       this.active = false;
     }
   }
 
-  // Call once per frame; returns 0–1
+  // Returns 0–1. Focuses on low-mid frequencies (speech/music energy bands)
+  // and normalises to a range where normal speaking reaches 0.5–1.0
   update() {
     if (!this.active || !this._analyser) return 0;
     this._analyser.getByteFrequencyData(this._dataArray);
-    const avg = this._dataArray.reduce((s, v) => s + v, 0) / this._dataArray.length;
-    this._smoothed += (avg / 255 - this._smoothed) * 0.12;
+
+    // Bins 0-30 cover ~0-4 kHz — where voice and most instruments live
+    let sum = 0;
+    const limit = Math.min(30, this._dataArray.length);
+    for (let i = 0; i < limit; i++) sum += this._dataArray[i];
+    const avg = sum / limit;
+
+    // 55 is a conservative "loud speech" threshold on a 0-255 scale
+    const normalized = Math.min(avg / 55, 1.0);
+
+    // Fast attack (0.30), slow release (0.08) — visually punchy but smooth decay
+    const coeff = normalized > this._smoothed ? 0.30 : 0.08;
+    this._smoothed += (normalized - this._smoothed) * coeff;
     this.level = this._smoothed;
     return this.level;
   }

@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IML Workstation — Jiwon Yang</title>
+  <link rel="stylesheet" href="./_layout.css" />
+</head>
+<body>
+  <nav>
+    <a class="nav-back" href="../index.html">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M10 3L5 8l5 5"/>
+      </svg>
+      Portfolio
+    </a>
+    <span class="nav-name">Jiwon Yang</span>
+  </nav>
+
+  <main>
+    <div class="hero">
+      <p class="hero-tag">WebGL + Machine Learning · 2024</p>
+      <h1 class="hero-title">IML WORKSTATION</h1>
+      <div class="hero-meta">
+        <div class="meta-item">
+          <label>Year</label>
+          <span>2024</span>
+        </div>
+        <div class="meta-item">
+          <label>Role</label>
+          <span>Design / Development</span>
+        </div>
+        <div class="meta-item">
+          <label>Medium</label>
+          <span>Web Application</span>
+        </div>
+        <div class="meta-item">
+          <label>Tools</label>
+          <span>Three.js, Wekinator, p5.js</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="img-hero">[ Hero Image ]</div>
+
+    <div class="section">
+      <p class="section-label">Overview</p>
+      <h2>Sound → Motion Graphics via Machine Learning</h2>
+      <p>
+        IML Workstation is a browser-based creative tool that uses Interactive Machine
+        Learning (IML) to map live audio features — pitch, loudness, timbre — to
+        parameters of a 3D generative scene built in Three.js.
+      </p>
+      <p>
+        Users train the system in real time: hum a low note → scene contracts.
+        Whistle high → particles scatter. The mapping is personal, intuitive,
+        and entirely up to the user. The machine learns what the body already knows.
+      </p>
+      <div class="tags">
+        <span class="tag">Interactive ML</span>
+        <span class="tag">WebGL</span>
+        <span class="tag">Motion Graphics</span>
+        <span class="tag">Three.js</span>
+        <span class="tag">Wekinator</span>
+      </div>
+    </div>
+
+    <div class="img-grid">
+      <div>
+        <div class="img-grid-item">[ Interface 01 ]</div>
+        <p class="img-caption">Training interface — assign gestures to visual parameters</p>
+      </div>
+      <div>
+        <div class="img-grid-item">[ Interface 02 ]</div>
+        <p class="img-caption">Live output — WebGL scene responding to microphone input</p>
+      </div>
+    </div>
+
+    <div class="section">
+      <p class="section-label">System Design</p>
+      <h2>A Pipeline for Embodied Control</h2>
+      <p>
+        Audio is captured via Web Audio API and analyzed for spectral features using
+        a custom FFT pipeline. Features are sent over OSC to Wekinator, which runs
+        a k-NN regression model in real time. Wekinator's output — a set of
+        0–1 parameters — is routed back into the browser and mapped to Three.js
+        shader uniforms: particle count, orbit radius, color temperature, rotation speed.
+      </p>
+      <p>
+        The design challenge was not the pipeline but the interface: how do you let
+        a non-technical user understand that they are training a model without
+        exposing the model?
+      </p>
+    </div>
+
+    <div class="img-full">[ System Diagram / Demo Screenshot ]</div>
+
+    <div class="section">
+      <p class="section-label">Outcome</p>
+      <h2>Design Research Through Making</h2>
+      <p>
+        The project was developed in the Interactive Media Lab (IML) at SNU as a
+        research prototype exploring embodied interaction with generative systems.
+        User testing revealed that non-expert participants found the training loop
+        legible within 90 seconds — and spent significantly longer with the system
+        than with a fixed-mapping equivalent.
+      </p>
+    </div>
+
+    <div class="next-project">
+      <div>
+        <p class="next-label">Back to Start</p>
+        <a class="next-name" href="playground.html">PLAYGROUND →</a>
+      </div>
+    </div>
+  </main>
+</body>
+</html>
