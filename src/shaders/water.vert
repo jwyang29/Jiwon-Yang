@@ -45,11 +45,11 @@ void main() {
 
   float boost = 1.0 + uAudioLevel * 4.0;
 
-  // Four Gerstner waves — shorter wavelengths for finer pool ripples
-  GerstnerResult g0 = gerstner(vec2( 1.0,  0.4),  0.26 * boost, 2.0, p, uTime);
-  GerstnerResult g1 = gerstner(vec2( 0.3,  1.0),  0.20 * boost, 1.4, p, uTime);
-  GerstnerResult g2 = gerstner(vec2(-0.6,  0.7),  0.18 * boost, 1.2, p, uTime);
-  GerstnerResult g3 = gerstner(vec2( 0.8, -0.4),  0.16 * boost, 2.4, p, uTime);
+  // Four Gerstner waves — balanced directions to prevent +X horizontal bunching
+  GerstnerResult g0 = gerstner(vec2( 0.7,  0.7),  0.13 * boost, 2.0, p, uTime);
+  GerstnerResult g1 = gerstner(vec2(-0.5,  0.9),  0.10 * boost, 1.4, p, uTime);
+  GerstnerResult g2 = gerstner(vec2(-0.8, -0.6),  0.09 * boost, 1.2, p, uTime);
+  GerstnerResult g3 = gerstner(vec2( 0.4, -0.9),  0.08 * boost, 2.4, p, uTime);
 
   p += g0.offset + g1.offset + g2.offset + g3.offset;
 

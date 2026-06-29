@@ -20,15 +20,15 @@ float gerstnerHeight(vec2 xz, float t) {
   float boost = 1.0 + uAudioLevel * 3.5;
   float h = 0.0;
 
-  // Wavelengths halved vs. old version → finer ripple pattern
-  { float k=2.0*PI/2.0; vec2 d=normalize(vec2(1.0,0.4));
-    h += (0.26*boost/k)*sin(k*(dot(d,xz)-sqrt(9.8/k)*t)); }
-  { float k=2.0*PI/1.4; vec2 d=normalize(vec2(0.3,1.0));
-    h += (0.20*boost/k)*sin(k*(dot(d,xz)-sqrt(9.8/k)*t)); }
-  { float k=2.0*PI/1.2; vec2 d=normalize(vec2(-0.6,0.7));
-    h += (0.18*boost/k)*sin(k*(dot(d,xz)-sqrt(9.8/k)*t)); }
-  { float k=2.0*PI/2.4; vec2 d=normalize(vec2(0.8,-0.4));
-    h += (0.16*boost/k)*sin(k*(dot(d,xz)-sqrt(9.8/k)*t)); }
+  // Must mirror water.vert exactly so caustics are physically synced to waves
+  { float k=2.0*PI/2.0; vec2 d=normalize(vec2( 0.7, 0.7));
+    h += (0.13*boost/k)*sin(k*(dot(d,xz)-sqrt(9.8/k)*t)); }
+  { float k=2.0*PI/1.4; vec2 d=normalize(vec2(-0.5, 0.9));
+    h += (0.10*boost/k)*sin(k*(dot(d,xz)-sqrt(9.8/k)*t)); }
+  { float k=2.0*PI/1.2; vec2 d=normalize(vec2(-0.8,-0.6));
+    h += (0.09*boost/k)*sin(k*(dot(d,xz)-sqrt(9.8/k)*t)); }
+  { float k=2.0*PI/2.4; vec2 d=normalize(vec2( 0.4,-0.9));
+    h += (0.08*boost/k)*sin(k*(dot(d,xz)-sqrt(9.8/k)*t)); }
 
   return h;
 }
@@ -43,14 +43,16 @@ float waveCausticAt(vec2 xz, float t) {
   float hpz = gerstnerHeight(xz + vec2(0.0, eps), t);
   float hmz = gerstnerHeight(xz - vec2(0.0, eps), t);
   float laplacian = (hpx + hmx + hpz + hmz - 4.0*h00) / (eps*eps);
-  float cv = clamp(laplacian * 3.2 + 0.25, 0.0, 1.0);
-  return pow(cv, 2.2);
+  // With halved steepness, max Laplacian ≈ 1.5; scale to keep peak cv near 0.65
+  float cv = clamp(laplacian * 0.38 + 0.06, 0.0, 1.0);
+  return pow(cv, 1.6);
 }
 
 float waveCaustic(vec2 xz, float t) {
   float c1 = waveCausticAt(xz, t);
-  float c2 = waveCausticAt(xz * 1.8 + vec2(2.5, 0.9), t * 0.85);
-  return mix(c1, c1 * c2, 0.5);
+  // Secondary at 2× spatial freq adds finer grain without re-saturating
+  float c2 = waveCausticAt(xz * 2.2 + vec2(3.1, 1.7), t * 0.82);
+  return mix(c1, sqrt(c1 * c2), 0.45);
 }
 
 void main() {
@@ -62,7 +64,7 @@ void main() {
 
   // ── Wave-linked caustic ───────────────────────────────────────────────
   float cv = waveCaustic(vWorldXZ, uTime);
-  vec3 causticColor = vec3(1.0, 0.95, 0.80) * cv * 0.50;
+  vec3 causticColor = vec3(1.0, 0.94, 0.78) * cv * 0.34;
 
   // ── Depth vignette ────────────────────────────────────────────────────
   float depth = 1.0 - length(vUv - 0.5) * 0.48;

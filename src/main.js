@@ -39,6 +39,7 @@ sun.shadow.camera.near   =  0.5;
 sun.shadow.camera.far    = 40;
 sun.shadow.camera.left   = sun.shadow.camera.bottom = -10;
 sun.shadow.camera.right  = sun.shadow.camera.top    =  10;
+sun.shadow.bias          = -0.001;
 scene.add(sun);
 scene.add(new THREE.AmbientLight(0xb8dde8, 0.9));
 const fill = new THREE.PointLight(0xa0d8ef, 1.2, 20);
