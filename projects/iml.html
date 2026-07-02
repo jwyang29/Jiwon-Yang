@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IML Workstation — Jiwon Yang</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Jacquarda+Bastarda+9&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./layout.css?v=4" />
+</head>
+<body>
+  <nav>
+    <a class="nav-back" href="../index.html">&lt;&lt; Portfolio</a>
+    <span class="nav-name">Jiwon Yang</span>
+  </nav>
+
+  <main>
+    <p class="hero-tag">WebGL + Machine Learning · 2024</p>
+    <h1 class="hero-title">IML Workstation <span class="title-alt">( IML WORKSTATION )</span></h1>
+
+    <div class="hero-intro-wrap">
+      <span class="hero-intro">A browser-based creative tool that maps live
+      audio — pitch, loudness, timbre — to a 3D generative scene, using
+      interactive machine learning.</span>
+    </div>
+
+    <div class="div-stars"></div>
+
+    <div class="meta-block">
+      <span class="meta-heading">Meta</span>
+      <div class="meta-rows">
+        <div class="row"><label>Year</label><span>2024</span></div>
+        <div class="row"><label>Role</label><span>Design / Development</span></div>
+        <div class="row"><label>Medium</label><span>WebGL, ML</span></div>
+        <div class="row"><label>Tools</label><span>Three.js, Wekinator, OSC</span></div>
+      </div>
+    </div>
+
+    <div class="window">
+      <div class="window-bar">
+        <span>iml_hero.png</span>
+        <span class="controls">─ □ ×</span>
+      </div>
+      <div class="window-body">[ Hero Image ]</div>
+      <div class="window-caption">Live generative scene driven by voice input</div>
+    </div>
+
+    <div class="section">
+      <div class="section-bracket">[ .Overview ]</div>
+      <h2>Sound → Motion Graphics via Machine Learning</h2>
+      <p>
+        IML Workstation uses <span class="hl-blue">Interactive Machine
+        Learning</span> to map live audio features — pitch, loudness,
+        timbre — to parameters of a <span class="hl-teal">3D generative
+        scene</span> built in Three.js. Users train the mapping themselves,
+        by example, in <span class="hl-pink">real time</span>.
+      </p>
+      <div class="tags">
+        <span class="tag">WebGL</span>
+        <span class="tag">Machine Learning</span>
+        <span class="tag">Creative Tools</span>
+        <span class="tag">Three.js</span>
+      </div>
+    </div>
+
+    <div class="div-slash"></div>
+
+    <div class="window-grid">
+      <div class="window">
+        <div class="window-bar">
+          <span>pipeline.png</span>
+          <span class="controls">─ □ ×</span>
+        </div>
+        <div class="window-body">[ Detail 01 ]</div>
+        <div class="window-caption">Audio → OSC → Wekinator → shader uniforms</div>
+      </div>
+      <div class="window">
+        <div class="window-bar">
+          <span>training_ui.png</span>
+          <span class="controls">─ □ ×</span>
+        </div>
+        <div class="window-body">[ Detail 02 ]</div>
+        <div class="window-caption">In-browser training interface</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-bracket">[ .Process ]</div>
+      <h2>A Pipeline for Embodied Control</h2>
+      <p>
+        Audio is captured via <span class="hl-blue">Web Audio API</span> and
+        analyzed for spectral features using a custom FFT pipeline. Features
+        are sent over OSC to <span class="hl-yellow">Wekinator</span>, which
+        runs a k-NN regression model in real time.
+      </p>
+      <p>
+        Wekinator's output — a set of <span class="hl-mark">0–1
+        parameters</span> — is routed back into the browser and mapped to
+        Three.js shader uniforms: particle count, orbit radius, color
+        temperature, rotation speed.
+      </p>
+    </div>
+
+    <div class="div-stars"></div>
+
+    <div class="section">
+      <div class="deco-asterisk">✳</div>
+      <div class="section-bracket">[ .Context ]</div>
+      <h2>Design Research Through Making</h2>
+      <p>
+        Developed in the <span class="hl-blue">Interactive Media Lab (IML) at
+        SNU</span> as a research prototype exploring embodied interaction with
+        generative systems. User testing revealed that non-expert participants
+        found the training loop <span class="hl-pink">legible within 90
+        seconds</span> — and spent significantly longer with the system than
+        with a fixed-mapping equivalent.
+      </p>
+    </div>
+
+    <div class="next-project">
+      <span class="next-label">Next Project</span>
+      <a class="next-name" href="playground.html">Playground →</a>
+    </div>
+  </main>
+</body>
+</html>
