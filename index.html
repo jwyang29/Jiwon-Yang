@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Jiwon Yang — Portfolio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Jacquarda+Bastarda+9&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #9ecedd;
+      overflow-x: hidden;
+      font-family: 'Courier New', Courier, monospace;
+    }
+
+    /* Canvas stays fixed; the page scrolls to pan the camera across the pool */
+    #canvas { position: fixed; inset: 0; width: 100vw; height: 100vh; display: block; }
+
+    /* Invisible spacer that gives the page its scrollable height */
+    #scroll-space { height: 300vh; pointer-events: none; }
+
+    /* ── Bounding box overlay ────────────────────────────── */
+    #bbox {
+      position: fixed;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.1s ease;
+    }
+    #bbox.visible { opacity: 1; }
+
+    #bbox-border {
+      position: absolute;
+      inset: 0;
+      border: 1.5px solid #FF6B9D;
+      box-shadow: 0 0 18px rgba(255, 107, 157, 0.4),
+                  inset 0 0 18px rgba(255, 107, 157, 0.06);
+    }
+    /* Corner brackets */
+    #bbox-border::before {
+      content: '';
+      position: absolute;
+      top: -3px; left: -3px;
+      width: 11px; height: 11px;
+      border-top: 2.5px solid #FF6B9D;
+      border-left: 2.5px solid #FF6B9D;
+    }
+    #bbox-border::after {
+      content: '';
+      position: absolute;
+      bottom: -3px; right: -3px;
+      width: 11px; height: 11px;
+      border-bottom: 2.5px solid #FF6B9D;
+      border-right: 2.5px solid #FF6B9D;
+    }
+
+    #bbox-label {
+      position: absolute;
+      top: -24px; left: -1px;
+      background: #FF6B9D;
+      color: #fff;
+      font: bold 10px/1 'Courier New', monospace;
+      padding: 4px 9px;
+      letter-spacing: 0.05em;
+      white-space: nowrap;
+    }
+    #bbox-sub {
+      position: absolute;
+      bottom: -20px; left: 0;
+      color: #FF6B9D;
+      font: 9px/1 'Courier New', monospace;
+      letter-spacing: 0.06em;
+      white-space: nowrap;
+      text-shadow: 0 1px 6px rgba(0,0,0,0.35);
+    }
+
+    /* ── UI chrome ──────────────────────────────────────── */
+    #ui {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    #name-tag {
+      position: absolute;
+      top: 22px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: rgba(10, 45, 60, 0.6);
+      font-size: 11px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    #hint {
+      margin-top: 20px;
+      text-align: center;
+      color: rgba(255, 255, 255, 0.95);
+      font-size: 14px;
+      font-weight: bold;
+      letter-spacing: 0.16em;
+      text-shadow:
+        0 1px 10px rgba(40, 120, 120, 0.55),
+        0 0px  3px rgba(40, 120, 120, 0.35);
+      transition: opacity 0.4s ease;
+    }
+
+    #mic-btn, #pool-btn {
+      position: absolute;
+      top: 18px;
+      pointer-events: all;
+      background: rgba(255,255,255,0.22);
+      border: 1px solid rgba(255,255,255,0.5);
+      color: rgba(10, 45, 60, 0.75);
+      font: 9px 'Courier New', monospace;
+      letter-spacing: 0.1em;
+      padding: 7px 14px;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    #mic-btn  { right: 18px; }
+    #pool-btn { left: 18px; }
+    #mic-btn:hover, #pool-btn:hover,
+    #mic-btn.active { background: rgba(255,255,255,0.4); }
+    #mic-btn.active { color: #FF6B9D; border-color: #FF6B9D; }
+
+    /* ── "The Pool" concept popup ───────────────────────── */
+    #pool-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 40;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background: rgba(210, 235, 235, 0.25);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+    #pool-modal.open { display: flex; }
+
+    #pool-card {
+      position: relative;
+      max-width: 520px;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.66);
+      border: 1px solid rgba(255, 255, 255, 0.85);
+      border-radius: 18px;
+      padding: 38px 36px 34px;
+      box-shadow: 0 18px 60px rgba(20, 80, 80, 0.22);
+      color: rgba(10, 45, 60, 0.9);
+    }
+
+    #pool-card h2 {
+      font-family: 'Jacquarda Bastarda 9', serif;
+      font-weight: normal;
+      font-size: 44px;
+      letter-spacing: -0.01em;
+      color: rgba(255, 148, 170, 1);
+      margin-bottom: 4px;
+    }
+    #pool-card .card-sub {
+      font: bold 10px 'Courier New', monospace;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      margin-bottom: 22px;
+    }
+    #pool-card p {
+      font: 13px/1.8 'Courier New', monospace;
+      letter-spacing: 0.03em;
+      margin-bottom: 14px;
+    }
+    #pool-card p b { letter-spacing: 0.08em; }
+    #pool-card .card-rule {
+      border: none;
+      border-top: 1px dashed rgba(10, 45, 60, 0.35);
+      margin: 18px 0;
+    }
+
+    #pool-close {
+      position: absolute;
+      top: 14px; right: 16px;
+      background: none;
+      border: none;
+      font: bold 18px 'Courier New', monospace;
+      color: rgba(10, 45, 60, 0.6);
+      cursor: pointer;
+      padding: 4px 8px;
+    }
+    #pool-close:hover { color: rgba(255, 120, 150, 1); }
+
+    @media (max-width: 640px) {
+      #pool-btn { top: calc(14px + env(safe-area-inset-top)); left: 14px; }
+      #pool-card { padding: 28px 22px 26px; }
+      #pool-card h2 { font-size: 34px; }
+    }
+
+    /* ── Floating name typography ───────────────────────── */
+    /* Flexbox wrapper guarantees true centering on every aspect ratio;
+       the animation only nudges translateY so it can't break alignment. */
+    #name-wrap {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      z-index: 5;
+    }
+
+    @keyframes nameFloat {
+      0%, 100% { transform: translateY(0px); }
+      33%       { transform: translateY(-14px) rotate(-0.4deg); }
+      66%       { transform: translateY(-6px)  rotate(0.3deg); }
+    }
+
+    #floating-name {
+      font-family: 'Jacquarda Bastarda 9', serif;
+      font-size: clamp(52px, 8.5vw, 128px);
+      color: rgba(255, 168, 184, 0.95); /* soft pink */
+      text-shadow:
+        0 3px  2px rgba(30, 90, 90, 0.40),   /* crisp dark drop for contrast */
+        0 8px 22px rgba(20, 80, 80, 0.35),   /* soft depth below */
+        0 2px 30px rgba(255, 168, 184, 0.50); /* pink glow */
+      letter-spacing: -0.01em;
+      white-space: nowrap;
+      text-align: center;
+      user-select: none;
+      animation: nameFloat 7s ease-in-out infinite;
+      /* clickable link → about page */
+      pointer-events: auto;
+      cursor: pointer;
+      text-decoration: none;
+      transition: color 0.25s ease, text-shadow 0.25s ease;
+    }
+    #floating-name:hover {
+      color: rgba(255, 190, 205, 1);
+      text-shadow:
+        0 2px 34px rgba(255, 168, 184, 0.65),
+        0 0px 10px rgba(255, 255, 255, 0.35);
+    }
+
+    /* ── Mobile ─────────────────────────────────────────── */
+    @media (max-width: 640px) {
+      #floating-name {
+        font-size: clamp(34px, 11vw, 52px);
+        white-space: normal;
+        max-width: 90vw;
+      }
+      #name-tag { top: calc(16px + env(safe-area-inset-top)); font-size: 10px; }
+      #mic-btn  { top: calc(14px + env(safe-area-inset-top)); right: 14px; }
+      #hint     { font-size: 11px; margin-top: 14px; }
+    }
+  </style>
+  <script type="module" crossorigin src="/Jiwon-Yang/assets/index-Q_SGPBeG.js"></script>
+</head>
+<body>
+  <canvas id="canvas"></canvas>
+
+  <!-- Bounding box HTML overlay -->
+  <div id="bbox">
+    <div id="bbox-border"></div>
+    <div id="bbox-label"></div>
+    <div id="bbox-sub"></div>
+  </div>
+
+  <!-- Large floating name (stays centered while scrolling) — links to About -->
+  <div id="name-wrap">
+    <a id="floating-name" href="./projects/about.html">Jiwon Yang</a>
+    <div id="hint">SCROLL DOWN  ↓</div>
+  </div>
+
+  <!-- UI chrome -->
+  <div id="ui">
+    <div id="name-tag">Portfolio</div>
+    <button id="pool-btn">◎  THE POOL</button>
+    <button id="mic-btn">◎  MIC</button>
+  </div>
+
+  <!-- "The Pool" concept popup -->
+  <div id="pool-modal">
+    <div id="pool-card">
+      <button id="pool-close" aria-label="Close">×</button>
+      <h2>The Pool</h2>
+      <div class="card-sub">— How this portfolio works</div>
+      <p>
+        This site is a swimming pool. Every object floating on the
+        water is <b>one project</b> — drifting, bobbing, waiting to be
+        picked up.
+      </p>
+      <hr class="card-rule">
+      <p><b>SCROLL</b> — drift down the pool to find more works.</p>
+      <p><b>HOVER / TAP</b> — an object shows its name. Tap again to dive in.</p>
+      <p><b>MIC</b> — let the water listen. Speak, and the ripples answer.</p>
+      <hr class="card-rule">
+      <p style="margin-bottom:0">
+        Designed &amp; built by <b>Jiwon Yang</b> — tap my name in the
+        middle of the pool to read more about me.
+      </p>
+    </div>
+  </div>
+
+  <!-- Scrollable page height -->
+  <div id="scroll-space"></div>
+
+</body>
+</html>
