@@ -4,114 +4,123 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>IML Workstation — Jiwon Yang</title>
-  <link rel="stylesheet" href="./layout.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Jacquarda+Bastarda+9&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./layout.css?v=10" />
 </head>
 <body>
   <nav>
-    <a class="nav-back" href="../index.html">
-      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
-        <path d="M10 3L5 8l5 5"/>
-      </svg>
-      Portfolio
-    </a>
+    <a class="nav-back" href="../index.html">&lt;&lt; Portfolio</a>
     <span class="nav-name">Jiwon Yang</span>
   </nav>
 
   <main>
-    <div class="hero">
-      <p class="hero-tag">WebGL + Machine Learning · 2024</p>
-      <h1 class="hero-title">IML WORKSTATION</h1>
-      <div class="hero-meta">
-        <div class="meta-item">
-          <label>Year</label>
-          <span>2024</span>
-        </div>
-        <div class="meta-item">
-          <label>Role</label>
-          <span>Design / Development</span>
-        </div>
-        <div class="meta-item">
-          <label>Medium</label>
-          <span>Web Application</span>
-        </div>
-        <div class="meta-item">
-          <label>Tools</label>
-          <span>Three.js, Wekinator, p5.js</span>
-        </div>
+    <p class="hero-tag">WebGL + Machine Learning · 2026</p>
+    <h1 class="hero-title">IML Workstation <span class="title-alt">( IML WORKSTATION )</span></h1>
+
+    <div class="hero-intro-wrap">
+      <span class="hero-intro">A browser-based creative tool that maps live
+      audio — pitch, loudness, timbre — to a 3D generative scene, using
+      interactive machine learning.</span>
+    </div>
+
+    <div class="div-stars"></div>
+
+    <div class="meta-block">
+      <span class="meta-heading">Meta</span>
+      <div class="meta-rows">
+        <div class="row"><label>Year</label><span>2026</span></div>
+        <div class="row"><label>Role</label><span>Design / Development</span></div>
+        <div class="row"><label>Medium</label><span>WebGL, ML</span></div>
+        <div class="row"><label>Tools</label><span>Three.js, Wekinator, OSC</span></div>
       </div>
     </div>
 
-    <div class="img-hero">[ Hero Image ]</div>
+    <div class="window">
+      <div class="window-bar">
+        <span>iml_hero.png</span>
+        <span class="controls">─ □ ×</span>
+      </div>
+      <div class="window-body">[ Hero Image ]</div>
+      <div class="window-caption">Live generative scene driven by voice input</div>
+    </div>
 
     <div class="section">
-      <p class="section-label">Overview</p>
+      <div class="section-bracket">[ .Overview ]</div>
       <h2>Sound → Motion Graphics via Machine Learning</h2>
       <p>
-        IML Workstation is a browser-based creative tool that uses Interactive Machine
-        Learning (IML) to map live audio features — pitch, loudness, timbre — to
-        parameters of a 3D generative scene built in Three.js.
-      </p>
-      <p>
-        Users train the system in real time: hum a low note → scene contracts.
-        Whistle high → particles scatter. The mapping is personal, intuitive,
-        and entirely up to the user. The machine learns what the body already knows.
+        IML Workstation uses <span class="hl-blue">Interactive Machine
+        Learning</span> to map live audio features — pitch, loudness,
+        timbre — to parameters of a <span class="hl-teal">3D generative
+        scene</span> built in Three.js. Users train the mapping themselves,
+        by example, in <span class="hl-pink">real time</span>.
       </p>
       <div class="tags">
-        <span class="tag">Interactive ML</span>
         <span class="tag">WebGL</span>
-        <span class="tag">Motion Graphics</span>
+        <span class="tag">Machine Learning</span>
+        <span class="tag">Creative Tools</span>
         <span class="tag">Three.js</span>
-        <span class="tag">Wekinator</span>
       </div>
     </div>
 
-    <div class="img-grid">
-      <div>
-        <div class="img-grid-item">[ Interface 01 ]</div>
-        <p class="img-caption">Training interface — assign gestures to visual parameters</p>
+    <div class="div-slash"></div>
+
+    <div class="window-grid">
+      <div class="window">
+        <div class="window-bar">
+          <span>pipeline.png</span>
+          <span class="controls">─ □ ×</span>
+        </div>
+        <div class="window-body">[ Detail 01 ]</div>
+        <div class="window-caption">Audio → OSC → Wekinator → shader uniforms</div>
       </div>
-      <div>
-        <div class="img-grid-item">[ Interface 02 ]</div>
-        <p class="img-caption">Live output — WebGL scene responding to microphone input</p>
+      <div class="window">
+        <div class="window-bar">
+          <span>training_ui.png</span>
+          <span class="controls">─ □ ×</span>
+        </div>
+        <div class="window-body">[ Detail 02 ]</div>
+        <div class="window-caption">In-browser training interface</div>
       </div>
     </div>
 
     <div class="section">
-      <p class="section-label">System Design</p>
+      <div class="section-bracket">[ .Process ]</div>
       <h2>A Pipeline for Embodied Control</h2>
       <p>
-        Audio is captured via Web Audio API and analyzed for spectral features using
-        a custom FFT pipeline. Features are sent over OSC to Wekinator, which runs
-        a k-NN regression model in real time. Wekinator's output — a set of
-        0–1 parameters — is routed back into the browser and mapped to Three.js
-        shader uniforms: particle count, orbit radius, color temperature, rotation speed.
+        Audio is captured via <span class="hl-blue">Web Audio API</span> and
+        analyzed for spectral features using a custom FFT pipeline. Features
+        are sent over OSC to <span class="hl-yellow">Wekinator</span>, which
+        runs a k-NN regression model in real time.
       </p>
       <p>
-        The design challenge was not the pipeline but the interface: how do you let
-        a non-technical user understand that they are training a model without
-        exposing the model?
+        Wekinator's output — a set of <span class="hl-mark">0–1
+        parameters</span> — is routed back into the browser and mapped to
+        Three.js shader uniforms: particle count, orbit radius, color
+        temperature, rotation speed.
       </p>
     </div>
 
-    <div class="img-full">[ System Diagram / Demo Screenshot ]</div>
+    <div class="div-stars"></div>
 
     <div class="section">
-      <p class="section-label">Outcome</p>
+      <div class="deco-asterisk">✳</div>
+      <div class="section-bracket">[ .Context ]</div>
       <h2>Design Research Through Making</h2>
       <p>
-        The project was developed in the Interactive Media Lab (IML) at SNU as a
-        research prototype exploring embodied interaction with generative systems.
-        User testing revealed that non-expert participants found the training loop
-        legible within 90 seconds — and spent significantly longer with the system
-        than with a fixed-mapping equivalent.
+        Developed in the <span class="hl-blue">Interactive Media Lab (IML) at
+        SNU</span> as a research prototype exploring embodied interaction with
+        generative systems. User testing revealed that non-expert participants
+        found the training loop <span class="hl-pink">legible within 90
+        seconds</span> — and spent significantly longer with the system than
+        with a fixed-mapping equivalent.
       </p>
     </div>
 
     <div class="next-project">
-      <div>
-        <p class="next-label">Back to Start</p>
-        <a class="next-name" href="playground.html">PLAYGROUND →</a>
-      </div>
+      <span class="next-label">Next Project</span>
+      <a class="next-name" href="playground.html">Playground →</a>
     </div>
   </main>
 </body>

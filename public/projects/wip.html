@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Work in Progress — Jiwon Yang</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Jacquarda+Bastarda+9&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./layout.css?v=10" />
+  <style>
+    /* ── Barrel carousel ─────────────────────────────────────── */
+    .barrel-stage {
+      perspective: 1200px;
+      height: 460px;
+      position: relative;
+      margin: 30px 0 10px;
+      overflow: visible;
+    }
+    .barrel {
+      position: absolute;
+      inset: 0;
+      transform-style: preserve-3d;
+    }
+    .wip-card {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: min(620px, 88vw);
+      transform-style: preserve-3d;
+      transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.55s ease;
+      will-change: transform, opacity;
+      cursor: pointer;
+    }
+    .wip-card .window { margin: 0; box-shadow: 0 14px 40px rgba(20, 80, 80, 0.14); }
+    .wip-card .window-body {
+      min-height: 0;
+      display: block;
+      background: #fff;
+      padding: 26px 28px 24px;
+      text-align: left;
+      text-transform: none;
+      letter-spacing: normal;
+      color: #1d1d1d;
+    }
+    .wip-title {
+      font-family: var(--sans);
+      font-weight: 800;
+      font-size: clamp(19px, 2.6vw, 25px);
+      color: var(--ink);
+      margin-bottom: 4px;
+    }
+    .wip-tag {
+      font: bold 10.5px var(--mono);
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--pink-text);
+      margin-bottom: 14px;
+    }
+    .wip-desc {
+      font-family: var(--sans);
+      font-size: 14.5px;
+      line-height: 1.75;
+      color: #1d1d1d;
+    }
+    .wip-desc a { color: var(--teal-text); font-weight: 600; }
+    .wip-status {
+      display: inline-block;
+      margin-top: 16px;
+      font: bold 10px var(--mono);
+      letter-spacing: 0.14em;
+      background: var(--ink);
+      color: #fff;
+      padding: 3px 10px;
+    }
+
+    /* ── Barrel controls ─────────────────────────────────────── */
+    .barrel-nav {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 22px;
+      margin-top: 6px;
+    }
+    .barrel-nav button {
+      background: none;
+      border: 2px solid var(--ink);
+      color: var(--ink);
+      font: bold 13px var(--mono);
+      padding: 7px 16px;
+      cursor: pointer;
+    }
+    .barrel-nav button:hover { background: var(--salmon); }
+    .barrel-count {
+      font: bold 12px var(--mono);
+      letter-spacing: 0.14em;
+      color: var(--ink);
+    }
+    .barrel-hint {
+      text-align: center;
+      font: 11px var(--mono);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #888;
+      margin-top: 12px;
+    }
+    @media (max-width: 640px) {
+      .barrel-stage { height: 480px; }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <a class="nav-back" href="../index.html">&lt;&lt; Portfolio</a>
+    <span class="nav-name">Jiwon Yang</span>
+  </nav>
+
+  <main>
+    <p class="hero-tag">Ongoing · Currently Swimming</p>
+    <h1 class="hero-title">Work in Progress <span class="title-alt">( WIP )</span></h1>
+
+    <div class="hero-intro-wrap">
+      <span class="hero-intro">Things that are still in the water — research
+      and experiments in motion, not yet ready to surface.</span>
+    </div>
+
+    <div class="div-stars"></div>
+
+    <!-- Barrel -->
+    <div class="barrel-stage">
+      <div class="barrel" id="barrel">
+
+        <article class="wip-card" data-i="0">
+          <div class="window">
+            <div class="window-bar">
+              <span>nodexr — in_progress</span>
+              <span class="controls">─ □ ×</span>
+            </div>
+            <div class="window-body">
+              <div class="wip-title">NodeXR</div>
+              <div class="wip-tag">XR Collaboration · AI Copilot · Team Research</div>
+              <p class="wip-desc">
+                An XR collaboration copilot that makes group discussion visible for
+                student project teams. Teammates think through a problem together in
+                an XR meeting room while an AI structures every utterance into
+                claims, evidence, questions, rebuttals, and agreements. The
+                structured conversation grows into a live node graph — rendered in
+                both 2D and 3D inside the XR space — and an AI agent, working from
+                the discussion memory, gives real-time feedback on logical gaps and
+                participation imbalance.
+              </p>
+              <span class="wip-status">IN PROGRESS</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="wip-card" data-i="1">
+          <div class="window">
+            <div class="window-bar">
+              <span>prepared_john — in_progress</span>
+              <span class="controls">─ □ ×</span>
+            </div>
+            <div class="window-body">
+              <div class="wip-title">Prepared John — Virtual Dojo</div>
+              <div class="wip-tag">Media Art · Sound × Plant</div>
+              <p class="wip-desc">
+                An interactive sound–plant media art project, in collaboration with
+                <a href="https://virtualdojolab.com/" target="_blank" rel="noopener">Virtual Dojo</a>.
+                Living plants and sound meet as one instrument — an ongoing
+                exploration of how organic matter can perform, respond, and be
+                played.
+              </p>
+              <span class="wip-status">IN PROGRESS</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="wip-card" data-i="2">
+          <div class="window">
+            <div class="window-bar">
+              <span>??? — warming_up</span>
+              <span class="controls">─ □ ×</span>
+            </div>
+            <div class="window-body">
+              <div class="wip-title">· · ·</div>
+              <div class="wip-tag">Unannounced</div>
+              <p class="wip-desc">
+                More experiments are swimming this way. Check back soon — or
+                <a href="mailto:jwyang29@snu.ac.kr">write to me</a> if you're curious
+                about what's in the water.
+              </p>
+              <span class="wip-status">SOON</span>
+            </div>
+          </div>
+        </article>
+
+      </div>
+    </div>
+
+    <div class="barrel-nav">
+      <button id="barrel-prev" aria-label="Previous">↑ PREV</button>
+      <span class="barrel-count" id="barrel-count">1 / 3</span>
+      <button id="barrel-next" aria-label="Next">NEXT ↓</button>
+    </div>
+    <p class="barrel-hint">Scroll, swipe, or use the buttons to turn the barrel</p>
+
+    <div class="div-slash"></div>
+
+    <div class="next-project">
+      <span class="next-label">Back to</span>
+      <a class="next-name" href="../index.html">The Pool →</a>
+    </div>
+  </main>
+
+  <script>
+    (function () {
+      const cards = [...document.querySelectorAll('.wip-card')];
+      const count = cards.length;
+      const countEl = document.getElementById('barrel-count');
+      let cur = 0;
+
+      const STEP = 34;      // degrees between cards on the barrel
+      const RADIUS = 330;   // px — barrel radius
+
+      function render() {
+        cards.forEach((card) => {
+          const i = +card.dataset.i;
+          const off = i - cur;
+          const a = off * STEP;
+          card.style.transform =
+            `translate(-50%, -50%) rotateX(${-a}deg) translateZ(${RADIUS}px)`;
+          card.style.opacity = Math.abs(off) > 1.6 ? 0 : 1 - Math.abs(off) * 0.45;
+          card.style.pointerEvents = off === 0 ? 'auto' : 'none';
+          card.style.zIndex = 10 - Math.abs(off);
+        });
+        countEl.textContent = `${cur + 1} / ${count}`;
+      }
+
+      function go(delta) {
+        cur = Math.min(count - 1, Math.max(0, cur + delta));
+        render();
+      }
+
+      document.getElementById('barrel-prev').addEventListener('click', () => go(-1));
+      document.getElementById('barrel-next').addEventListener('click', () => go(1));
+
+      // wheel — turn the barrel instead of scrolling while over the stage
+      const stage = document.querySelector('.barrel-stage');
+      let wheelLock = 0;
+      stage.addEventListener('wheel', (e) => {
+        const now = Date.now();
+        if (now - wheelLock < 450) { e.preventDefault(); return; }
+        if (Math.abs(e.deltaY) < 12) return;
+        // at the ends, let the page scroll naturally
+        const d = e.deltaY > 0 ? 1 : -1;
+        if ((d > 0 && cur === count - 1) || (d < 0 && cur === 0)) return;
+        e.preventDefault();
+        wheelLock = now;
+        go(d);
+      }, { passive: false });
+
+      // touch swipe (vertical)
+      let touchY = null;
+      stage.addEventListener('touchstart', (e) => { touchY = e.touches[0].clientY; }, { passive: true });
+      stage.addEventListener('touchend', (e) => {
+        if (touchY === null) return;
+        const dy = touchY - e.changedTouches[0].clientY;
+        if (Math.abs(dy) > 40) go(dy > 0 ? 1 : -1);
+        touchY = null;
+      }, { passive: true });
+
+      // keyboard
+      window.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowDown' || e.key === 'ArrowRight') go(1);
+        if (e.key === 'ArrowUp'   || e.key === 'ArrowLeft')  go(-1);
+      });
+
+      // click a side card to bring it to front
+      cards.forEach((card) => card.addEventListener('click', () => {
+        const i = +card.dataset.i;
+        if (i !== cur) { cur = i; render(); }
+      }));
+
+      render();
+    })();
+  </script>
+</body>
+</html>

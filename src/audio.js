@@ -5,6 +5,8 @@ export class AudioAnalyser {
     this._analyser = null;
     this._dataArray = null;
     this._smoothed = 0;
+    this._stream = null;
+    this._ctx = null;
   }
 
   async start() {
@@ -17,10 +19,23 @@ export class AudioAnalyser {
       this._analyser.smoothingTimeConstant = 0.5; // less internal smoothing → faster response
       source.connect(this._analyser);
       this._dataArray = new Uint8Array(this._analyser.frequencyBinCount);
+      this._stream = stream;
+      this._ctx = ctx;
       this.active = true;
     } catch {
       this.active = false;
     }
+  }
+
+  stop() {
+    if (this._stream) this._stream.getTracks().forEach((t) => t.stop());
+    if (this._ctx) this._ctx.close();
+    this._stream = null;
+    this._ctx = null;
+    this._analyser = null;
+    this.active = false;
+    this.level = 0;
+    this._smoothed = 0;
   }
 
   // Returns 0–1. Focuses on low-mid frequencies (speech/music energy bands)

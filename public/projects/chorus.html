@@ -4,57 +4,61 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Chorus — Jiwon Yang</title>
-  <link rel="stylesheet" href="./layout.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Jacquarda+Bastarda+9&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./layout.css?v=10" />
 </head>
 <body>
   <nav>
-    <a class="nav-back" href="../index.html">
-      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
-        <path d="M10 3L5 8l5 5"/>
-      </svg>
-      Portfolio
-    </a>
+    <a class="nav-back" href="../index.html">&lt;&lt; Portfolio</a>
     <span class="nav-name">Jiwon Yang</span>
   </nav>
 
   <main>
-    <div class="hero">
-      <p class="hero-tag">Interactive Installation · 2024</p>
-      <h1 class="hero-title">CHORUS</h1>
-      <div class="hero-meta">
-        <div class="meta-item">
-          <label>Year</label>
-          <span>2024</span>
-        </div>
-        <div class="meta-item">
-          <label>Role</label>
-          <span>Designer / Engineer</span>
-        </div>
-        <div class="meta-item">
-          <label>Medium</label>
-          <span>Light & Sound</span>
-        </div>
-        <div class="meta-item">
-          <label>Tools</label>
-          <span>Max/MSP, LED Array</span>
-        </div>
+    <p class="hero-tag">Interactive Installation · 2025</p>
+    <h1 class="hero-title">Chorus <span class="title-alt">( CHORUS )</span></h1>
+
+    <div class="hero-intro-wrap">
+      <span class="hero-intro">Chorus is an interactive installation that treats
+      sound and light as a single, unified material — when voices overlap,
+      the light overlaps.</span>
+    </div>
+
+    <div class="div-stars"></div>
+
+    <div class="meta-block">
+      <span class="meta-heading">Meta</span>
+      <div class="meta-rows">
+        <div class="row"><label>Year</label><span>2025</span></div>
+        <div class="row"><label>Role</label><span>Designer / Engineer</span></div>
+        <div class="row"><label>Medium</label><span>Light &amp; Sound</span></div>
+        <div class="row"><label>Tools</label><span>Max/MSP, LED Array</span></div>
       </div>
     </div>
 
-    <div class="img-hero">[ Hero Image ]</div>
+    <div class="window">
+      <div class="window-bar">
+        <span>chorus_hero.png</span>
+        <span class="controls">─ □ ×</span>
+      </div>
+      <div class="window-body">[ Hero Image ]</div>
+      <div class="window-caption">Full installation view — gallery foyer</div>
+    </div>
 
     <div class="section">
-      <p class="section-label">Overview</p>
+      <div class="section-bracket">[ .Overview ]</div>
       <h2>Light × Sound: A Responsive Architecture</h2>
       <p>
-        Chorus is an interactive installation that treats sound and light as a single,
-        unified material. A column of vertical tubes responds to ambient audio — each
-        pipe independently lit, its brightness and color shifting as the collective
-        soundscape in the room evolves.
+        A column of vertical tubes responds to <span class="hl-blue">ambient
+        audio</span> — each pipe independently lit, its brightness and color
+        shifting as the collective soundscape in the room evolves. The
+        installation transforms passive listening into a
+        <span class="hl-pink">visible, spatial phenomenon</span>.
       </p>
       <p>
-        The installation transforms passive listening into a visible, spatial phenomenon.
-        When voices overlap, the light overlaps. When silence falls, the light breathes.
+        When voices overlap, the light overlaps. When silence falls,
+        <span class="hl-teal">the light breathes</span>.
       </p>
       <div class="tags">
         <span class="tag">Installation</span>
@@ -64,50 +68,63 @@
       </div>
     </div>
 
-    <div class="img-grid">
-      <div>
-        <div class="img-grid-item">[ Detail 01 ]</div>
-        <p class="img-caption">Individual pipe module with diffused LED strip</p>
+    <div class="div-slash"></div>
+
+    <div class="window-grid">
+      <div class="window">
+        <div class="window-bar">
+          <span>detail_01.png</span>
+          <span class="controls">─ □ ×</span>
+        </div>
+        <div class="window-body">[ Detail 01 ]</div>
+        <div class="window-caption">Pipe module — diffused LED strip</div>
       </div>
-      <div>
-        <div class="img-grid-item">[ Detail 02 ]</div>
-        <p class="img-caption">Frequency-to-brightness mapping interface</p>
+      <div class="window">
+        <div class="window-bar">
+          <span>detail_02.png</span>
+          <span class="controls">─ □ ×</span>
+        </div>
+        <div class="window-body">[ Detail 02 ]</div>
+        <div class="window-caption">Frequency-to-brightness mapping</div>
       </div>
     </div>
 
     <div class="section">
-      <p class="section-label">Technical Approach</p>
+      <div class="section-bracket">[ .Process ]</div>
       <h2>Frequency as Form</h2>
       <p>
-        Audio is analyzed in real time using FFT in Max/MSP. The frequency spectrum
-        is divided into four bands — sub-bass, bass, mid, high — each mapped to one
-        of the four pipe columns. Amplitude drives brightness; sustained tones create
-        a slow wash of color that peaks and decays with the room's energy.
+        Audio is analyzed in real time using <span class="hl-blue">FFT in
+        Max/MSP</span>. The frequency spectrum is divided into four bands —
+        sub-bass, bass, mid, high — each mapped to one of the four pipe columns.
+        <span class="hl-yellow">Amplitude drives brightness</span>; sustained
+        tones create a slow wash of color that peaks and decays with the
+        room's energy.
       </p>
       <p>
-        The diffusion material on each tube was selected after testing twelve different
-        densities to find the balance between color fidelity and softness.
+        The diffusion material on each tube was selected after testing
+        <span class="hl-mark">twelve different densities</span> to find the
+        balance between color fidelity and softness.
       </p>
     </div>
 
-    <div class="img-full">[ Full Installation View ]</div>
+    <div class="div-stars"></div>
 
     <div class="section">
-      <p class="section-label">Context</p>
+      <div class="deco-asterisk">✳</div>
+      <div class="section-bracket">[ .Context ]</div>
       <h2>Designed for Social Space</h2>
       <p>
-        Chorus was exhibited in a gallery foyer — a transitional space where people
-        pause briefly before entering an exhibition. The work is designed to reward
-        attention without demanding it: it functions as ambient environment or, for
-        those who notice, as an invitation to listen differently.
+        Chorus was exhibited in a gallery foyer — a transitional space where
+        people pause briefly before entering an exhibition. The work is
+        designed to <span class="hl-pink">reward attention without demanding
+        it</span>: it functions as ambient environment or, for those who
+        notice, as an invitation to listen differently.
       </p>
     </div>
 
     <div class="next-project">
-      <div>
-        <p class="next-label">Next Project</p>
-        <a class="next-name" href="sendlove.html">SEND LOVE →</a>
-      </div>
+      <span class="next-label">Next Project</span>
+      <a class="next-name" href="sendlove.html">Send Love →</a>
     </div>
   </main>
 </body>
