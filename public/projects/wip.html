@@ -9,25 +9,22 @@
   <link href="https://fonts.googleapis.com/css2?family=Jacquarda+Bastarda+9&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./layout.css?v=10" />
   <style>
-    /* ── Barrel carousel ─────────────────────────────────────── */
+    /* ── Horizontal gallery ──────────────────────────────────── */
     .barrel-stage {
-      perspective: 1200px;
-      height: 460px;
+      height: 440px;
       position: relative;
       margin: 30px 0 10px;
-      overflow: visible;
+      overflow: hidden;    /* side cards peek from the edges */
     }
     .barrel {
       position: absolute;
       inset: 0;
-      transform-style: preserve-3d;
     }
     .wip-card {
       position: absolute;
       left: 50%;
       top: 50%;
-      width: min(620px, 88vw);
-      transform-style: preserve-3d;
+      width: min(620px, 86vw);
       transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.55s ease;
       will-change: transform, opacity;
       cursor: pointer;
@@ -198,11 +195,11 @@
     </div>
 
     <div class="barrel-nav">
-      <button id="barrel-prev" aria-label="Previous">↑ PREV</button>
+      <button id="barrel-prev" aria-label="Previous">← PREV</button>
       <span class="barrel-count" id="barrel-count">1 / 3</span>
-      <button id="barrel-next" aria-label="Next">NEXT ↓</button>
+      <button id="barrel-next" aria-label="Next">NEXT →</button>
     </div>
-    <p class="barrel-hint">Scroll, swipe, or use the buttons to turn the barrel</p>
+    <p class="barrel-hint">Swipe or use the buttons to browse</p>
 
     <div class="div-slash"></div>
 
@@ -219,18 +216,17 @@
       const countEl = document.getElementById('barrel-count');
       let cur = 0;
 
-      const STEP = 34;      // degrees between cards on the barrel
-      const RADIUS = 330;   // px — barrel radius
+      const SHIFT = 106;    // % of card width between slides
 
       function render() {
         cards.forEach((card) => {
           const i = +card.dataset.i;
           const off = i - cur;
-          const a = off * STEP;
+          const scale = off === 0 ? 1 : 0.9;
           card.style.transform =
-            `translate(-50%, -50%) rotateX(${-a}deg) translateZ(${RADIUS}px)`;
-          card.style.opacity = Math.abs(off) > 1.6 ? 0 : 1 - Math.abs(off) * 0.45;
-          card.style.pointerEvents = off === 0 ? 'auto' : 'none';
+            `translate(-50%, -50%) translateX(${off * SHIFT}%) scale(${scale})`;
+          card.style.opacity = Math.abs(off) > 1.6 ? 0 : (off === 0 ? 1 : 0.45);
+          card.style.pointerEvents = Math.abs(off) > 1 ? 'none' : 'auto';
           card.style.zIndex = 10 - Math.abs(off);
         });
         countEl.textContent = `${cur + 1} / ${count}`;
@@ -244,35 +240,21 @@
       document.getElementById('barrel-prev').addEventListener('click', () => go(-1));
       document.getElementById('barrel-next').addEventListener('click', () => go(1));
 
-      // wheel — turn the barrel instead of scrolling while over the stage
+      // horizontal touch swipe
       const stage = document.querySelector('.barrel-stage');
-      let wheelLock = 0;
-      stage.addEventListener('wheel', (e) => {
-        const now = Date.now();
-        if (now - wheelLock < 450) { e.preventDefault(); return; }
-        if (Math.abs(e.deltaY) < 12) return;
-        // at the ends, let the page scroll naturally
-        const d = e.deltaY > 0 ? 1 : -1;
-        if ((d > 0 && cur === count - 1) || (d < 0 && cur === 0)) return;
-        e.preventDefault();
-        wheelLock = now;
-        go(d);
-      }, { passive: false });
-
-      // touch swipe (vertical)
-      let touchY = null;
-      stage.addEventListener('touchstart', (e) => { touchY = e.touches[0].clientY; }, { passive: true });
+      let touchX = null;
+      stage.addEventListener('touchstart', (e) => { touchX = e.touches[0].clientX; }, { passive: true });
       stage.addEventListener('touchend', (e) => {
-        if (touchY === null) return;
-        const dy = touchY - e.changedTouches[0].clientY;
-        if (Math.abs(dy) > 40) go(dy > 0 ? 1 : -1);
-        touchY = null;
+        if (touchX === null) return;
+        const dx = touchX - e.changedTouches[0].clientX;
+        if (Math.abs(dx) > 40) go(dx > 0 ? 1 : -1);
+        touchX = null;
       }, { passive: true });
 
       // keyboard
       window.addEventListener('keydown', (e) => {
-        if (e.key === 'ArrowDown' || e.key === 'ArrowRight') go(1);
-        if (e.key === 'ArrowUp'   || e.key === 'ArrowLeft')  go(-1);
+        if (e.key === 'ArrowRight') go(1);
+        if (e.key === 'ArrowLeft')  go(-1);
       });
 
       // click a side card to bring it to front
