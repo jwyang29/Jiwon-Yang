@@ -231,12 +231,14 @@ main {
   text-transform: uppercase;
 }
 
-/* Two-up window grid */
+/* Two-up window grid — align-items: start prevents a short (landscape)
+   image from being stretched to match a tall (portrait) neighbour */
 .window-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 22px;
   margin: 46px 0;
+  align-items: start;
 }
 .window-grid .window { margin: 0; }
 .window-grid .window-body { min-height: 210px; }
@@ -315,6 +317,21 @@ main {
 .hero-grid .window-body img { width: 100%; height: auto; object-fit: unset; }
 .hero-grid .meta-block { margin: 30px 0 0; }
 .hero-grid .read-more  { margin-top: 24px; }
+
+/* In the two-column hero the title shares space with the image —
+   smaller size + tighter leading so long names wrap to two clean lines
+   instead of dwarfing the hero image */
+.hero-grid .hero-title {
+  font-size: clamp(28px, 4vw, 48px);
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+  margin-bottom: 22px;
+}
+.hero-grid .title-alt {
+  display: block;
+  margin-left: 0;
+  margin-top: 10px;
+}
 @media (max-width: 640px) {
   .hero-grid { grid-template-columns: 1fr; gap: 24px; }
   .hero-grid .window-body { min-height: 300px; }
