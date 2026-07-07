@@ -125,6 +125,8 @@
     }
     #mic-btn  { right: 18px; }
     #lang-btn { right: 96px; }
+    /* Language toggle hidden until i18n is enabled (JS adds .i18n-on to <html>) */
+    html:not(.i18n-on) #lang-btn { display: none; }
     #pool-btn { left: 18px; }
     #mic-btn:hover, #pool-btn:hover,
     #mic-btn.active { background: rgba(255,255,255,0.4); }

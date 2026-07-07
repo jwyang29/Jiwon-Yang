@@ -126,7 +126,18 @@
     try { localStorage.setItem('lang', lang); } catch (e) {}
   }
   function current() { try { return localStorage.getItem('lang') || 'en'; } catch (e) { return 'en'; } }
+
+  // ── EN/KO toggle temporarily disabled — English only for now. ──────────
+  // To re-enable: set ENABLED = true and unhide `.lang-toggle` in layout.css.
+  const ENABLED = false;
+
   function init() {
+    if (!ENABLED) {                    // English only; buttons hidden via CSS
+      apply('en');
+      try { localStorage.setItem('lang', 'en'); } catch (e) {}
+      return;
+    }
+    document.documentElement.classList.add('i18n-on');   // reveals .lang-toggle
     apply(current());
     document.querySelectorAll('.lang-toggle').forEach((b) => {
       b.addEventListener('click', () => apply(document.documentElement.lang === 'ko' ? 'en' : 'ko'));

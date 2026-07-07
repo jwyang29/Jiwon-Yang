@@ -35,6 +35,8 @@ html[lang="ko"] {
   cursor: pointer;
 }
 .lang-toggle:hover { background: var(--salmon); }
+/* Toggle hidden until i18n is enabled (JS adds .i18n-on to <html>) */
+html:not(.i18n-on) .lang-toggle { display: none !important; }
 
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
