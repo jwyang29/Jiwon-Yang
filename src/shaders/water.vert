@@ -2,8 +2,8 @@ precision highp float;
 
 uniform float uTime;
 uniform float uAudioLevel;
-uniform vec2  uObjPos[10];
-uniform float uObjStrength[10];
+uniform vec2  uObjPos[9];
+uniform float uObjStrength[9];
 
 varying vec3 vWorldPos;
 varying vec2 vUv;
@@ -38,7 +38,7 @@ void main() {
   y *= boost;
 
   // Object-driven radial ripples (Y-only)
-  for (int i = 0; i < 10; i++) {
+  for (int i = 0; i < 9; i++) {
     float d   = length(pos - uObjPos[i]);
     float env = exp(-d * d * 0.45);
     float rip = sin(d * 3.8 - t * 1.8 + float(i) * 1.3) * 0.055;

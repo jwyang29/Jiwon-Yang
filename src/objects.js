@@ -78,20 +78,11 @@ export const PROJECTS = [
     shadowRx: 0.50, shadowRz: 0.45,
   },
   {
-    id: 'graphics',
-    name: 'GRAPHIC WORKS',
-    conf: '83',
-    sub: 'selected small projects  ·  print & digital',
-    rx: -2.4, rz: 13.0,
-    rippleStrength: 0.35,
-    shadowRx: 0.60, shadowRz: 0.45,
-  },
-  {
     id: 'wip',
     name: 'WORK IN PROGRESS',
     conf: '···',
     sub: 'currently swimming  ·  ongoing experiments',
-    rx:  1.6, rz: 15.6,
+    rx: -2.0, rz: 13.4,
     rippleStrength: 1.0,
     shadowRx: 0.60, shadowRz: 0.60,
     spin: 0.02,            // the whirlpool spins visibly faster
@@ -242,20 +233,6 @@ function buildFallback(id) {
     }));
     armB.rotation.y = Math.PI;
     g.add(armA, armB);
-  }
-
-  else if (id === 'graphics') {
-    // fanned stack of thin poster sheets
-    const tones = [0xf2e9dd, 0xf291ad, 0x7fc8c8, 0xe3bc2f, 0xf5f0ea];
-    tones.forEach((c, i) => {
-      const m = new THREE.Mesh(
-        new THREE.BoxGeometry(0.9, 0.02, 0.62),
-        new THREE.MeshStandardMaterial({ color: c, roughness: 0.9 }),
-      );
-      m.position.y = i * 0.035;
-      m.rotation.y = (i - 2) * 0.16;
-      g.add(m);
-    });
   }
 
   else {

@@ -6,8 +6,8 @@ uniform vec3  uSunDir;
 uniform vec3  uSunColor;
 uniform vec3  uWaterColor;
 uniform vec3  uCameraPos;
-uniform vec2  uObjPos[10];
-uniform float uObjStrength[10];
+uniform vec2  uObjPos[9];
+uniform float uObjStrength[9];
 
 varying vec3 vWorldPos;
 varying vec2 vUv;
@@ -45,7 +45,7 @@ void waveGradient(vec2 pos, float t, float boost,
   gz *= boost;
 
   // Object ripple gradient: ∂/∂r [A*sin(kr-ωt)*exp(-αr²)] × (unit radial vec)
-  for (int i = 0; i < 10; i++) {
+  for (int i = 0; i < 9; i++) {
     vec2  dr  = pos - uObjPos[i];
     float r   = length(dr);
     if (r < 0.01) continue;

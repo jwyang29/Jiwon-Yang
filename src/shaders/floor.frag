@@ -3,10 +3,10 @@ precision highp float;
 uniform float uTime;
 uniform float uAudioLevel;
 uniform vec3  uSunDir;
-uniform vec2  uObjPos[10];
-uniform float uObjRx[10];    // shadow ellipse semi-axis in object local X
-uniform float uObjRz[10];    // shadow ellipse semi-axis in object local Z
-uniform float uObjAngle[10]; // object rotation.y — rotates the ellipse with the object
+uniform vec2  uObjPos[9];
+uniform float uObjRx[9];    // shadow ellipse semi-axis in object local X
+uniform float uObjRz[9];    // shadow ellipse semi-axis in object local Z
+uniform float uObjAngle[9]; // object rotation.y — rotates the ellipse with the object
 
 varying vec2 vUv;
 varying vec2 vWorldXZ;
@@ -105,7 +105,7 @@ void main() {
   {
     vec3 sun = normalize(vec3(2.0, 14.0, 3.0));
     vec2 off = -vec2(sun.x, sun.z) / sun.y * 0.98;
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 9; i++) {
       vec2  sc  = uObjPos[i] + off;          // shadow centre on floor
       vec2  rel = vWorldXZ - sc;
 

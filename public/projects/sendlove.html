@@ -8,7 +8,7 @@
 <link href="https://fonts.googleapis.com" rel="preconnect"/>
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
 <link href="https://fonts.googleapis.com/css2?family=Jacquarda+Bastarda+9&amp;display=swap" rel="stylesheet"/>
-<link href="./layout.css?v=14" rel="stylesheet"/>
+<link href="./layout.css?v=15" rel="stylesheet"/>
 <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet"/></head>
 <body>
 <nav>
@@ -18,19 +18,17 @@
 <main>
 <div class="hero-grid">
 <div>
-<p class="hero-tag" data-i18n="sendlove.tag">Acrylic Sculpture · 2025</p>
+<p class="hero-tag" data-i18n="sendlove.tag">Acrylic Installation · 2025</p>
 <h1 class="hero-title">Send Love <span class="title-alt">( SEND LOVE )</span></h1>
 <div class="hero-intro-wrap">
-<span class="hero-intro" data-i18n="sendlove.intro">Send Love takes the invisible — a spoken
-          message — and makes it hold still. The ephemeral act of speaking,
-          frozen into something you can hold.</span>
+<span class="hero-intro" data-i18n="sendlove.intro">Send Love gives shape to an <span class="hl-blue">invisible message</span>. It captures the moment of saying "I love you" and lets visitors <span class="hl-pink">replay it, again and again</span>.</span>
 </div>
 <div class="meta-block">
 <span class="meta-heading">Meta</span>
 <div class="meta-rows">
 <div class="row"><label data-i18n="g.meta.year">Year</label><span>2025</span></div>
-<div class="row"><label data-i18n="g.meta.role">Role</label><span data-i18n="sendlove.meta.role">Designer / Fabricator</span></div>
-<div class="row"><label data-i18n="g.meta.medium">Medium</label><span data-i18n="sendlove.meta.medium">Acrylic, Voice</span></div>
+<div class="row"><label data-i18n="g.meta.role">Role</label><span data-i18n="sendlove.meta.role">Personal Project</span></div>
+<div class="row"><label data-i18n="g.meta.medium">Medium</label><span data-i18n="sendlove.meta.medium">Acrylic, Arduino + Ultrasonic Sensor</span></div>
 <div class="row"><label data-i18n="g.meta.tools">Tools</label><span>CNC, p5.js, Laser Cut</span></div>
 </div>
 </div>
@@ -47,13 +45,7 @@
 <div class="section">
 <div class="section-bracket">[ .Overview ]</div>
 <h2 data-i18n="sendlove.h2.1">Voice Waveform as Object</h2>
-<p data-i18n="sendlove.p.1">
-        Visitors record a short phrase; the <span class="hl-blue">voice
-        waveform</span> is extracted, simplified, and engraved into
-        <span class="hl-teal">stacked acrylic sheets</span>. Each sculpture is
-        unique to the voice that created it. <span class="hl-pink">No two
-        waveforms, no two objects, are the same</span>.
-      </p>
+<p data-i18n="sendlove.p.1">Seen from the side, the form is the recorded <span class="hl-teal">waveform of the words "I love you."</span> Multiple acrylic sheets are layered so that together they trace a single waveform.</p>
 <div class="tags">
 <span class="tag">Sculpture</span>
 <span class="tag">Voice</span>
@@ -88,32 +80,11 @@
 <div class="section">
 <div class="section-bracket">[ .Process ]</div>
 <h2 data-i18n="sendlove.h2.2">From Sound to Material</h2>
-<p data-i18n="sendlove.p.2">
-        Audio is recorded in-browser via <span class="hl-blue">Web Audio API</span>.
-        A custom p5.js sketch analyzes the waveform and applies
-        <span class="hl-yellow">RDP path simplification</span> to reduce noise
-        while preserving the essential shape of each syllable and breath.
-      </p>
-<p data-i18n="sendlove.p.3">
-        The simplified path is exported as DXF and laser-cut into
-        <span class="hl-mark">3mm clear acrylic</span> at varying depths across
-        five stacked layers, giving the waveform volume and a sense of
-        geological time.
-      </p>
+<p data-i18n="sendlove.p.2">When a visitor makes a <span class="hl-pink">"sending" gesture</span> in front of an ultrasonic distance sensor, LED strips beneath the acrylic — mapped to the distance of the hand — light up in sequence, completing a motion that feels like <span class="hl-mark">the message being sent</span>.</p>
+
 </div>
-<div class="div-stars"></div>
-<div class="section">
-<div class="deco-asterisk">✳</div>
-<div class="section-bracket">[ .Context ]</div>
-<h2 data-i18n="sendlove.h2.3">The Weight of a Word</h2>
-<p data-i18n="sendlove.p.4">
-        The title comes from the instruction given to participants:
-        <span class="hl-blue">"Say something you want to send to someone."</span>
-        The most common response, across all sessions, was a variation of
-        <span class="hl-pink">"I love you."</span> The project became,
-        unexpectedly, a study in what people choose to preserve.
-      </p>
-</div>
+
+
 <div class="next-project">
 <span class="next-label" data-i18n="g.next">Next Project</span>
 <a class="next-name" href="cocoon.html">Cocoon →</a>

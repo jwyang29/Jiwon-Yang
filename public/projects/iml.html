@@ -8,7 +8,7 @@
 <link href="https://fonts.googleapis.com" rel="preconnect"/>
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
 <link href="https://fonts.googleapis.com/css2?family=Jacquarda+Bastarda+9&amp;display=swap" rel="stylesheet"/>
-<link href="./layout.css?v=14" rel="stylesheet"/>
+<link href="./layout.css?v=15" rel="stylesheet"/>
 <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet"/></head>
 <body>
 <nav>
@@ -19,9 +19,7 @@
 <p class="hero-tag" data-i18n="iml.tag">WebGL + Machine Learning · 2026</p>
 <h1 class="hero-title">IML Workstation <span class="title-alt">( IML WORKSTATION )</span></h1>
 <div class="hero-intro-wrap">
-<span class="hero-intro" data-i18n="iml.intro">A browser-based creative tool that maps live
-      audio — pitch, loudness, timbre — to a 3D generative scene, using
-      interactive machine learning.</span>
+<span class="hero-intro" data-i18n="iml.intro">A browser-based creative tool that maps live audio — pitch, loudness, timbre — to a 3D generative scene, using interactive machine learning.</span>
 </div>
 <div class="div-stars"></div>
 <div class="meta-block">
@@ -43,13 +41,7 @@
 <div class="section">
 <div class="section-bracket">[ .Overview ]</div>
 <h2 data-i18n="iml.h2.1">Sound → Motion Graphics via Machine Learning</h2>
-<p data-i18n="iml.p.1">
-        IML Workstation uses <span class="hl-blue">Interactive Machine
-        Learning</span> to map live audio features — pitch, loudness,
-        timbre — to parameters of a <span class="hl-teal">3D generative
-        scene</span> built in Three.js. Users train the mapping themselves,
-        by example, in <span class="hl-pink">real time</span>.
-      </p>
+<p data-i18n="iml.p.1">IML Workstation uses <span class="hl-blue">Interactive Machine Learning</span> to map live audio features — pitch, loudness, timbre — to parameters of a <span class="hl-teal">3D generative scene</span> built in Three.js. Users train the mapping themselves, by example, in <span class="hl-pink">real time</span>.</p>
 <div class="tags">
 <span class="tag">WebGL</span>
 <span class="tag">Machine Learning</span>
@@ -77,32 +69,15 @@
 <div class="section">
 <div class="section-bracket">[ .Process ]</div>
 <h2 data-i18n="iml.h2.2">A Pipeline for Embodied Control</h2>
-<p data-i18n="iml.p.2">
-        Audio is captured via <span class="hl-blue">Web Audio API</span> and
-        analyzed for spectral features using a custom FFT pipeline. Features
-        are sent over OSC to <span class="hl-yellow">Wekinator</span>, which
-        runs a k-NN regression model in real time.
-      </p>
-<p data-i18n="iml.p.3">
-        Wekinator's output — a set of <span class="hl-mark">0–1
-        parameters</span> — is routed back into the browser and mapped to
-        Three.js shader uniforms: particle count, orbit radius, color
-        temperature, rotation speed.
-      </p>
+<p data-i18n="iml.p.2">Audio is captured via <span class="hl-blue">Web Audio API</span> and analyzed for spectral features using a custom FFT pipeline. Features are sent over OSC to <span class="hl-yellow">Wekinator</span>, which runs a k-NN regression model in real time.</p>
+<p data-i18n="iml.p.3">Wekinator's output — a set of <span class="hl-mark">0–1 parameters</span> — is routed back into the browser and mapped to Three.js shader uniforms: particle count, orbit radius, color temperature, rotation speed.</p>
 </div>
 <div class="div-stars"></div>
 <div class="section">
 <div class="deco-asterisk">✳</div>
 <div class="section-bracket">[ .Context ]</div>
 <h2 data-i18n="iml.h2.3">Design Research Through Making</h2>
-<p data-i18n="iml.p.4">
-        Developed in the <span class="hl-blue">Interactive Media Lab (IML) at
-        SNU</span> as a research prototype exploring embodied interaction with
-        generative systems. User testing revealed that non-expert participants
-        found the training loop <span class="hl-pink">legible within 90
-        seconds</span> — and spent significantly longer with the system than
-        with a fixed-mapping equivalent.
-      </p>
+<p data-i18n="iml.p.4">Developed in the <span class="hl-blue">Interactive Media Lab (IML) at SNU</span> as a research prototype exploring embodied interaction with generative systems. User testing revealed that non-expert participants found the training loop <span class="hl-pink">legible within 90 seconds</span> — and spent significantly longer with the system than with a fixed-mapping equivalent.</p>
 </div>
 <div class="next-project">
 <span class="next-label" data-i18n="g.next">Next Project</span>
