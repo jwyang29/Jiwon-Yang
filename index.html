@@ -7,6 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Jacquarda+Bastarda+9&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -108,7 +109,7 @@
       transition: opacity 0.4s ease;
     }
 
-    #mic-btn, #pool-btn {
+    #mic-btn, #pool-btn, #lang-btn {
       position: absolute;
       top: 18px;
       pointer-events: all;
@@ -123,6 +124,7 @@
       transition: background 0.2s;
     }
     #mic-btn  { right: 18px; }
+    #lang-btn { right: 96px; }
     #pool-btn { left: 18px; }
     #mic-btn:hover, #pool-btn:hover,
     #mic-btn.active { background: rgba(255,255,255,0.4); }
@@ -271,13 +273,14 @@
   <!-- Large floating name (stays centered while scrolling) — links to About -->
   <div id="name-wrap">
     <a id="floating-name" href="./projects/about.html">Jiwon Yang</a>
-    <div id="hint">SCROLL DOWN  ↓</div>
+    <div id="hint" data-i18n="main.hint">SCROLL DOWN  ↓</div>
   </div>
 
   <!-- UI chrome -->
   <div id="ui">
-    <div id="name-tag">Portfolio</div>
+    <div id="name-tag" data-i18n="main.nametag">Portfolio</div>
     <button id="pool-btn">◎  THE POOL</button>
+    <button id="lang-btn" class="lang-toggle">KO</button>
     <button id="mic-btn">◎  MIC</button>
   </div>
 
@@ -286,18 +289,18 @@
     <div id="pool-card">
       <button id="pool-close" aria-label="Close">×</button>
       <h2>The Pool</h2>
-      <div class="card-sub">— How this portfolio works</div>
-      <p>
+      <div class="card-sub" data-i18n="main.pool.sub">— How this portfolio works</div>
+      <p data-i18n="main.pool.p1">
         This site is a swimming pool. Every object floating on the
         water is <b>one project</b> — drifting, bobbing, waiting to be
         picked up.
       </p>
       <hr class="card-rule">
-      <p><b>SCROLL</b> — drift down the pool to find more works.</p>
-      <p><b>HOVER / TAP</b> — an object shows its name. Tap again to dive in.</p>
-      <p><b>MIC</b> — let the water listen. Speak, and the ripples answer.</p>
+      <p data-i18n="main.pool.p2"><b>SCROLL</b> — drift down the pool to find more works.</p>
+      <p data-i18n="main.pool.p3"><b>HOVER / TAP</b> — an object shows its name. Tap again to dive in.</p>
+      <p data-i18n="main.pool.p4"><b>MIC</b> — let the water listen. Speak, and the ripples answer.</p>
       <hr class="card-rule">
-      <p style="margin-bottom:0">
+      <p style="margin-bottom:0" data-i18n="main.pool.p5">
         Designed &amp; built by <b>Jiwon Yang</b> — tap my name in the
         middle of the pool to read more about me.
       </p>
@@ -307,6 +310,7 @@
   <!-- Scrollable page height -->
   <div id="scroll-space"></div>
 
+  <script src="/projects/i18n.js"></script>
   <script type="module" src="/src/main.js"></script>
 </body>
 </html>

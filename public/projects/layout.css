@@ -13,9 +13,28 @@
   /* text-safe accents — WCAG-friendly contrast on --paper */
   --teal-text: #0e7c74;
   --pink-text: #c2456a;
-  --mono:   'Courier New', Courier, monospace;
-  --sans:   'Helvetica Neue', Helvetica, Arial, sans-serif;
+  /* Pretendard sits behind Latin fonts so Korean glyphs always render cleanly */
+  --mono:   'Courier New', Courier, 'Pretendard Variable', Pretendard, 'Noto Sans KR', monospace;
+  --sans:   'Helvetica Neue', Helvetica, 'Pretendard Variable', Pretendard, 'Noto Sans KR', Arial, sans-serif;
 }
+
+/* Korean mode: Pretendard leads the body stack for readability */
+html[lang="ko"] {
+  --sans: 'Pretendard Variable', Pretendard, 'Noto Sans KR', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+/* ── Language toggle (nav) ────────────────────────────────────── */
+.lang-toggle {
+  background: none;
+  border: 2px solid var(--ink);
+  color: var(--ink);
+  font: bold 11px var(--mono);
+  letter-spacing: 0.1em;
+  padding: 4px 10px;
+  margin-left: 16px;
+  cursor: pointer;
+}
+.lang-toggle:hover { background: var(--salmon); }
 
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
