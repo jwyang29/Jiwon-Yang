@@ -79,7 +79,7 @@ story = []
 story.append(Paragraph('JIWON YANG&nbsp;&nbsp;<font name="NotoSansKR" size="15">양지원</font>', S['name']))
 story.append(Paragraph('DESIGN UNDERGRADUATE · AFFECTIVE &amp; MULTISENSORY INTERACTION · HCI', S['sub']))
 story.append(Paragraph(
-  'jwyang29@snu.ac.kr &nbsp;·&nbsp; +82 10-2803-6556 &nbsp;·&nbsp; '
+  'jwyang29@snu.ac.kr &nbsp;·&nbsp; '
   'Portfolio: <link href="https://jwyang29.github.io/Jiwon-Yang/" color="#2ab5ab">jwyang29.github.io/Jiwon-Yang</link> &nbsp;·&nbsp; '
   'GitHub: <link href="https://github.com/jwyang29" color="#2ab5ab">github.com/jwyang29</link>', S['contact']))
 story.append(Spacer(1, 2))
