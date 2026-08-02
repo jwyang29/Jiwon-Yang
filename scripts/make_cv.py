@@ -144,8 +144,9 @@ pubs = [
   'Efficient MAE with Enhanced Superpatch Integration Strategy." Submitted to IEEE AICAS 2026 (under review).',
   'Contribution: Data visualization and figure design.'),
  ('Anna Jung, Kyeonghun Kim, Youngung Han, Eunseob Choi, <b>Jiwon Yang</b>, Ken Ying-Kai Liao, Hyuk-Jae Lee, '
-  'Nam-Joon Kim. "ProsMAE: Multi-Source MAE Pretraining for ISUP Grade Classification." Submitted to IEEE '
-  'APCCAS 2026 (under review).', 'Contribution: Data visualization and figure design.'),
+  'Nam-Joon Kim. "ProsMAE: Multi-Source MAE Pretraining for ISUP Grade Classification." '
+  '<b>Accepted to IEEE APCCAS 2026 (Poster Session).</b>',
+  'Contribution: Data visualization and figure design.'),
  ('Kyeonghun Kim, Jaehyung Park, Youngung Han, Anna Jung, Seongbin Park, Sumin Lee, <b>Jiwon Yang</b>, et al. '
   '"MATHENA: Mamba-based Architectural Tooth Hierarchical Estimator and Holistic Evaluation Network for Anatomy." '
   'arXiv preprint arXiv:2604.00537, 2026. <link href="https://arxiv.org/abs/2604.00537" color="#2ab5ab">arxiv.org/abs/2604.00537</link>',
