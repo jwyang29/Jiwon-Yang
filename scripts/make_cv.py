@@ -106,7 +106,7 @@ story.append(Paragraph('University of Sydney — Exchange Student, Interaction D
 # ══ Research Experience ═══════════════════════════════════════════════════════
 story += sec('RESEARCH EXPERIENCE')
 story.append(Paragraph('ASC Lab, KAIST — Student Intern &nbsp;<font name="Helvetica" size="8.6" color="#555555">· Sep 2026–Present</font>', S['item']))
-story.append(Paragraph('Independent Research — Researcher (First Author) &nbsp;<font name="Helvetica" size="8.6" color="#555555">· Dec 2025–Present</font>', S['item']))
+story.append(Paragraph('Independent Research — Researcher (First Author) &nbsp;<font name="Helvetica" size="8.6" color="#555555">· Feb 2026–Jul 2026</font>', S['item']))
 story.append(Paragraph('<i>"Beyond Parentheses: Personalizing Graphical Sound Captions through Interactive Machine Learning"</i>', S['body']))
 story.append(B('Led the entire project end-to-end: problem framing, system design, implementation, user study, and manuscript writing.'))
 story.append(B('Built the <b>IML Audio Workstation</b> — a dual-head (multi-task) neural network mapping '
@@ -114,7 +114,7 @@ story.append(B('Built the <b>IML Audio Workstation</b> — a dual-head (multi-ta
 story.append(B('Designed a <b>"Listen–Sculpt–Train"</b> human-in-the-loop workflow for accessible, personalized sound '
                'captioning (incl. Deaf and hard-of-hearing viewers); pilot study (n=4) raised perceptual agreement '
                'from 3.2 to 6.4 on a 7-point scale.'))
-story.append(Paragraph('Medical AI Lab (IMSI), Seoul National University — Undergraduate Research Intern &nbsp;<font name="Helvetica" size="8.6" color="#555555">· Feb 2026–Present</font>', S['item']))
+story.append(Paragraph('Medical AI Lab (IMSI), Seoul National University — Undergraduate Research Intern &nbsp;<font name="Helvetica" size="8.6" color="#555555">· Feb 2026–Aug 2026</font>', S['item']))
 story.append(B('Implemented and experimented with medical-imaging models and tasks in PyTorch.'))
 story.append(B('Led data visualization and paper-figure design for medical imaging research — bridging design and ML.'))
 
