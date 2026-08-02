@@ -105,6 +105,7 @@ story.append(Paragraph('University of Sydney — Exchange Student, Interaction D
 
 # ══ Research Experience ═══════════════════════════════════════════════════════
 story += sec('RESEARCH EXPERIENCE')
+story.append(Paragraph('ASC Lab, KAIST — Student Intern &nbsp;<font name="Helvetica" size="8.6" color="#555555">· Sep 2026–Present</font>', S['item']))
 story.append(Paragraph('Independent Research — Researcher (First Author) &nbsp;<font name="Helvetica" size="8.6" color="#555555">· Dec 2025–Present</font>', S['item']))
 story.append(Paragraph('<i>"Beyond Parentheses: Personalizing Graphical Sound Captions through Interactive Machine Learning"</i>', S['body']))
 story.append(B('Led the entire project end-to-end: problem framing, system design, implementation, user study, and manuscript writing.'))
