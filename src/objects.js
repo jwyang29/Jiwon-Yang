@@ -335,14 +335,17 @@ export function buildObjects(scene, onFootprint) {
 
 /**
  * Spread the objects down the pool between z0 and z1, keeping their lane order.
- * Called on every resize — z0 tracks the bottom edge of the opening frame.
+ * Called on every resize — z0 tracks the bottom edge of the opening frame, and
+ * xLimit pulls the two columns in on a narrow screen so neither rides the edge.
  */
-export function layoutObjects(meshes, z0, z1) {
+export function layoutObjects(meshes, z0, z1, xLimit) {
   const span = z1 - z0;
   meshes.forEach((m) => {
     const p = m.userData.project;
+    if (p.baseRx === undefined) p.baseRx = p.rx;
     p.rz = z0 + p.lane * span;
-    m.position.z = p.rz;
+    p.rx = THREE.MathUtils.clamp(p.baseRx, -xLimit, xLimit);
+    m.position.set(p.rx, m.position.y, p.rz);
   });
 }
 

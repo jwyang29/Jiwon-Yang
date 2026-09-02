@@ -74,9 +74,9 @@ const floorUniforms = {
   uObjRz:      { value: objShadowRz },
   uObjAngle:   { value: objShadowAngle },
 };
-// Pool is elongated along Z (22 x 48) so scrolling pans down to more objects
+// Pool is elongated along Z (22 x 88) so scrolling pans down to more objects
 const floor = new THREE.Mesh(
-  new THREE.PlaneGeometry(22, 48),
+  new THREE.PlaneGeometry(22, 88),
   new THREE.ShaderMaterial({ vertexShader: floorVert, fragmentShader: floorFrag, uniforms: floorUniforms }),
 );
 floor.rotation.x = -Math.PI / 2;
@@ -95,7 +95,7 @@ const waterUniforms = {
   uObjStrength: { value: objStrengths },
 };
 const water = new THREE.Mesh(
-  new THREE.PlaneGeometry(22, 48, 110, 240),
+  new THREE.PlaneGeometry(22, 88, 96, 300),
   new THREE.ShaderMaterial({
     vertexShader:   waterVert,
     fragmentShader: waterFrag,
@@ -196,22 +196,34 @@ window.addEventListener('pointerup', (e) => {
 
 // ─── Resize + scroll-driven camera pan ────────────────────────────────────────
 const TAN_HALF_FOV = Math.tan(THREE.MathUtils.degToRad(52 / 2));
-const POOL_HALF_Z  = 24;   // pool plane is 48 deep
+const POOL_HALF_Z  = 44;   // pool plane is 88 deep
+// Scroll distance is derived from the pan distance rather than a fixed vh, so a
+// tall phone — which sees more of the pool at once — doesn't end up racing past
+// the objects in the same 300vh a desktop gets.
+const SCROLL_PX_PER_UNIT = 90;
 let cameraY  = 11;
 let scrollMaxZ = 10;       // how far the camera can pan down the pool
+
+const scrollSpace = document.getElementById('scroll-space');
 
 function resize() {
   const w = window.innerWidth, h = window.innerHeight;
   renderer.setSize(w, h);
   camera.aspect = w / h;
-  // Portrait (mobile): raise the camera so all floating objects stay in view.
-  cameraY = camera.aspect >= 1 ? 11 : Math.min(20, 11 / Math.max(camera.aspect, 0.45));
+  // Portrait (mobile): lift the camera enough to keep the pool's full width in
+  // frame, but no further — every extra unit of height pulls more objects into
+  // one screen and leaves each of them less room.
+  cameraY = camera.aspect >= 1 ? 11 : Math.min(17, 11 / Math.max(camera.aspect, 0.45));
   // Pan range: stop before the pool's far edge enters the view
   const visibleHalfZ = TAN_HALF_FOV * cameraY;
   scrollMaxZ = Math.max(0, POOL_HALF_Z - visibleHalfZ - 0.5);
+  scrollSpace.style.height = `${Math.round(h + scrollMaxZ * SCROLL_PX_PER_UNIT)}px`;
   // Opening frame is open water — leaves and fish only. The objects start just
-  // past its bottom edge and drift into view as the camera pans down the pool.
-  layoutObjects(objects, visibleHalfZ + 2.6, POOL_HALF_Z - 1.2);
+  // past its bottom edge, spread down the pool, and stop short of the far end so
+  // the last one isn't pinned to the bottom of the final frame.
+  // 1.35 ≈ an object's half-width plus its drift, so its outer edge stays inside
+  const xLimit = visibleHalfZ * camera.aspect - 1.35;
+  layoutObjects(objects, visibleHalfZ + 3.0, POOL_HALF_Z - 5.0, xLimit);
   camera.updateProjectionMatrix();
   fishField.setSize();
 }

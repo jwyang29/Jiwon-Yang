@@ -79,7 +79,7 @@ const LEAF_COLORS = [
 ];
 
 // ─── Public API ───────────────────────────────────────────────────────────────
-export function buildLeaves(scene, count = 18) {
+export function buildLeaves(scene, count = 34) {
   const shape = makeMapleShape();
   const geo = new THREE.ShapeGeometry(shape, 6);
   geo.rotateX(-Math.PI / 2);        // lay flat on the XZ plane
@@ -112,7 +112,7 @@ export function buildLeaves(scene, count = 18) {
     const leaf = {
       mesh,
       x: -9.5 + f(r1) * 19.0,
-      z: -7.0 + f(r2) * 25.0,
+      z: -7.0 + f(r2) * 52.0,
       spin: (f(r3) - 0.5) * 0.10,           // slow rotation
       angle: f(r1) * Math.PI * 2,
       driftX: (f(r2) - 0.5) * 0.055,        // gentle surface drift
@@ -134,7 +134,7 @@ export function animateLeaves(leaves, t) {
     const x = leaf.x + leaf.driftX * t;
     const z = leaf.z + leaf.driftZ * t;
     const wx = ((x + 11) % 22 + 22) % 22 - 11;
-    const wz = ((z + 10) % 32 + 32) % 32 - 10;
+    const wz = ((z + 10) % 56 + 56) % 56 - 10;
 
     const g = waveGradient(wx, wz, t, _grad);
     leaf.mesh.position.set(wx, waveHeight(wx, wz, t) + 0.02, wz);

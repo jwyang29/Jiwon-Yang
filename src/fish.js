@@ -346,11 +346,11 @@ class Goldfish {
  */
 export function buildFishField(scene, renderer) {
   const specs = [
-    { cx: -3.4, cz: -2.4, rx: 3.1, rx2: 1.1, rz: 2.5, rz2: 0.9, cy: FISH_Y,        speed: 0.150, scale: 0.82, palette: 0 },
-    { cx:  3.6, cz:  0.6, rx: 2.7, rx2: 0.9, rz: 2.9, rz2: 1.1, cy: FISH_Y - 0.06, speed: 0.126, scale: 0.70, palette: 1 },
-    { cx: -2.6, cz:  5.6, rx: 3.3, rx2: 1.2, rz: 2.3, rz2: 0.8, cy: FISH_Y + 0.03, speed: 0.168, scale: 0.76, palette: 2 },
-    { cx:  3.0, cz:  9.4, rx: 2.9, rx2: 1.0, rz: 2.6, rz2: 1.0, cy: FISH_Y - 0.04, speed: 0.140, scale: 0.88, palette: 0 },
-    { cx: -2.2, cz: 13.6, rx: 3.2, rx2: 1.1, rz: 2.5, rz2: 0.9, cy: FISH_Y + 0.02, speed: 0.158, scale: 0.72, palette: 1 },
+    { cx: -3.4, cz: -1.0, rx: 3.1, rx2: 1.1, rz: 4.6, rz2: 1.6, cy: FISH_Y,        speed: 0.150, scale: 0.82, palette: 0 },
+    { cx:  3.6, cz:  9.4, rx: 2.7, rx2: 0.9, rz: 5.2, rz2: 1.8, cy: FISH_Y - 0.06, speed: 0.126, scale: 0.70, palette: 1 },
+    { cx: -2.6, cz: 19.6, rx: 3.3, rx2: 1.2, rz: 4.4, rz2: 1.5, cy: FISH_Y + 0.03, speed: 0.168, scale: 0.76, palette: 2 },
+    { cx:  3.0, cz: 29.4, rx: 2.9, rx2: 1.0, rz: 4.9, rz2: 1.7, cy: FISH_Y - 0.04, speed: 0.140, scale: 0.88, palette: 0 },
+    { cx: -2.2, cz: 38.6, rx: 3.2, rx2: 1.1, rz: 4.6, rz2: 1.6, cy: FISH_Y + 0.02, speed: 0.158, scale: 0.72, palette: 1 },
   ];
 
   const fishScene = new THREE.Scene();
