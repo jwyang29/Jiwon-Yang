@@ -84,14 +84,18 @@ void main() {
   // 1.4 world units ≈ 0.065 in old UV space — clear pool-water distortion.
   vec2 refractW = vWorldXZ + waveGrad(vWorldXZ, t, boost) * 1.4;
 
-  // ── Pool tile — pink tiles seen THROUGH teal pool water ──────────────────
-  vec3 tileBase  = vec3(0.62, 0.80, 0.80);
-  vec3 tileGrout = vec3(0.44, 0.62, 0.65);
+  // ── Pool tile — deep teal tiles seen THROUGH dusk-lit autumn water ────────
+  vec3 tileBase  = vec3(0.17, 0.44, 0.46);
+  vec3 tileGrout = vec3(0.09, 0.27, 0.32);
   vec3 floorCol  = mix(tileBase, tileGrout, tileGrid(refractW, 0.048));
 
-  // ── Caustic light blobs — white-pink shimmer ──────────────────────────────
+  // Slow amber wash — low autumn sun warming patches of the floor
+  float warm = 0.5 + 0.5 * snoise(vWorldXZ * 0.11 + vec2(t * 0.035, t * 0.02));
+  floorCol = mix(floorCol, vec3(0.42, 0.31, 0.18), warm * 0.22);
+
+  // ── Caustic light blobs — warm amber shimmer ──────────────────────────────
   float cv = poolCaustic(vWorldXZ, t);
-  vec3 causticCol = vec3(1.00, 0.92, 0.94) * clamp(cv, 0.0, 1.0) * 0.60;
+  vec3 causticCol = vec3(1.00, 0.78, 0.46) * clamp(cv, 0.0, 1.0) * 0.55;
 
   // ── Wave-depth darkening ───────────────────────────────────────────────────
   float wh          = waveHeight(vWorldXZ, t, boost);
@@ -128,9 +132,9 @@ void main() {
   floorCol   *= poolShadow;
   causticCol *= (poolShadow * 0.55 + 0.45);
 
-  // ── Edge vignette ─────────────────────────────────────────────────────────
-  float edge  = 1.0 - length(vUv - 0.5) * 0.50;
-  floorCol   *= 0.82 + edge * 0.25;
+  // ── Edge vignette — deeper, for the dusk mood ─────────────────────────────
+  float edge  = 1.0 - length(vUv - 0.5) * 0.72;
+  floorCol   *= 0.66 + edge * 0.34;
 
   gl_FragColor = vec4(clamp(floorCol + causticCol, 0.0, 1.0), 1.0);
 }

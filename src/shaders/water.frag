@@ -84,13 +84,14 @@ void main() {
   vec3  H    = normalize(uSunDir + V);
   float spec = pow(max(dot(N, H), 0.0), 340.0) * 1.3;
 
-  // Bright teal shimmer — floor already pre-tinted, so water is lighter
-  vec3 tint = vec3(0.50, 0.88, 0.84) * (1.0 + uAudioLevel * 0.25);
+  // Deep autumn teal — dusk water, warmed where the low sun catches a slope
+  vec3 tint = vec3(0.20, 0.52, 0.53) * (1.0 + uAudioLevel * 0.25);
+  tint = mix(tint, vec3(0.55, 0.34, 0.16), F * 0.35);   // amber glance off crests
 
-  vec3  color = mix(tint, uSunColor * 0.92, F * 0.16) + uSunColor * spec;
-  // Lower base alpha — floor handles the underwater tint, water adds sparkle
-  float alpha = 0.10 + F * 0.16 + min(spec * 0.28, 0.18);
-  alpha = clamp(alpha, 0.06, 0.62);
+  vec3  color = mix(tint, uSunColor * 0.80, F * 0.20) + uSunColor * spec * 0.9;
+  // Slightly denser than the summer water so the pool reads as deeper
+  float alpha = 0.16 + F * 0.20 + min(spec * 0.28, 0.18);
+  alpha = clamp(alpha, 0.10, 0.68);
 
   gl_FragColor = vec4(clamp(color, 0.0, 1.0), alpha);
 }

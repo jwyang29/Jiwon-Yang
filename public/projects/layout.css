@@ -1,18 +1,19 @@
 /* ────────────────────────────────────────────────────────────────
-   Project detail pages — b&w brutalist editorial
-   Base: black & white. Accents only: main-page pool colors
-   (teal water #7fc8c8 / salmon pink #faac9b)
+   Project detail pages — brutalist editorial, autumn palette
+   Base: warm cream paper + near-black ink. Accents echo the pool:
+   deep teal water and the amber / burnt-orange of fallen leaves.
 ──────────────────────────────────────────────────────────────── */
 
 :root {
-  --ink:    #111111;
-  --paper:  #f4f3f0;
-  --teal:   #7fc8c8;
-  --teal-d: #2ab5ab;
-  --salmon: #ffa8b8;   /* soft pink (decorative use only) */
+  --ink:    #171310;   /* warm near-black */
+  --paper:  #f4ede1;   /* autumn cream */
+  --teal:   #4f8f93;   /* light decorative teal (rules, dividers) */
+  --teal-d: #2b6f76;   /* deeper decorative teal */
+  --salmon: #e8a24a;   /* amber fill — hovers, highlight marks */
+  --accent: #b8551a;   /* burnt orange — display titles */
   /* text-safe accents — WCAG-friendly contrast on --paper */
-  --teal-text: #0e7c74;
-  --pink-text: #c2456a;
+  --teal-text: #16565e;
+  --pink-text: #a8431a;
   /* Pretendard sits behind Latin fonts so Korean glyphs always render cleanly */
   --mono:   'Courier New', Courier, 'Pretendard Variable', Pretendard, 'Noto Sans KR', monospace;
   --sans:   'Helvetica Neue', Helvetica, 'Pretendard Variable', Pretendard, 'Noto Sans KR', Arial, sans-serif;
@@ -110,7 +111,7 @@ main {
   font-size: clamp(38px, 7.5vw, 84px);
   letter-spacing: -0.01em;
   text-transform: uppercase;
-  color: var(--salmon);   /* accent: matches floating name on main page */
+  color: var(--accent);   /* accent: matches the floating name on the pool page */
   line-height: 1.08;
   margin-bottom: 30px;
   word-break: keep-all;
@@ -409,7 +410,7 @@ a.works-row:hover { background: var(--salmon); }
 .works-row .cat   { font-size: 11.5px; letter-spacing: 0.1em; color: #777; }
 .works-row .yr    { font-size: 12px; letter-spacing: 0.08em; text-align: right; }
 .works-row.soon   { opacity: 0.45; }
-.works-row.soon .yr { color: var(--salmon); }
+.works-row.soon .yr { color: var(--accent); }
 @media (max-width: 640px) {
   .works-row { grid-template-columns: 34px 1fr 52px; }
   .works-row .cat { display: none; }
@@ -435,7 +436,7 @@ a.works-row:hover { background: var(--salmon); }
   font-family: var(--sans);
   font-size: 80px;
   font-weight: 300;
-  color: var(--salmon);
+  color: var(--accent);
   line-height: 1;
   margin: 10px 0;
   user-select: none;

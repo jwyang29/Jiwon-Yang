@@ -1,6 +1,8 @@
 import * as THREE from 'three';
 import { AudioAnalyser }                  from './audio.js';
 import { buildObjects, animateObjects, PROJECTS } from './objects.js';
+import { buildFish, animateFish }           from './fish.js';
+import { buildLeaves, animateLeaves }       from './leaves.js';
 import { BBoxOverlay, worldToScreenRect } from './bbox.js';
 
 import floorVert from './shaders/floor.vert?raw';
@@ -17,12 +19,12 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.shadowMap.enabled   = true;
 renderer.shadowMap.type      = THREE.PCFSoftShadowMap;
 renderer.toneMapping         = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.1;
+renderer.toneMappingExposure = 0.92;   // autumn dusk — a touch under-exposed
 
 // ─── Scene ────────────────────────────────────────────────────────────────────
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x8acece);
-scene.fog        = new THREE.Fog(0x8acece, 20, 36);
+scene.background = new THREE.Color(0x1d4f58);
+scene.fog        = new THREE.Fog(0x17414c, 18, 38);
 
 // ─── Camera ───────────────────────────────────────────────────────────────────
 const camera = new THREE.PerspectiveCamera(52, 1, 0.1, 40);
@@ -31,7 +33,7 @@ camera.up.set(0, 0, -1);
 camera.lookAt(0, 0, 0);
 
 // ─── Lighting ─────────────────────────────────────────────────────────────────
-const sun = new THREE.DirectionalLight(0xfff0f6, 3.2);
+const sun = new THREE.DirectionalLight(0xffcf94, 2.5);   // low, warm autumn sun
 sun.position.set(2, 14, 3);
 sun.castShadow = true;
 sun.shadow.mapSize.set(2048, 2048);
@@ -41,8 +43,8 @@ sun.shadow.camera.left   = sun.shadow.camera.bottom = -10;
 sun.shadow.camera.right  = sun.shadow.camera.top    =  10;
 sun.shadow.bias          = -0.001;
 scene.add(sun);
-scene.add(new THREE.AmbientLight(0x88d0d0, 1.0));
-const fill = new THREE.PointLight(0x70c8c8, 1.0, 20);
+scene.add(new THREE.AmbientLight(0x3d7a86, 0.95));       // cool teal bounce
+const fill = new THREE.PointLight(0xe08a3c, 0.85, 22);   // warm amber counter-light
 fill.position.set(-4, 6, -3);
 scene.add(fill);
 
@@ -80,8 +82,8 @@ const waterUniforms = {
   uTime:        { value: 0 },
   uAudioLevel:  { value: 0 },
   uSunDir:      { value: sunDir },
-  uSunColor:    { value: new THREE.Color(0xfff0f8) },
-  uWaterColor:  { value: new THREE.Color(0x40c0b8) },
+  uSunColor:    { value: new THREE.Color(0xffe0b0) },
+  uWaterColor:  { value: new THREE.Color(0x1f6b70) },
   uCameraPos:   { value: camera.position },
   uObjPos:      { value: objPositions },
   uObjStrength: { value: objStrengths },
@@ -106,6 +108,12 @@ const objects = buildObjects(scene, (i, rx, rz) => {
   objShadowRx[i] = rx;
   objShadowRz[i] = rz;
 });
+
+// ─── Autumn life: goldfish below the surface, maple leaves on top ─────────────
+// Both are decorative — deliberately excluded from the raycast set so they
+// never steal a click from a project object.
+const fish   = buildFish(scene);
+const leaves = buildLeaves(scene);
 
 // ─── Audio ────────────────────────────────────────────────────────────────────
 const audio  = new AudioAnalyser();
@@ -241,6 +249,8 @@ function frame() {
   waterUniforms.uCameraPos.value.copy(camera.position);
 
   animateObjects(objects, t);
+  animateFish(fish, t);
+  animateLeaves(leaves, t);
 
   // Sync object XZ positions and rotation angles into shader uniforms
   objects.forEach((obj, i) => {
@@ -280,4 +290,18 @@ function frame() {
 frame();
 
 // debug handle for automated checks
-window.__pool = { camera, get scrollMaxZ() { return scrollMaxZ; } };
+window.__pool = {
+  camera,
+  get scrollMaxZ() { return scrollMaxZ; },
+  fishAt: () => fish.map((f) => {
+    const p = f.group.position;
+    return [+p.x.toFixed(3), +p.y.toFixed(3), +p.z.toFixed(3), +f.group.rotation.y.toFixed(3)];
+  }),
+  leafAt: () => leaves.slice(0, 3).map((l) => {
+    const p = l.mesh.position;
+    return [+p.x.toFixed(3), +p.y.toFixed(3), +p.z.toFixed(3)];
+  }),
+  // Drive one animation step at an arbitrary time (used to verify motion in
+  // headless checks, where requestAnimationFrame is paused).
+  stepTo: (t) => { animateFish(fish, t); animateLeaves(leaves, t); },
+};
