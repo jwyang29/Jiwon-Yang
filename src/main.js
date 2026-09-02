@@ -33,7 +33,11 @@ camera.up.set(0, 0, -1);
 camera.lookAt(0, 0, 0);
 
 // ─── Lighting ─────────────────────────────────────────────────────────────────
-const sun = new THREE.DirectionalLight(0xffcf94, 2.5);   // low, warm autumn sun
+// NOTE: the water and floor are ShaderMaterials with baked-in colour, so none
+// of these lights touch them. Lighting here only shapes the floating project
+// objects and the leaves — which lets the pool stay dusky while the objects
+// themselves read bright and crisp.
+const sun = new THREE.DirectionalLight(0xfff1da, 4.2);   // warm autumn key light
 sun.position.set(2, 14, 3);
 sun.castShadow = true;
 sun.shadow.mapSize.set(2048, 2048);
@@ -43,8 +47,10 @@ sun.shadow.camera.left   = sun.shadow.camera.bottom = -10;
 sun.shadow.camera.right  = sun.shadow.camera.top    =  10;
 sun.shadow.bias          = -0.001;
 scene.add(sun);
-scene.add(new THREE.AmbientLight(0x3d7a86, 0.95));       // cool teal bounce
-const fill = new THREE.PointLight(0xe08a3c, 0.85, 22);   // warm amber counter-light
+scene.add(new THREE.AmbientLight(0xbcd4d8, 1.25));       // bright neutral fill
+// Sky-warm / water-cool wrap so object colours stay saturated, not muddy
+scene.add(new THREE.HemisphereLight(0xffe6c4, 0x2f6f78, 1.35));
+const fill = new THREE.PointLight(0xffb066, 1.15, 24);   // warm amber counter-light
 fill.position.set(-4, 6, -3);
 scene.add(fill);
 

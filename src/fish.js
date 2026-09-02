@@ -16,7 +16,8 @@ const BODY_VERT = /* glsl */ `
   uniform float uTime;
   uniform float uPhase;
   uniform float uSwim;
-  varying vec3  vNrm;
+  varying vec3  vWNrm;       // world normal — lighting
+  varying vec3  vVNrm;       // view normal  — silhouette softening
   varying float vU;          // 0 at tail, 1 at head
 
   void main() {
@@ -27,31 +28,40 @@ const BODY_VERT = /* glsl */ `
     float amp   = uSwim * pow(along, 1.7);
     p.z += sin(uTime * 5.0 - along * 3.4 + uPhase) * amp;
 
-    vNrm = normalize(normalMatrix * normal);
+    vWNrm = normalize(mat3(modelMatrix) * normal);
+    vVNrm = normalize(normalMatrix * normal);
     gl_Position = projectionMatrix * modelViewMatrix * vec4(p, 1.0);
   }
 `;
 
 const BODY_FRAG = /* glsl */ `
-  uniform vec3 uDeep;        // saturated back / head
-  uniform vec3 uMid;         // body orange
-  uniform vec3 uPale;        // belly + peduncle
-  varying vec3  vNrm;
+  uniform vec3  uDeep;       // saturated back / head
+  uniform vec3  uMid;        // body orange
+  uniform vec3  uPale;       // belly + peduncle
+  uniform vec3  uHaze;       // colour of the water the fish sits in
+  uniform float uHazeAmt;    // base scattering — how far under the surface
+  varying vec3  vWNrm;
+  varying vec3  vVNrm;
   varying float vU;
 
   void main() {
-    vec3  n  = normalize(vNrm);
-    float up = clamp(n.y * 0.5 + 0.5, 0.0, 1.0);   // 1 on the back (top-down view)
+    float up = clamp(vWNrm.y * 0.5 + 0.5, 0.0, 1.0);   // 1 on the back
 
     // Along the body: pale tail → orange middle → deep head
     vec3 base = mix(uPale, uMid,  smoothstep(0.10, 0.62, vU));
     base      = mix(base,  uDeep, smoothstep(0.55, 0.98, vU) * 0.85);
-    // Flanks stay paler than the back
-    base = mix(base * 1.06, base, up);
+    base = mix(base * 1.05, base, up);
 
-    float lam = 0.62 + 0.5 * up;                   // soft overhead key light
-    float rim = pow(1.0 - up, 2.2) * 0.18;         // gentle edge lift
-    gl_FragColor = vec4(base * lam + rim, 1.0);
+    // Flat, diffused key light — sunlight scattered by the water column
+    vec3 col = base * (0.78 + 0.30 * up);
+
+    // Dissolve the silhouette into the surrounding water. Grazing angles pick
+    // up the most scattering, so the outline melts instead of cutting sharply.
+    float facing = abs(normalize(vVNrm).z);
+    float edge   = 1.0 - smoothstep(0.0, 0.62, facing);
+    col = mix(col, uHaze, clamp(uHazeAmt + edge * 0.62, 0.0, 1.0));
+
+    gl_FragColor = vec4(col, 1.0);
   }
 `;
 
@@ -80,20 +90,24 @@ const FIN_VERT = /* glsl */ `
 const FIN_FRAG = /* glsl */ `
   uniform vec3  uInner;
   uniform vec3  uOuter;
+  uniform vec3  uHaze;
+  uniform float uHazeAmt;
   uniform float uOpacity;
   varying vec2  vST;
 
   void main() {
     float s = vST.x, v = vST.y;
 
-    // Radiating fin rays
+    // Radiating fin rays — kept low-contrast so they read as a soft veil
     float rays = 0.5 + 0.5 * sin(v * 46.0 + 1.7);
     vec3  col  = mix(uInner, uOuter, pow(s, 0.8));
-    col *= 0.86 + rays * 0.22;
+    col *= 0.90 + rays * 0.13;
+    // Fins are the thinnest tissue, so the water washes through them most
+    col = mix(col, uHaze, clamp(uHazeAmt + s * 0.30, 0.0, 1.0));
 
-    // Thin out toward the tip and along the outer edges
-    float edge = smoothstep(0.0, 0.10, min(v, 1.0 - v));
-    float a = uOpacity * (1.0 - 0.42 * s) * (0.32 + 0.68 * edge);
+    // Wide, gradual falloff at the tip and along the outer edges
+    float edge = smoothstep(0.0, 0.17, min(v, 1.0 - v));
+    float a = uOpacity * (1.0 - 0.50 * s) * (0.20 + 0.80 * edge);
     gl_FragColor = vec4(col, a);
   }
 `;
@@ -159,6 +173,9 @@ function makeFanGeometry({ rootX, len, spread, notch = 0, curl = 0, segS = 14, s
 }
 
 // ─── Palettes ─────────────────────────────────────────────────────────────────
+// The water the fish are seen through — everything blends toward this.
+const HAZE_COLOR = 0x2c5f68;
+
 const FISH_PALETTES = [
   { deep: 0xd2451c, mid: 0xef7a2b, pale: 0xfbe2ca, finI: 0xf08a48, finO: 0xfff3e6 },
   { deep: 0xe2622a, mid: 0xf79a4e, pale: 0xfdefe0, finI: 0xf6a066, finO: 0xfff8f0 },
@@ -187,6 +204,14 @@ class Goldfish {
     };
     this.uniforms = uniforms;
 
+    // Colour of the water column the fish swims in — everything is blended
+    // toward it so the fish sits *under* the surface instead of on top of it.
+    const haze = new THREE.Color(HAZE_COLOR);
+    // Deeper fish are washed out more. Kept modest on purpose — the silhouette
+    // dissolve in the shader does the softening, while this only takes the
+    // edge off the saturation, so the fish stay orange instead of going muddy.
+    const depthHaze = THREE.MathUtils.clamp(0.15 + (-cfg.cy - 0.28) * 0.45, 0.13, 0.25);
+
     const group = new THREE.Group();
     group.rotation.order = 'YXZ';   // yaw then roll about the fish's own axis
 
@@ -198,9 +223,11 @@ class Goldfish {
         fragmentShader: BODY_FRAG,
         uniforms: {
           ...uniforms,
-          uDeep: { value: new THREE.Color(pal.deep) },
-          uMid:  { value: new THREE.Color(pal.mid)  },
-          uPale: { value: new THREE.Color(pal.pale) },
+          uDeep:    { value: new THREE.Color(pal.deep) },
+          uMid:     { value: new THREE.Color(pal.mid)  },
+          uPale:    { value: new THREE.Color(pal.pale) },
+          uHaze:    { value: haze },
+          uHazeAmt: { value: depthHaze },
         },
       }),
     );
@@ -214,6 +241,8 @@ class Goldfish {
         uWave:    { value: wave },
         uInner:   { value: new THREE.Color(pal.finI) },
         uOuter:   { value: new THREE.Color(pal.finO) },
+        uHaze:    { value: haze },
+        uHazeAmt: { value: depthHaze + 0.08 },
         uOpacity: { value: opacity },
       },
       transparent: true,
@@ -224,7 +253,7 @@ class Goldfish {
     // Flowing veil tail
     const tail = new THREE.Mesh(
       makeFanGeometry({ rootX: -0.50, len: 0.95, spread: 0.54, notch: 0.38, curl: 0.10, segS: 16, segV: 24 }),
-      finMat(0.92, 2.3),
+      finMat(0.62, 2.3),
     );
     group.add(tail);
 
@@ -232,7 +261,7 @@ class Goldfish {
     for (const side of [1, -1]) {
       const pec = new THREE.Mesh(
         makeFanGeometry({ rootX: 0.02, len: 0.46, spread: 0.20, notch: 0.12, curl: 0.05, segS: 10, segV: 12 }),
-        finMat(0.78, 1.5),
+        finMat(0.50, 1.5),
       );
       pec.position.set(0.06, -0.02, side * 0.15);
       pec.rotation.y = side * -0.55;      // sweep out and back
@@ -243,7 +272,7 @@ class Goldfish {
     // Dorsal fin — a thin sail along the back
     const dorsal = new THREE.Mesh(
       makeFanGeometry({ rootX: 0.10, len: 0.44, spread: 0.26, notch: 0.10, curl: 0, segS: 10, segV: 12 }),
-      finMat(0.7, 1.4),
+      finMat(0.46, 1.4),
     );
     dorsal.rotation.x = Math.PI / 2;      // stand it up vertically
     dorsal.position.y = 0.20;
