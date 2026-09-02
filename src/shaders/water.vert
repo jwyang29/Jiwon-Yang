@@ -18,7 +18,11 @@ void addWaveY(
 
 void main() {
   vUv = uv;
-  vec2 pos    = position.xz;
+  // The plane is rotated into the XZ plane on the mesh, so its local Z is 0 for
+  // every vertex: sampling the waves in local space would make them a function
+  // of X alone, and the surface would come out as ridges running down the pool.
+  vec4 wpos   = modelMatrix * vec4(position, 1.0);
+  vec2 pos    = wpos.xz;
   float t     = uTime;
   float boost = 1.0 + uAudioLevel * 3.5;
 
@@ -31,10 +35,7 @@ void main() {
   addWaveY(y, -2.10,  2.80, 0.018, 2.80, t, pos);
   addWaveY(y,  1.68, -3.20, 0.016, 2.30, t, pos);
   addWaveY(y, -3.45, -1.80, 0.014, 3.10, t, pos);
-  addWaveY(y,  5.20,  3.80, 0.009, 4.20, t, pos);
-  addWaveY(y, -4.60,  5.10, 0.007, 4.80, t, pos);
-  addWaveY(y,  6.30, -4.40, 0.006, 5.50, t, pos);
-  addWaveY(y, -5.80, -6.20, 0.005, 6.10, t, pos);
+  // Eight overlapping swells; more than this and the surface reads as busy noise.
   y *= boost;
 
   // Object-driven radial ripples (Y-only)
@@ -45,11 +46,10 @@ void main() {
     y += rip * uObjStrength[i] * env;
   }
 
-  vec3 p = position;
-  p.y += y;
-  vWorldPos = p;
+  wpos.y   += y;                 // displace in world Y, whatever the mesh rotation
+  vWorldPos = wpos.xyz;
 
   // Normal is NOT interpolated from vertices — computed per-pixel in water.frag
   // to eliminate triangle-edge interpolation artifacts (tearing).
-  gl_Position = projectionMatrix * modelViewMatrix * vec4(p, 1.0);
+  gl_Position = projectionMatrix * viewMatrix * wpos;
 }

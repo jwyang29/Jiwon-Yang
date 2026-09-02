@@ -4,13 +4,18 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 // ─── Projects (career-ranked order → pool position top to bottom) ─────────────
 // Each project loads `public/models/<id>.glb`; if the file is missing a
 // procedural fallback object is built instead.
+//
+// `lane` is the object's normalized position down the pool (0 = first, 1 = last).
+// The actual Z is assigned by layoutObjects() on resize: the opening frame is
+// meant to be open water, so how far down the first object can sit depends on
+// how much of the pool that frame happens to show.
 export const PROJECTS = [
   {
     id: 'playground',
     name: 'PLAYGROUND',
     conf: '94',
     sub: 'touch × sand  ·  physical computing',
-    rx: -2.7, rz: -2.6,
+    rx: -2.7, lane: 0.024,
     rippleStrength: 0.8,
     shadowRx: 0.90, shadowRz: 0.62,
   },
@@ -19,7 +24,7 @@ export const PROJECTS = [
     name: 'CHORUS',
     conf: '88',
     sub: 'light × sound  ·  interactive installation',
-    rx:  2.4, rz: -3.0,
+    rx:  2.4, lane: 0.000,
     rippleStrength: 0.5,
     shadowRx: 0.65, shadowRz: 0.11,
   },
@@ -28,7 +33,7 @@ export const PROJECTS = [
     name: 'SEND LOVE',
     conf: '96',
     sub: 'voice waveform  ·  acrylic sculpture',
-    rx: -0.9, rz:  4.0,
+    rx: -0.9, lane: 0.427,
     rippleStrength: 0.4,
     shadowRx: 0.58, shadowRz: 0.22,
   },
@@ -37,7 +42,7 @@ export const PROJECTS = [
     name: 'COCOON',
     conf: '92',
     sub: 'breathing motion  ·  interactive lighting',
-    rx:  2.7, rz:  2.6,
+    rx:  2.7, lane: 0.341,
     rippleStrength: 0.6,
     shadowRx: 0.55, shadowRz: 0.55,
   },
@@ -46,7 +51,7 @@ export const PROJECTS = [
     name: 'FOLDIT',
     conf: '89',
     sub: 'origami × AI detection  ·  mobile game',
-    rx: -2.9, rz:  6.4,
+    rx: -2.9, lane: 0.573,
     rippleStrength: 0.5,
     shadowRx: 0.55, shadowRz: 0.55,
   },
@@ -55,7 +60,7 @@ export const PROJECTS = [
     name: 'TIDEPOOL',
     conf: '90',
     sub: 'clicker diorama  ·  AR fish keeping',
-    rx:  2.2, rz:  7.6,
+    rx:  2.2, lane: 0.646,
     rippleStrength: 0.7,
     shadowRx: 0.60, shadowRz: 0.60,
   },
@@ -64,7 +69,7 @@ export const PROJECTS = [
     name: 'SILHOUETTE SERIES',
     conf: '87',
     sub: 'AUD + VIB  ·  fidget puzzle toys',
-    rx: -0.5, rz:  9.8,
+    rx: -0.5, lane: 0.780,
     rippleStrength: 0.45,
     shadowRx: 0.75, shadowRz: 0.40,
   },
@@ -73,7 +78,7 @@ export const PROJECTS = [
     name: 'BUBBLELINK',
     conf: '85',
     sub: 'NFC message bubble  ·  keyring',
-    rx:  2.5, rz: 11.6,
+    rx:  2.5, lane: 0.890,
     rippleStrength: 0.4,
     shadowRx: 0.50, shadowRz: 0.45,
   },
@@ -82,7 +87,7 @@ export const PROJECTS = [
     name: 'WORK IN PROGRESS',
     conf: '···',
     sub: 'currently swimming  ·  ongoing experiments',
-    rx: -2.0, rz: 13.4,
+    rx: -2.0, lane: 1.000,
     rippleStrength: 1.0,
     shadowRx: 0.60, shadowRz: 0.60,
     spin: 0.02,            // the whirlpool spins visibly faster
@@ -312,7 +317,7 @@ export function buildObjects(scene, onFootprint) {
       },
     );
 
-    group.position.set(p.rx, 0.18, p.rz);
+    group.position.set(p.rx, 0.18, p.rz ?? 0);
     group.userData = {
       project: p,
       bobPhase:    Math.random() * Math.PI * 2,
@@ -326,6 +331,19 @@ export function buildObjects(scene, onFootprint) {
   });
 
   return meshes;
+}
+
+/**
+ * Spread the objects down the pool between z0 and z1, keeping their lane order.
+ * Called on every resize — z0 tracks the bottom edge of the opening frame.
+ */
+export function layoutObjects(meshes, z0, z1) {
+  const span = z1 - z0;
+  meshes.forEach((m) => {
+    const p = m.userData.project;
+    p.rz = z0 + p.lane * span;
+    m.position.z = p.rz;
+  });
 }
 
 export function animateObjects(meshes, time) {

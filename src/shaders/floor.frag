@@ -84,14 +84,14 @@ void main() {
   // 1.4 world units ≈ 0.065 in old UV space — clear pool-water distortion.
   vec2 refractW = vWorldXZ + waveGrad(vWorldXZ, t, boost) * 1.4;
 
-  // ── Pool tile — deep teal tiles seen THROUGH dusk-lit autumn water ────────
-  vec3 tileBase  = vec3(0.17, 0.44, 0.46);
-  vec3 tileGrout = vec3(0.09, 0.27, 0.32);
+  // ── Pool tile — deep navy, the way a dusk pond floor reads ────────────────
+  vec3 tileBase  = vec3(0.10, 0.26, 0.35);
+  vec3 tileGrout = vec3(0.05, 0.15, 0.23);
   vec3 floorCol  = mix(tileBase, tileGrout, tileGrid(refractW, 0.048));
 
-  // Slow amber wash — low autumn sun warming patches of the floor
-  float warm = 0.5 + 0.5 * snoise(vWorldXZ * 0.11 + vec2(t * 0.035, t * 0.02));
-  floorCol = mix(floorCol, vec3(0.42, 0.31, 0.18), warm * 0.22);
+  // Slow wash of green-teal where light still reaches the bottom
+  float lit = 0.5 + 0.5 * snoise(vWorldXZ * 0.11 + vec2(t * 0.035, t * 0.02));
+  floorCol = mix(floorCol, vec3(0.16, 0.40, 0.37), lit * 0.30);
 
   // ── Caustic light blobs — warm amber shimmer ──────────────────────────────
   float cv = poolCaustic(vWorldXZ, t);

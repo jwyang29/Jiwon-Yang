@@ -1,32 +1,39 @@
 import * as THREE from 'three';
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   Goldfish — procedural veiltail goldfish that swim beneath the water surface.
+   Goldfish — slender comet goldfish drifting under the surface.
 
-   Local space convention: +X = forward (head), +Y = up, ±Z = lateral.
-   Body and fins share one travelling sine wave so the undulation stays
-   continuous from the head through to the tip of the tail.
+   They are rendered into their own low-resolution target and Gaussian-blurred
+   before being composited back at swimming depth, so they read as soft shapes
+   glimpsed through moving water rather than crisp sprites laid over it.
+
+   Local space: +X = forward (head), +Y = up, ±Z = lateral.
    ──────────────────────────────────────────────────────────────────────────── */
 
-const BODY_LEN = 1.15;   // body stretched along X → x ∈ [-0.575, 0.575]
+const BODY_LEN  = 1.15;
 const BODY_HALF = BODY_LEN / 2;
+const FISH_Y    = -0.34;       // depth the composite plane sits at
+const RT_SCALE  = 0.34;        // render fish small → cheap, and blurry by itself
+const BLUR_PASSES = 2;
 
-// ─── Shaders ──────────────────────────────────────────────────────────────────
+// The water the fish are seen through.
+const HAZE_COLOR = 0x1d4560;
+
+// ─── Fish shaders ─────────────────────────────────────────────────────────────
 const BODY_VERT = /* glsl */ `
   uniform float uTime;
   uniform float uPhase;
   uniform float uSwim;
-  varying vec3  vWNrm;       // world normal — lighting
-  varying vec3  vVNrm;       // view normal  — silhouette softening
-  varying float vU;          // 0 at tail, 1 at head
+  varying vec3  vWNrm;
+  varying vec3  vVNrm;
+  varying float vU;
 
   void main() {
     vec3 p = position;
     float u = (p.x + ${BODY_HALF.toFixed(3)}) / ${BODY_LEN.toFixed(3)};
     vU = u;
-    float along = 1.0 - u;                        // 0 head → 1 tail
-    float amp   = uSwim * pow(along, 1.7);
-    p.z += sin(uTime * 5.0 - along * 3.4 + uPhase) * amp;
+    float along = 1.0 - u;
+    p.z += sin(uTime * 5.0 - along * 3.4 + uPhase) * uSwim * pow(along, 1.7);
 
     vWNrm = normalize(mat3(modelMatrix) * normal);
     vVNrm = normalize(normalMatrix * normal);
@@ -35,33 +42,33 @@ const BODY_VERT = /* glsl */ `
 `;
 
 const BODY_FRAG = /* glsl */ `
-  uniform vec3  uDeep;       // saturated back / head
-  uniform vec3  uMid;        // body orange
-  uniform vec3  uPale;       // belly + peduncle
-  uniform vec3  uHaze;       // colour of the water the fish sits in
-  uniform float uHazeAmt;    // base scattering — how far under the surface
+  uniform vec3  uDeep;
+  uniform vec3  uMid;
+  uniform vec3  uPale;
+  uniform vec3  uHaze;
+  uniform float uHazeAmt;
   varying vec3  vWNrm;
   varying vec3  vVNrm;
   varying float vU;
 
   void main() {
-    float up = clamp(vWNrm.y * 0.5 + 0.5, 0.0, 1.0);   // 1 on the back
+    float up = clamp(vWNrm.y * 0.5 + 0.5, 0.0, 1.0);
 
-    // Along the body: pale tail → orange middle → deep head
-    vec3 base = mix(uPale, uMid,  smoothstep(0.10, 0.62, vU));
-    base      = mix(base,  uDeep, smoothstep(0.55, 0.98, vU) * 0.85);
-    base = mix(base * 1.05, base, up);
+    // Pale peduncle → vivid flank → deep red-orange head
+    vec3 base = mix(uPale, uMid,  smoothstep(0.06, 0.55, vU));
+    base      = mix(base,  uDeep, smoothstep(0.48, 0.95, vU) * 0.80);
+    base = mix(base * 1.04, base, up);
 
-    // Flat, diffused key light — sunlight scattered by the water column
-    vec3 col = base * (0.78 + 0.30 * up);
+    // Flat, diffused underwater light
+    vec3 col = base * (0.80 + 0.28 * up);
 
-    // Dissolve the silhouette into the surrounding water. Grazing angles pick
-    // up the most scattering, so the outline melts instead of cutting sharply.
+    // Let the silhouette fall away into the water at grazing angles
     float facing = abs(normalize(vVNrm).z);
-    float edge   = 1.0 - smoothstep(0.0, 0.62, facing);
-    col = mix(col, uHaze, clamp(uHazeAmt + edge * 0.62, 0.0, 1.0));
+    float edge   = 1.0 - smoothstep(0.0, 0.55, facing);
+    col = mix(col, uHaze, clamp(uHazeAmt + edge * 0.45, 0.0, 1.0));
 
-    gl_FragColor = vec4(col, 1.0);
+    float a = 1.0 - edge * 0.35;              // outline feathers out
+    gl_FragColor = vec4(col * a, a);          // premultiplied
   }
 `;
 
@@ -69,19 +76,18 @@ const FIN_VERT = /* glsl */ `
   uniform float uTime;
   uniform float uPhase;
   uniform float uSwim;
-  uniform float uWave;       // how strongly this fin trails the body
-  varying vec2  vST;         // x = root→tip (0..1), y = across (0..1)
+  uniform float uWave;
+  varying vec2  vST;
 
   void main() {
     vec3 p = position;
     float s = uv.x;
     vST = uv;
 
-    // Root offset matches the body's tail displacement → seamless attachment
     float root = sin(uTime * 5.0 - 3.4 + uPhase) * uSwim;
     float w    = pow(s, 1.35);
     p.z += root + sin(uTime * 5.0 - 3.4 - s * 2.2 + uPhase) * uSwim * uWave * w;
-    p.y += cos(uTime * 4.2 - s * 2.0 + uPhase) * 0.045 * w;   // veil flutter
+    p.y += cos(uTime * 4.2 - s * 2.0 + uPhase) * 0.045 * w;
 
     gl_Position = projectionMatrix * modelViewMatrix * vec4(p, 1.0);
   }
@@ -98,17 +104,44 @@ const FIN_FRAG = /* glsl */ `
   void main() {
     float s = vST.x, v = vST.y;
 
-    // Radiating fin rays — kept low-contrast so they read as a soft veil
     float rays = 0.5 + 0.5 * sin(v * 46.0 + 1.7);
-    vec3  col  = mix(uInner, uOuter, pow(s, 0.8));
-    col *= 0.90 + rays * 0.13;
-    // Fins are the thinnest tissue, so the water washes through them most
-    col = mix(col, uHaze, clamp(uHazeAmt + s * 0.30, 0.0, 1.0));
+    vec3  col  = mix(uInner, uOuter, pow(s, 0.7));   // orange root → white tip
+    col *= 0.90 + rays * 0.16;
+    col = mix(col, uHaze, uHazeAmt * 0.8);
 
-    // Wide, gradual falloff at the tip and along the outer edges
-    float edge = smoothstep(0.0, 0.17, min(v, 1.0 - v));
-    float a = uOpacity * (1.0 - 0.50 * s) * (0.20 + 0.80 * edge);
-    gl_FragColor = vec4(col, a);
+    float edge = smoothstep(0.0, 0.12, min(v, 1.0 - v));
+    float a = uOpacity * (1.0 - 0.30 * s) * (0.30 + 0.70 * edge);
+    gl_FragColor = vec4(col * a, a);                 // premultiplied
+  }
+`;
+
+// ─── Blur + composite shaders ─────────────────────────────────────────────────
+const QUAD_VERT = /* glsl */ `
+  varying vec2 vUv;
+  void main() { vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }
+`;
+
+const BLUR_FRAG = /* glsl */ `
+  uniform sampler2D uTex;
+  uniform vec2 uDir;                 // one texel step along the blur axis
+  varying vec2 vUv;
+  void main() {
+    // 9-tap Gaussian, linear-sampled
+    vec4 c  = texture2D(uTex, vUv) * 0.227027;
+    c += (texture2D(uTex, vUv + uDir * 1.3846) + texture2D(uTex, vUv - uDir * 1.3846)) * 0.316216;
+    c += (texture2D(uTex, vUv + uDir * 3.2308) + texture2D(uTex, vUv - uDir * 3.2308)) * 0.070270;
+    gl_FragColor = c;
+  }
+`;
+
+const COMPOSITE_FRAG = /* glsl */ `
+  uniform sampler2D uTex;
+  uniform vec2  uRes;
+  uniform float uStrength;
+  void main() {
+    vec4 c = texture2D(uTex, gl_FragCoord.xy / uRes);   // premultiplied
+    if (c.a < 0.003) discard;
+    gl_FragColor = c * uStrength;
   }
 `;
 
@@ -117,41 +150,42 @@ function makeBodyGeometry() {
   const g = new THREE.SphereGeometry(0.5, 30, 20);
   const pos = g.attributes.position;
   for (let i = 0; i < pos.count; i++) {
-    let x = pos.getX(i) * BODY_LEN;   // stretch fore–aft
-    let y = pos.getY(i) * 0.78;       // deep-bodied like a fancy goldfish
-    let z = pos.getZ(i) * 0.60;
+    let x = pos.getX(i) * BODY_LEN;
+    let y = pos.getY(i) * 0.50;      // slender comet build, not a fat fancy type
+    let z = pos.getZ(i) * 0.40;
 
-    // Taper the rear third into a slim peduncle
-    const u = (x + BODY_HALF) / BODY_LEN;
-    if (u < 0.42) {
-      const taper = 0.24 + 0.76 * Math.pow(u / 0.42, 0.85);
-      y *= taper;
-      z *= taper;
+    const u = (x + BODY_HALF) / BODY_LEN;   // 0 tail → 1 head
+
+    // Long, gradual taper into the tail wrist
+    if (u < 0.50) {
+      const taper = 0.16 + 0.84 * Math.pow(u / 0.50, 0.90);
+      y *= taper; z *= taper;
     }
-    if (y < 0) y *= 1.14;             // fuller belly
+    // Slightly pointed snout
+    if (u > 0.80) {
+      const t = (u - 0.80) / 0.20;
+      const nose = 1.0 - 0.38 * t * t;
+      y *= nose; z *= nose;
+    }
+    if (y < 0) y *= 1.10;            // a little belly
+
     pos.setXYZ(i, x, y, z);
   }
   g.computeVertexNormals();
   return g;
 }
 
-/**
- * A fan-shaped fin. `notch` forks the trailing edge (0 = round, 0.4 = deep fork).
- * UV.x runs root→tip so the shaders can taper motion and opacity along it.
- */
+/** Fan-shaped fin; `notch` forks the trailing edge. UV.x runs root→tip. */
 function makeFanGeometry({ rootX, len, spread, notch = 0, curl = 0, segS = 14, segV = 20 }) {
   const position = [], uv = [], index = [];
-
   for (let i = 0; i <= segS; i++) {
     const s = i / segS;
     for (let j = 0; j <= segV; j++) {
       const vn = j / segV;
       const v  = vn * 2 - 1;
       const av = Math.abs(v);
-
       const lenAt = len * (1 - notch + notch * Math.pow(av, 0.55));
-      const half  = 0.05 + Math.pow(s, 0.72) * spread;
-
+      const half  = 0.04 + Math.pow(s, 0.72) * spread;
       position.push(rootX - s * lenAt, curl * av * av * s, v * half);
       uv.push(s, vn);
     }
@@ -163,7 +197,6 @@ function makeFanGeometry({ rootX, len, spread, notch = 0, curl = 0, segS = 14, s
       index.push(a, b, a + 1, b, b + 1, a + 1);
     }
   }
-
   const g = new THREE.BufferGeometry();
   g.setAttribute('position', new THREE.Float32BufferAttribute(position, 3));
   g.setAttribute('uv',       new THREE.Float32BufferAttribute(uv, 2));
@@ -172,31 +205,28 @@ function makeFanGeometry({ rootX, len, spread, notch = 0, curl = 0, segS = 14, s
   return g;
 }
 
-// ─── Palettes ─────────────────────────────────────────────────────────────────
-// The water the fish are seen through — everything blends toward this.
-const HAZE_COLOR = 0x2c5f68;
-
+// ─── Palettes — vivid red-orange with white fin tips, as in the reference ─────
 const FISH_PALETTES = [
-  { deep: 0xd2451c, mid: 0xef7a2b, pale: 0xfbe2ca, finI: 0xf08a48, finO: 0xfff3e6 },
-  { deep: 0xe2622a, mid: 0xf79a4e, pale: 0xfdefe0, finI: 0xf6a066, finO: 0xfff8f0 },
-  { deep: 0xbf3a17, mid: 0xe06a24, pale: 0xf7d9bd, finI: 0xe87c3c, finO: 0xffeeda },
-  { deep: 0xf0e6d8, mid: 0xf7d9b8, pale: 0xfffaf3, finI: 0xf3c9a2, finO: 0xfffaf4 }, // pale calico
+  { deep: 0xd23a10, mid: 0xef5c1e, pale: 0xf6a874, finI: 0xf07a3c, finO: 0xfff2e4 },
+  { deep: 0xe2551a, mid: 0xf87a2c, pale: 0xfac89a, finI: 0xf59456, finO: 0xfff8ee },
+  { deep: 0xbf300c, mid: 0xdf4a16, pale: 0xef9a60, finI: 0xe86c2c, finO: 0xffeeda },
 ];
 
-// ─── Fish ─────────────────────────────────────────────────────────────────────
 const TWO_PI = Math.PI * 2;
-
-function wrapAngle(a) {
+const wrapAngle = (a) => {
   while (a >  Math.PI) a -= TWO_PI;
   while (a < -Math.PI) a += TWO_PI;
   return a;
-}
+};
 
 class Goldfish {
   constructor(cfg) {
     Object.assign(this, cfg);
 
-    const pal = FISH_PALETTES[cfg.palette % FISH_PALETTES.length];
+    const pal  = FISH_PALETTES[cfg.palette % FISH_PALETTES.length];
+    const haze = new THREE.Color(HAZE_COLOR);
+    const hazeAmt = 0.16;
+
     const uniforms = {
       uTime:  { value: 0 },
       uPhase: { value: cfg.phase },
@@ -204,18 +234,9 @@ class Goldfish {
     };
     this.uniforms = uniforms;
 
-    // Colour of the water column the fish swims in — everything is blended
-    // toward it so the fish sits *under* the surface instead of on top of it.
-    const haze = new THREE.Color(HAZE_COLOR);
-    // Deeper fish are washed out more. Kept modest on purpose — the silhouette
-    // dissolve in the shader does the softening, while this only takes the
-    // edge off the saturation, so the fish stay orange instead of going muddy.
-    const depthHaze = THREE.MathUtils.clamp(0.15 + (-cfg.cy - 0.28) * 0.45, 0.13, 0.25);
-
     const group = new THREE.Group();
-    group.rotation.order = 'YXZ';   // yaw then roll about the fish's own axis
+    group.rotation.order = 'YXZ';
 
-    // Body
     const body = new THREE.Mesh(
       makeBodyGeometry(),
       new THREE.ShaderMaterial({
@@ -227,8 +248,11 @@ class Goldfish {
           uMid:     { value: new THREE.Color(pal.mid)  },
           uPale:    { value: new THREE.Color(pal.pale) },
           uHaze:    { value: haze },
-          uHazeAmt: { value: depthHaze },
+          uHazeAmt: { value: hazeAmt },
         },
+        transparent: true,
+        premultipliedAlpha: true,
+        depthWrite: false,
       }),
     );
     group.add(body);
@@ -242,40 +266,41 @@ class Goldfish {
         uInner:   { value: new THREE.Color(pal.finI) },
         uOuter:   { value: new THREE.Color(pal.finO) },
         uHaze:    { value: haze },
-        uHazeAmt: { value: depthHaze + 0.08 },
+        uHazeAmt: { value: hazeAmt },
         uOpacity: { value: opacity },
       },
       transparent: true,
+      premultipliedAlpha: true,
       side: THREE.DoubleSide,
       depthWrite: false,
     });
 
-    // Flowing veil tail
+    // Deeply forked comet tail
     const tail = new THREE.Mesh(
-      makeFanGeometry({ rootX: -0.50, len: 0.95, spread: 0.54, notch: 0.38, curl: 0.10, segS: 16, segV: 24 }),
-      finMat(0.62, 2.3),
+      makeFanGeometry({ rootX: -0.50, len: 0.88, spread: 0.42, notch: 0.46, curl: 0.06, segS: 16, segV: 24 }),
+      finMat(0.95, 2.3),
     );
     group.add(tail);
 
-    // Pectoral fins — clearly visible from directly above
+    // Pectoral fins — the pale flecks either side of the body from above
     for (const side of [1, -1]) {
       const pec = new THREE.Mesh(
-        makeFanGeometry({ rootX: 0.02, len: 0.46, spread: 0.20, notch: 0.12, curl: 0.05, segS: 10, segV: 12 }),
-        finMat(0.50, 1.5),
+        makeFanGeometry({ rootX: 0.04, len: 0.34, spread: 0.14, notch: 0.14, curl: 0.04, segS: 10, segV: 12 }),
+        finMat(0.72, 1.5),
       );
-      pec.position.set(0.06, -0.02, side * 0.15);
-      pec.rotation.y = side * -0.55;      // sweep out and back
+      pec.position.set(0.06, -0.02, side * 0.11);
+      pec.rotation.y = side * -0.55;
       pec.rotation.x = side * 0.25;
       group.add(pec);
     }
 
-    // Dorsal fin — a thin sail along the back
+    // Dorsal sail
     const dorsal = new THREE.Mesh(
-      makeFanGeometry({ rootX: 0.10, len: 0.44, spread: 0.26, notch: 0.10, curl: 0, segS: 10, segV: 12 }),
-      finMat(0.46, 1.4),
+      makeFanGeometry({ rootX: 0.14, len: 0.40, spread: 0.20, notch: 0.10, curl: 0, segS: 10, segV: 12 }),
+      finMat(0.68, 1.4),
     );
-    dorsal.rotation.x = Math.PI / 2;      // stand it up vertically
-    dorsal.position.y = 0.20;
+    dorsal.rotation.x = Math.PI / 2;
+    dorsal.position.y = 0.13;
     group.add(dorsal);
 
     group.scale.setScalar(cfg.scale);
@@ -284,12 +309,11 @@ class Goldfish {
     this.roll = 0;
   }
 
-  /** Smooth wandering path — layered sines never repeat on a short cycle. */
   pathAt(t) {
     const s = t * this.speed + this.phase;
     return {
-      x: this.cx + this.rx * Math.sin(s)            + this.rx2 * Math.sin(s * 1.73 + 1.1),
-      z: this.cz + this.rz * Math.cos(s * 0.86)     + this.rz2 * Math.sin(s * 2.31 + 0.4),
+      x: this.cx + this.rx * Math.sin(s)        + this.rx2 * Math.sin(s * 1.73 + 1.1),
+      z: this.cz + this.rz * Math.cos(s * 0.86) + this.rz2 * Math.sin(s * 2.31 + 0.4),
       y: this.cy + Math.sin(s * 1.3 + this.phase) * 0.05,
     };
   }
@@ -301,11 +325,9 @@ class Goldfish {
     const pN = this.pathAt(t + 0.06);
     this.group.position.set(p.x, p.y, p.z);
 
-    // Local +X is forward: yaw so it points along the path tangent
     const yaw = Math.atan2(-(pN.z - p.z), pN.x - p.x);
     this.group.rotation.y = yaw;
 
-    // Bank into turns
     const dYaw = wrapAngle(yaw - this.prevYaw);
     this.prevYaw = yaw;
     const target = THREE.MathUtils.clamp(dYaw * 90, -0.42, 0.42);
@@ -316,31 +338,111 @@ class Goldfish {
 
 // ─── Public API ───────────────────────────────────────────────────────────────
 /**
- * Populate the pool with goldfish. They swim below the surface and are purely
- * decorative — deliberately kept out of the raycast set in main.js.
+ * Builds the blurred goldfish layer.
+ *
+ * The fish live in their own scene so they can be rendered small, blurred, and
+ * composited onto a plane sitting at swimming depth — which means the floating
+ * project objects still occlude them through ordinary depth testing.
  */
-export function buildFish(scene) {
+export function buildFishField(scene, renderer) {
   const specs = [
-    { cx: -3.6, cz: -3.0, rx: 3.0, rx2: 1.1, rz: 2.4, rz2: 0.9, cy: -0.34, speed: 0.155, scale: 0.80, palette: 0 },
-    { cx:  3.9, cz: -0.6, rx: 2.6, rx2: 0.9, rz: 2.9, rz2: 1.1, cy: -0.44, speed: 0.128, scale: 0.66, palette: 1 },
-    { cx: -2.4, cz:  4.6, rx: 3.4, rx2: 1.2, rz: 2.2, rz2: 0.8, cy: -0.30, speed: 0.171, scale: 0.72, palette: 2 },
-    { cx:  3.2, cz:  6.8, rx: 2.8, rx2: 1.0, rz: 2.6, rz2: 1.0, cy: -0.40, speed: 0.142, scale: 0.86, palette: 0 },
-    { cx: -3.9, cz:  9.8, rx: 3.1, rx2: 1.3, rz: 2.5, rz2: 0.9, cy: -0.36, speed: 0.163, scale: 0.62, palette: 3 },
-    { cx:  2.6, cz: 12.4, rx: 3.3, rx2: 1.0, rz: 2.7, rz2: 1.2, cy: -0.46, speed: 0.134, scale: 0.78, palette: 1 },
-    { cx: -1.8, cz: 15.2, rx: 2.9, rx2: 1.1, rz: 2.3, rz2: 0.8, cy: -0.32, speed: 0.150, scale: 0.70, palette: 2 },
+    { cx: -3.4, cz: -2.4, rx: 3.1, rx2: 1.1, rz: 2.5, rz2: 0.9, cy: FISH_Y,        speed: 0.150, scale: 0.82, palette: 0 },
+    { cx:  3.6, cz:  0.6, rx: 2.7, rx2: 0.9, rz: 2.9, rz2: 1.1, cy: FISH_Y - 0.06, speed: 0.126, scale: 0.70, palette: 1 },
+    { cx: -2.6, cz:  5.6, rx: 3.3, rx2: 1.2, rz: 2.3, rz2: 0.8, cy: FISH_Y + 0.03, speed: 0.168, scale: 0.76, palette: 2 },
+    { cx:  3.0, cz:  9.4, rx: 2.9, rx2: 1.0, rz: 2.6, rz2: 1.0, cy: FISH_Y - 0.04, speed: 0.140, scale: 0.88, palette: 0 },
+    { cx: -2.2, cz: 13.6, rx: 3.2, rx2: 1.1, rz: 2.5, rz2: 0.9, cy: FISH_Y + 0.02, speed: 0.158, scale: 0.72, palette: 1 },
   ];
 
-  return specs.map((s, i) => {
-    const fish = new Goldfish({
-      ...s,
-      phase: (i * 1.97) % TWO_PI,
-      swim:  0.040 + (i % 3) * 0.006,
-    });
-    scene.add(fish.group);
-    return fish;
+  const fishScene = new THREE.Scene();
+  const fish = specs.map((s, i) => {
+    const f = new Goldfish({ ...s, phase: (i * 1.97) % TWO_PI, swim: 0.040 + (i % 3) * 0.006 });
+    fishScene.add(f.group);
+    return f;
   });
-}
 
-export function animateFish(fish, t) {
-  for (const f of fish) f.update(t);
+  // ── Offscreen targets ──
+  const rtOpts = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, depthBuffer: false };
+  const rtA = new THREE.WebGLRenderTarget(2, 2, rtOpts);
+  const rtB = new THREE.WebGLRenderTarget(2, 2, rtOpts);
+
+  const blurMat = new THREE.ShaderMaterial({
+    vertexShader: QUAD_VERT,
+    fragmentShader: BLUR_FRAG,
+    uniforms: { uTex: { value: null }, uDir: { value: new THREE.Vector2() } },
+    depthTest: false, depthWrite: false,
+  });
+  const quadScene = new THREE.Scene();
+  quadScene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), blurMat));
+  const quadCam = new THREE.Camera();
+
+  // ── Composite plane, parked at swimming depth ──
+  const compositeMat = new THREE.ShaderMaterial({
+    fragmentShader: COMPOSITE_FRAG,
+    uniforms: {
+      uTex:      { value: rtA.texture },
+      uRes:      { value: new THREE.Vector2(1, 1) },
+      uStrength: { value: 0.92 },
+    },
+    transparent: true,
+    premultipliedAlpha: true,
+    depthWrite: false,
+  });
+  const plane = new THREE.Mesh(new THREE.PlaneGeometry(90, 90), compositeMat);
+  plane.rotation.x = -Math.PI / 2;
+  plane.position.y = FISH_Y;
+  plane.renderOrder = 0;          // under the water (1) and the leaves (2)
+  scene.add(plane);
+
+  const size = new THREE.Vector2();
+
+  return {
+    fish,
+
+    setSize() {
+      renderer.getDrawingBufferSize(size);
+      compositeMat.uniforms.uRes.value.copy(size);
+      const w = Math.max(2, Math.floor(size.x * RT_SCALE));
+      const h = Math.max(2, Math.floor(size.y * RT_SCALE));
+      rtA.setSize(w, h);
+      rtB.setSize(w, h);
+    },
+
+    update(t) {
+      for (const f of fish) f.update(t);
+    },
+
+    /** Renders the fish offscreen and blurs them. Call before the main render. */
+    renderPass(camera) {
+      // Follow the camera so the plane always spans the view
+      plane.position.x = camera.position.x;
+      plane.position.z = camera.position.z;
+
+      const prevTarget = renderer.getRenderTarget();
+      const prevAlpha  = renderer.getClearAlpha();
+      const prevColor  = new THREE.Color();
+      renderer.getClearColor(prevColor);
+
+      renderer.setClearColor(0x000000, 0);
+      renderer.setRenderTarget(rtA);
+      renderer.clear();
+      renderer.render(fishScene, camera);
+
+      for (let i = 0; i < BLUR_PASSES; i++) {
+        blurMat.uniforms.uTex.value = rtA.texture;
+        blurMat.uniforms.uDir.value.set(1 / rtA.width, 0);
+        renderer.setRenderTarget(rtB);
+        renderer.clear();
+        renderer.render(quadScene, quadCam);
+
+        blurMat.uniforms.uTex.value = rtB.texture;
+        blurMat.uniforms.uDir.value.set(0, 1 / rtA.height);
+        renderer.setRenderTarget(rtA);
+        renderer.clear();
+        renderer.render(quadScene, quadCam);
+      }
+
+      renderer.setRenderTarget(prevTarget);
+      renderer.setClearColor(prevColor, prevAlpha);
+    },
+  };
 }

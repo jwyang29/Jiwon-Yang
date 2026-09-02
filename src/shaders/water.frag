@@ -12,13 +12,20 @@ uniform float uObjStrength[9];
 varying vec3 vWorldPos;
 varying vec2 vUv;
 
-// Value noise for micro-ripple normal detail
+// Value noise for micro-ripple normal detail.
+// Trig-free hash: the usual fract(sin(dot(...))) one loses its low bits out at
+// the far end of a 48-unit pool and the noise collapses into parallel stripes,
+// which the specular then paints across the water as straight bright lines.
 vec2 _h2(vec2 p) {
-  p = vec2(dot(p,vec2(127.1,311.7)), dot(p,vec2(269.5,183.3)));
-  return -1.0 + 2.0 * fract(sin(p) * 43758.5453);
+  vec3 p3 = fract(vec3(p.xyx) * vec3(0.1031, 0.1030, 0.0973));
+  p3 += dot(p3, p3.yzx + 33.33);
+  return -1.0 + 2.0 * fract((p3.xx + p3.yz) * p3.zy);
 }
 float gnoise(vec2 p) {
-  vec2 i = floor(p), f = fract(p), u = f*f*(3.0-2.0*f);
+  // Quintic fade, not cubic: the glint mask below rides on a high-power
+  // specular, which turns cubic's second-derivative break at each lattice line
+  // into a visible straight crease drawn across the pool.
+  vec2 i = floor(p), f = fract(p), u = f*f*f*(f*(f*6.0-15.0)+10.0);
   return mix(mix(dot(_h2(i),f),          dot(_h2(i+vec2(1,0)),f-vec2(1,0)),u.x),
              mix(dot(_h2(i+vec2(0,1)),f-vec2(0,1)),dot(_h2(i+vec2(1,1)),f-vec2(1,1)),u.x),u.y);
 }
@@ -37,10 +44,6 @@ void waveGradient(vec2 pos, float t, float boost,
   c=cos(-2.10*pos.x+2.80*pos.y-2.80*t);  gx+=0.018*-2.10*c; gz+=0.018* 2.80*c;
   c=cos( 1.68*pos.x-3.20*pos.y-2.30*t);  gx+=0.016* 1.68*c; gz+=0.016*-3.20*c;
   c=cos(-3.45*pos.x-1.80*pos.y-3.10*t);  gx+=0.014*-3.45*c; gz+=0.014*-1.80*c;
-  c=cos( 5.20*pos.x+3.80*pos.y-4.20*t);  gx+=0.009* 5.20*c; gz+=0.009* 3.80*c;
-  c=cos(-4.60*pos.x+5.10*pos.y-4.80*t);  gx+=0.007*-4.60*c; gz+=0.007* 5.10*c;
-  c=cos( 6.30*pos.x-4.40*pos.y-5.50*t);  gx+=0.006* 6.30*c; gz+=0.006*-4.40*c;
-  c=cos(-5.80*pos.x-6.20*pos.y-6.10*t);  gx+=0.005*-5.80*c; gz+=0.005*-6.20*c;
   gx *= boost;
   gz *= boost;
 
@@ -69,9 +72,11 @@ void main() {
   waveGradient(pos, t, boost, gx, gz);
   vec3 N = normalize(vec3(-gx, 1.0, -gz));
 
-  // Fine micro-ripple texture on top of coarse wave normal
-  float n1 = gnoise(pos * 20.0 + t * 0.52) * 0.020;
-  float n2 = gnoise(pos * 36.0 - t * 0.68) * 0.011;
+  // Fine micro-ripple texture on top of coarse wave normal. Keep the frequency
+  // low enough that a ripple spans several pixels — finer than that it aliases
+  // against the pixel grid and the specular beats it into bands.
+  float n1 = gnoise(pos * 14.0 + t * 0.52) * 0.020;
+  float n2 = gnoise(pos * 22.0 - t * 0.68) * 0.011;
   N = normalize(N + vec3(n1, 0.0, n2));
 
   vec3 V = normalize(uCameraPos - vWorldPos);
@@ -82,13 +87,13 @@ void main() {
 
   // Narrow Blinn-Phong specular — pool sparkle, not broad streaks
   vec3  H    = normalize(uSunDir + V);
-  float spec = pow(max(dot(N, H), 0.0), 340.0) * 1.3;
+  float spec = pow(max(dot(N, H), 0.0), 340.0) * 0.90;
 
-  // Deep autumn teal — dusk water, warmed where the low sun catches a slope
-  vec3 tint = vec3(0.20, 0.52, 0.53) * (1.0 + uAudioLevel * 0.25);
-  tint = mix(tint, vec3(0.55, 0.34, 0.16), F * 0.35);   // amber glance off crests
+  // Deep navy dusk water, warmed where the low sun catches a slope
+  vec3 tint = vec3(0.10, 0.27, 0.39) * (1.0 + uAudioLevel * 0.25);
+  tint = mix(tint, vec3(0.48, 0.30, 0.15), F * 0.35);   // amber glance off crests
 
-  vec3  color = mix(tint, uSunColor * 0.80, F * 0.20) + uSunColor * spec * 0.9;
+  vec3  color = mix(tint, uSunColor * 0.80, F * 0.20) + uSunColor * spec * 0.90;
   // Slightly denser than the summer water so the pool reads as deeper
   float alpha = 0.16 + F * 0.20 + min(spec * 0.28, 0.18);
   alpha = clamp(alpha, 0.10, 0.68);
