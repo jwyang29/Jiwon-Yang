@@ -140,7 +140,7 @@ story.append(Paragraph('Playground: A Line Between Us — Individual &nbsp;<font
 story.append(B('Interactive installation that reads a visitor\'s touch gesture through a sparse sensor grid and '
                '"answers" by drawing back in sand — translating the feel of a gesture (pressure, pace) rather than '
                'copying it. · Tools: physical computing (sensor grid), actuated drawing machine. · '
-               '<b>SIGGRAPH Asia 2026 Art Gallery (under review)</b>'))
+               '<b>Selected for SIGGRAPH Asia 2026 Art Gallery.</b>'))
 story.append(Paragraph('Chorus — Team &nbsp;<font name="Pretendard" size="8.6" color="#555555">· 2025</font>', S['item']))
 story.append(B('Medieval-organ-inspired interactive artwork: light sensors detect a visitor\'s playing gestures to '
                'control four "door" structures — modulating emitted light and four-track audio levels so the visitor '
@@ -177,7 +177,7 @@ for cite, contrib in pubs:
 
 # ══ Exhibitions ═══════════════════════════════════════════════════════════════
 story += sec('EXHIBITIONS (JURIED)')
-story.append(B('<b>Playground: A Line Between Us.</b> Submitted to SIGGRAPH Asia 2026 Art Gallery (under review). '
+story.append(B('<b>Playground: A Line Between Us.</b> Selected for SIGGRAPH Asia 2026 Art Gallery. '
                'Individual work: concept, interaction design, and system implementation.'))
 
 # ══ Skills ════════════════════════════════════════════════════════════════════
