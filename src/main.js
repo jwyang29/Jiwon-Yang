@@ -128,13 +128,13 @@ micBtn.addEventListener('click', async () => {
   if (audio.active) {
     // toggle off
     audio.stop();
-    micBtn.textContent = '◎  MIC';
+    micBtn.textContent = 'MIC';
     micBtn.classList.remove('active');
     return;
   }
   await audio.start();
   if (audio.active) {
-    micBtn.textContent = '◉  LISTENING — TAP TO STOP';
+    micBtn.textContent = 'LISTENING — TAP TO STOP';
     micBtn.classList.add('active');
   }
 });

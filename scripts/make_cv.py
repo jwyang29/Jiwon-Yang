@@ -19,9 +19,19 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 import os
 
-# 한글: Noto Sans KR (scripts/fonts/NotoSansKR.ttf)
-_FONT = os.path.join(os.path.dirname(__file__), 'fonts', 'NotoSansKR.ttf')
-pdfmetrics.registerFont(TTFont('NotoSansKR', _FONT))
+_FONTS = os.path.join(os.path.dirname(__file__), 'fonts')
+
+# 한글 낱글자용 (이름, 인용구): Noto Sans KR
+pdfmetrics.registerFont(TTFont('NotoSansKR', os.path.join(_FONTS, 'NotoSansKR.ttf')))
+
+# 본문 전체: Pretendard — 웹사이트 UI 폰트와 동일
+pdfmetrics.registerFont(TTFont('Pretendard',      os.path.join(_FONTS, 'Pretendard-Regular.ttf')))
+pdfmetrics.registerFont(TTFont('Pretendard-Bold', os.path.join(_FONTS, 'Pretendard-Bold.ttf')))
+# Pretendard에는 이탤릭 페이스가 없고 reportlab은 TTF를 기울여 주지 않는다.
+# <i> 는 논문 제목·기여 표기에 의미를 담고 있으므로 base-14 Oblique로 넘긴다.
+pdfmetrics.registerFontFamily('Pretendard',
+                              normal='Pretendard', bold='Pretendard-Bold',
+                              italic='Helvetica-Oblique', boldItalic='Helvetica-BoldOblique')
 
 INK   = HexColor('#111111')
 PAPER = HexColor('#f7f6f2')
@@ -37,10 +47,13 @@ def bg(canvas, doc):
     canvas.setFillColor(PAPER)
     canvas.rect(0, 0, A4[0], A4[1], fill=1, stroke=0)
     canvas.setFillColor(TEAL)
-    canvas.setFont('Courier-Bold', 7)
-    canvas.drawString(18 * mm, 10 * mm, '*' * 92)
+    canvas.setFont('Pretendard-Bold', 7)
+    # Courier was monospaced, so 92 asterisks had a known width. Count to the
+    # same span instead of hard-coding it for a proportional face.
+    star = pdfmetrics.stringWidth('*', 'Pretendard-Bold', 7)
+    canvas.drawString(18 * mm, 10 * mm, '*' * int(386 / star))
     canvas.setFillColor(GRAY)
-    canvas.setFont('Courier', 7)
+    canvas.setFont('Pretendard', 7)
     canvas.drawRightString(A4[0] - 18 * mm, 10 * mm, f'JIWON YANG — CV · PAGE {doc.page}')
     canvas.restoreState()
 
@@ -51,15 +64,18 @@ frame = Frame(doc.leftMargin, doc.bottomMargin, doc.width, doc.height, id='f')
 doc.addPageTemplates([PageTemplate(id='p', frames=[frame], onPage=bg)])
 
 S = dict(
-  name=ParagraphStyle('name', fontName='Helvetica-Bold', fontSize=25, leading=29, textColor=INK),
-  sub=ParagraphStyle('sub', fontName='Courier-Bold', fontSize=9, leading=13, textColor=INK, spaceBefore=3),
-  contact=ParagraphStyle('contact', fontName='Helvetica', fontSize=8.5, leading=12, textColor=GRAY, spaceBefore=4),
-  section=ParagraphStyle('section', fontName='Courier-Bold', fontSize=10.5, leading=14, textColor=INK, spaceBefore=13, spaceAfter=2),
-  item=ParagraphStyle('item', fontName='Helvetica-Bold', fontSize=9.8, leading=13.5, textColor=INK, spaceBefore=6),
-  body=ParagraphStyle('body', fontName='Helvetica', fontSize=9.2, leading=13.2, textColor=INK, spaceBefore=2),
-  bullet=ParagraphStyle('bullet', fontName='Helvetica', fontSize=9.2, leading=13.2, textColor=INK,
-                        leftIndent=10, bulletIndent=1, spaceBefore=2),
-  small=ParagraphStyle('small', fontName='Helvetica', fontSize=8.6, leading=12.4, textColor=INK,
+  name=ParagraphStyle('name', fontName='Pretendard-Bold', fontSize=25, leading=29, textColor=INK),
+  sub=ParagraphStyle('sub', fontName='Pretendard-Bold', fontSize=9, leading=13, textColor=INK, spaceBefore=3),
+  contact=ParagraphStyle('contact', fontName='Pretendard', fontSize=8.5, leading=12, textColor=GRAY, spaceBefore=4),
+  section=ParagraphStyle('section', fontName='Pretendard-Bold', fontSize=10.5, leading=14, textColor=INK, spaceBefore=13, spaceAfter=2),
+  item=ParagraphStyle('item', fontName='Pretendard-Bold', fontSize=9.8, leading=13.5, textColor=INK, spaceBefore=6),
+  body=ParagraphStyle('body', fontName='Pretendard', fontSize=9.2, leading=13.2, textColor=INK, spaceBefore=2),
+  # bulletFontName defaults to Helvetica, which has no ● — that pulled a second
+  # font into the document just to draw the bullets.
+  bullet=ParagraphStyle('bullet', fontName='Pretendard', fontSize=9.2, leading=13.2, textColor=INK,
+                        leftIndent=10, bulletIndent=1, spaceBefore=2,
+                        bulletFontName='Pretendard', bulletFontSize=6.5),
+  small=ParagraphStyle('small', fontName='Pretendard', fontSize=8.6, leading=12.4, textColor=INK,
                        leftIndent=10, spaceBefore=3),
 )
 
@@ -95,18 +111,18 @@ story.append(Paragraph(
 
 # ══ Education ═════════════════════════════════════════════════════════════════
 story += sec('EDUCATION')
-story.append(Paragraph('Seoul National University — B.F.A. in Design &nbsp;<font name="Helvetica" size="8.6" color="#555555">· 2022–2027 (expected)</font>', S['item']))
+story.append(Paragraph('Seoul National University — B.F.A. in Design &nbsp;<font name="Pretendard" size="8.6" color="#555555">· 2022–2027 (expected)</font>', S['item']))
 story.append(B('Major GPA: 4.0 / 4.3'))
 story.append(B('<b>HCI &amp; Interaction:</b> Human Behavior and Design (A+), Object Interaction Design (A+), '
                'Product Service Design (A+), UI Design Programming (A0), Media Design Programming (A0)'))
 story.append(B('<b>AI &amp; Engineering:</b> Design for Machine Learning (A+), Extended Reality Design (A+), '
                'Data Visualization (S), Introduction to AI (S)'))
-story.append(Paragraph('University of Sydney — Exchange Student, Interaction Design &nbsp;<font name="Helvetica" size="8.6" color="#555555">· 2024 (Sem. 2)</font>', S['item']))
+story.append(Paragraph('University of Sydney — Exchange Student, Interaction Design &nbsp;<font name="Pretendard" size="8.6" color="#555555">· 2024 (Sem. 2)</font>', S['item']))
 
 # ══ Research Experience ═══════════════════════════════════════════════════════
 story += sec('RESEARCH EXPERIENCE')
-story.append(Paragraph('ASC Lab, KAIST — Student Intern &nbsp;<font name="Helvetica" size="8.6" color="#555555">· Sep 2026–Present</font>', S['item']))
-story.append(Paragraph('Independent Research — Researcher (First Author) &nbsp;<font name="Helvetica" size="8.6" color="#555555">· Feb 2026–Jul 2026</font>', S['item']))
+story.append(Paragraph('ASC Lab, KAIST — Student Intern &nbsp;<font name="Pretendard" size="8.6" color="#555555">· Sep 2026–Present</font>', S['item']))
+story.append(Paragraph('Independent Research — Researcher (First Author) &nbsp;<font name="Pretendard" size="8.6" color="#555555">· Feb 2026–Jul 2026</font>', S['item']))
 story.append(Paragraph('<i>"Beyond Parentheses: Personalizing Graphical Sound Captions through Interactive Machine Learning"</i>', S['body']))
 story.append(B('Led the entire project end-to-end: problem framing, system design, implementation, user study, and manuscript writing.'))
 story.append(B('Built the <b>IML Audio Workstation</b> — a dual-head (multi-task) neural network mapping '
@@ -114,24 +130,24 @@ story.append(B('Built the <b>IML Audio Workstation</b> — a dual-head (multi-ta
 story.append(B('Designed a <b>"Listen–Sculpt–Train"</b> human-in-the-loop workflow for accessible, personalized sound '
                'captioning (incl. Deaf and hard-of-hearing viewers); pilot study (n=4) raised perceptual agreement '
                'from 3.2 to 6.4 on a 7-point scale.'))
-story.append(Paragraph('Medical AI Lab (IMSI), Seoul National University — Undergraduate Research Intern &nbsp;<font name="Helvetica" size="8.6" color="#555555">· Feb 2026–Aug 2026</font>', S['item']))
+story.append(Paragraph('Medical AI Lab (IMSI), Seoul National University — Undergraduate Research Intern &nbsp;<font name="Pretendard" size="8.6" color="#555555">· Feb 2026–Aug 2026</font>', S['item']))
 story.append(B('Implemented and experimented with medical-imaging models and tasks in PyTorch.'))
 story.append(B('Led data visualization and paper-figure design for medical imaging research — bridging design and ML.'))
 
 # ══ Selected Projects ═════════════════════════════════════════════════════════
 story += sec('SELECTED PROJECTS')
-story.append(Paragraph('Playground: A Line Between Us — Individual &nbsp;<font name="Helvetica" size="8.6" color="#555555">· 2026</font>', S['item']))
+story.append(Paragraph('Playground: A Line Between Us — Individual &nbsp;<font name="Pretendard" size="8.6" color="#555555">· 2026</font>', S['item']))
 story.append(B('Interactive installation that reads a visitor\'s touch gesture through a sparse sensor grid and '
                '"answers" by drawing back in sand — translating the feel of a gesture (pressure, pace) rather than '
                'copying it. · Tools: physical computing (sensor grid), actuated drawing machine. · '
                '<b>SIGGRAPH Asia 2026 Art Gallery (under review)</b>'))
-story.append(Paragraph('Chorus — Team &nbsp;<font name="Helvetica" size="8.6" color="#555555">· 2025</font>', S['item']))
+story.append(Paragraph('Chorus — Team &nbsp;<font name="Pretendard" size="8.6" color="#555555">· 2025</font>', S['item']))
 story.append(B('Medieval-organ-inspired interactive artwork: light sensors detect a visitor\'s playing gestures to '
                'control four "door" structures — modulating emitted light and four-track audio levels so the visitor '
                'conducts an orchestral harmony in real time.'))
 story.append(B('Role: overall system design and code implementation (teammate: modeling, fabrication &amp; '
                'installation). · Tools: light sensors, sound/lighting control.'))
-story.append(Paragraph('SendLove — Individual &nbsp;<font name="Helvetica" size="8.6" color="#555555">· 2025</font>', S['item']))
+story.append(Paragraph('SendLove — Individual &nbsp;<font name="Pretendard" size="8.6" color="#555555">· 2025</font>', S['item']))
 story.append(B('Interactive sculpture: layered acrylic panels form the waveform of a recorded voice saying '
                '"<font name="NotoSansKR">사랑해</font>" (I love you); an ultrasonic sensor detects a "sending" '
                'hand gesture, lighting per-panel LED strips in sequence to evoke a message being sent. · '
@@ -176,7 +192,7 @@ skills = [
   ('WEB', 'HTML, CSS, JavaScript'),
   ('DATA VIZ', 'matplotlib, Tableau'),
 ]
-rows = [[Paragraph(f'<font name="Courier-Bold" size="7.8">{k}</font>', S['body']),
+rows = [[Paragraph(f'<font name="Pretendard-Bold" size="7.8">{k}</font>', S['body']),
          Paragraph(v, S['body'])] for k, v in skills]
 t = Table(rows, colWidths=[42 * mm, None])
 t.setStyle(TableStyle([

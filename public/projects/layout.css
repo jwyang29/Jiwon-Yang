@@ -14,8 +14,9 @@
   /* text-safe accents — WCAG-friendly contrast on --paper */
   --teal-text: #16565e;
   --pink-text: #a8431a;
-  /* Pretendard sits behind Latin fonts so Korean glyphs always render cleanly */
-  --mono:   'Courier New', Courier, 'Pretendard Variable', Pretendard, 'Noto Sans KR', monospace;
+  /* Pretendard leads both stacks — Latin and Korean come from one family */
+  --ui:     'Pretendard Variable', Pretendard, 'Noto Sans KR', -apple-system,
+            BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
   --sans:   'Helvetica Neue', Helvetica, 'Pretendard Variable', Pretendard, 'Noto Sans KR', Arial, sans-serif;
 }
 
@@ -29,7 +30,7 @@ html[lang="ko"] {
   background: none;
   border: 2px solid var(--ink);
   color: var(--ink);
-  font: bold 11px var(--mono);
+  font: bold 11px var(--ui);
   letter-spacing: 0.1em;
   padding: 4px 10px;
   margin-left: 16px;
@@ -48,7 +49,7 @@ html { scroll-behavior: smooth; }
 body {
   background: var(--paper);
   color: var(--ink);
-  font-family: var(--mono);
+  font-family: var(--ui);
   line-height: 1.55;
   -webkit-font-smoothing: antialiased;
 }
@@ -119,7 +120,7 @@ main {
 
 /* small plain-font legibility title next to the decorative one */
 .title-alt {
-  font-family: var(--mono);
+  font-family: var(--ui);
   font-weight: bold;
   font-size: clamp(13px, 1.6vw, 16px);
   letter-spacing: 0.22em;
@@ -280,7 +281,7 @@ main {
 }
 
 .section h2 {
-  font-family: var(--mono);
+  font-family: var(--ui);
   font-weight: bold;
   font-size: 16px;
   letter-spacing: 0.06em;
@@ -370,7 +371,7 @@ main {
   border-bottom: 1px solid rgba(17, 17, 17, 0.18);
 }
 .skills-row label {
-  font-family: var(--mono);
+  font-family: var(--ui);
   font-weight: bold;
   font-size: 12.5px;
   letter-spacing: 0.07em;
@@ -398,7 +399,7 @@ main {
   align-items: baseline;
   padding: 13px 6px;
   border-bottom: 2px solid var(--ink);
-  font-family: var(--mono);
+  font-family: var(--ui);
   font-weight: bold;
   text-transform: uppercase;
   color: var(--ink);

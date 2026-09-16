@@ -11,10 +11,16 @@
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
+    /* UI type — Pretendard, matching the project pages. Loaded above. */
+    :root {
+      --ui: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont,
+            'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    }
+
     body {
       background: #11304a;
       overflow-x: hidden;
-      font-family: 'Courier New', Courier, monospace;
+      font-family: var(--ui);
     }
 
     /* Canvas stays fixed; the page scrolls to pan the camera across the pool */
@@ -62,7 +68,7 @@
       top: -24px; left: -1px;
       background: #C2611C;
       color: #fff;
-      font: bold 10px/1 'Courier New', monospace;
+      font: bold 10px/1 var(--ui);
       padding: 4px 9px;
       letter-spacing: 0.05em;
       white-space: nowrap;
@@ -71,7 +77,7 @@
       position: absolute;
       bottom: -20px; left: 0;
       color: #F5A65A;
-      font: 9px/1 'Courier New', monospace;
+      font: 9px/1 var(--ui);
       letter-spacing: 0.06em;
       white-space: nowrap;
       text-shadow: 0 1px 6px rgba(0,0,0,0.35);
@@ -101,7 +107,7 @@
       text-align: center;
       color: rgba(255, 255, 255, 0.95);
       font-size: 14px;
-      font-weight: 400;
+      font-weight: 300;
       letter-spacing: 0.18em;
       text-shadow:
         0 1px 10px rgba(14, 48, 56, 0.65),
@@ -113,24 +119,31 @@
       position: absolute;
       top: 18px;
       pointer-events: all;
-      background: rgba(255,255,255,0.22);
-      border: 1px solid rgba(255,255,255,0.5);
-      color: rgba(10, 45, 60, 0.75);
-      font: 9px 'Courier New', monospace;
-      letter-spacing: 0.1em;
-      padding: 7px 14px;
-      border-radius: 20px;
+      background: none;
+      border: 1px solid rgba(240, 145, 60, 0.75);
+      color: rgba(246, 170, 96, 0.98);
+      font: 500 10px var(--ui);
+      letter-spacing: 0.14em;
+      padding: 7px 15px;
+      border-radius: 2px;
       cursor: pointer;
-      transition: background 0.2s;
+      transition: background 0.2s, color 0.2s, border-color 0.2s;
     }
     #mic-btn  { right: 18px; }
     #lang-btn { right: 96px; }
     /* Language toggle hidden until i18n is enabled (JS adds .i18n-on to <html>) */
     html:not(.i18n-on) #lang-btn { display: none; }
     #pool-btn { left: 18px; }
-    #mic-btn:hover, #pool-btn:hover,
-    #mic-btn.active { background: rgba(255,255,255,0.4); }
-    #mic-btn.active { color: #C2611C; border-color: #E0873A; }
+    #mic-btn:hover, #pool-btn:hover, #lang-btn:hover {
+      background: rgba(240, 145, 60, 0.16);
+      border-color: rgba(246, 170, 96, 0.95);
+    }
+    /* Listening — with the marker glyph gone, the filled state carries it */
+    #mic-btn.active {
+      background: #C2611C;
+      border-color: #C2611C;
+      color: #fdf3e6;
+    }
 
     /* ── "The Pool" concept popup ───────────────────────── */
     #pool-modal {
@@ -168,13 +181,13 @@
       margin-bottom: 4px;
     }
     #pool-card .card-sub {
-      font: bold 10px 'Courier New', monospace;
+      font: bold 10px var(--ui);
       letter-spacing: 0.22em;
       text-transform: uppercase;
       margin-bottom: 22px;
     }
     #pool-card p {
-      font: 13px/1.8 'Courier New', monospace;
+      font: 13px/1.8 var(--ui);
       letter-spacing: 0.03em;
       margin-bottom: 14px;
     }
@@ -190,7 +203,7 @@
       top: 14px; right: 16px;
       background: none;
       border: none;
-      font: bold 18px 'Courier New', monospace;
+      font: bold 18px var(--ui);
       color: rgba(10, 45, 60, 0.6);
       cursor: pointer;
       padding: 4px 8px;
@@ -281,9 +294,9 @@
   <!-- UI chrome -->
   <div id="ui">
     <div id="name-tag" data-i18n="main.nametag">Portfolio</div>
-    <button id="pool-btn">◎  THE POOL</button>
+    <button id="pool-btn">THE POOL</button>
     <button id="lang-btn" class="lang-toggle">KO</button>
-    <button id="mic-btn">◎  MIC</button>
+    <button id="mic-btn">MIC</button>
   </div>
 
   <!-- "The Pool" concept popup -->
