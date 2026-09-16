@@ -105,7 +105,7 @@
     #hint {
       margin-top: 20px;
       text-align: center;
-      color: rgba(255, 255, 255, 0.95);
+      color: rgba(246, 170, 96, 0.96);
       font-size: 14px;
       font-weight: 300;
       letter-spacing: 0.18em;
@@ -119,13 +119,15 @@
       position: absolute;
       top: 18px;
       pointer-events: all;
-      background: none;
-      border: 1px solid rgba(240, 145, 60, 0.75);
-      color: rgba(246, 170, 96, 0.98);
+      background: rgba(9, 32, 50, 0.52);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: rgba(240, 232, 220, 0.95);
       font: 500 10px var(--ui);
       letter-spacing: 0.14em;
-      padding: 7px 15px;
-      border-radius: 2px;
+      padding: 8px 16px;
+      border-radius: 999px;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
       cursor: pointer;
       transition: background 0.2s, color 0.2s, border-color 0.2s;
     }
@@ -135,13 +137,13 @@
     html:not(.i18n-on) #lang-btn { display: none; }
     #pool-btn { left: 18px; }
     #mic-btn:hover, #pool-btn:hover, #lang-btn:hover {
-      background: rgba(240, 145, 60, 0.16);
-      border-color: rgba(246, 170, 96, 0.95);
+      background: rgba(13, 44, 68, 0.72);
+      border-color: rgba(255, 255, 255, 0.3);
     }
     /* Listening — with the marker glyph gone, the filled state carries it */
     #mic-btn.active {
-      background: #C2611C;
-      border-color: #C2611C;
+      background: rgba(194, 97, 28, 0.88);
+      border-color: rgba(240, 145, 60, 0.9);
       color: #fdf3e6;
     }
 
