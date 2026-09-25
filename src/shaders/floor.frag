@@ -4,6 +4,7 @@ uniform float uTime;
 uniform float uAudioLevel;
 uniform vec3  uSunDir;
 uniform float uSwell;
+uniform float uCausticT;   // caustic clock — held still while the water is
 uniform vec2  uRipPos[12];
 uniform float uRipTime[12];
 uniform float uRipAmp[12];
@@ -128,11 +129,11 @@ void main() {
   vec3 floorCol  = mix(tileBase, tileGrout, tileGrid(refractW, 0.048));
 
   // Slow wash toward veil blue where light still reaches the bottom
-  float lit = 0.5 + 0.5 * snoise(vWorldXZ * 0.11 + vec2(t * 0.035, t * 0.02));
+  float lit = 0.5 + 0.5 * snoise(vWorldXZ * 0.11 + vec2(uCausticT * 0.035, uCausticT * 0.02));
   floorCol = mix(floorCol, vec3(0.300, 0.375, 0.445), lit * 0.28);
 
   // ── Caustic light blobs — warm amber shimmer ──────────────────────────────
-  float cv = poolCaustic(vWorldXZ, t);
+  float cv = poolCaustic(vWorldXZ, uCausticT);
   // Warmth rides the caustic's own intensity, so the faint ones stay pale and
   // only the bright cores pick up orange — the variation is the point.
   float cvn = clamp(cv, 0.0, 1.0);

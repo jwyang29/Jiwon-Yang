@@ -56,15 +56,25 @@ scene.add(fill);
 
 // ─── Shared sun + object arrays (used by both floor and water shaders) ────────
 const sunDir      = new THREE.Vector3(5, 12, 8).normalize();
-const objPositions = PROJECTS.map(() => new THREE.Vector2());
-const objStrengths = PROJECTS.map((p) => p.rippleStrength);
-
 const canHover = window.matchMedia('(hover: hover)').matches;
 
 // Resting swell. At zero the pool only moves when something touches it — the
 // cursor on desktop, a tap on touch — and when the mic hears something, which
 // the shaders add on top of this rather than multiplying into it.
 const SWELL = 0.0;
+
+// Caustics are the water surface projected onto the floor, so with the surface
+// still they have no reason to drift. Their clock only advances on sound; the
+// cursor's rings already warp the floor locally through the refraction.
+let causticT = 0;
+
+// Objects used to radiate a ring each, always on. That is a default ripple too,
+// so it rests at zero — raise it to let them disturb the water again.
+const OBJ_RIPPLE = 0.0;
+
+const objPositions = PROJECTS.map(() => new THREE.Vector2());
+const objStrengths = PROJECTS.map((p) => p.rippleStrength * OBJ_RIPPLE);
+
 
 // ─── Cursor ripples ───────────────────────────────────────────────────────────
 // A ring buffer of rings: the shader reads position, birth time and strength,
@@ -87,6 +97,7 @@ const floorUniforms = {
   uSunDir:     { value: sunDir },
   uObjPos:     { value: objPositions },
   uSwell:      { value: SWELL },
+  uCausticT:   { value: 0 },
   uRipPos:     { value: ripplePos },
   uRipTime:    { value: rippleTime },
   uRipAmp:     { value: rippleAmp },
@@ -317,11 +328,15 @@ window.addEventListener('keydown', (e) => {
 
 // ─── Render Loop ──────────────────────────────────────────────────────────────
 const clock = new THREE.Clock();
+let prevT = 0;
 
 function frame() {
   requestAnimationFrame(frame);
   const t          = clock.getElapsedTime();
+  const dt         = Math.min(t - prevT, 0.1);   // clamped: a hidden tab returns a huge delta
+  prevT = t;
   const audioLevel = audio.update();
+  causticT += dt * audioLevel * 2.2;
 
   // Scroll position → camera pans down the pool; name stays fixed via CSS
   const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
@@ -330,6 +345,7 @@ function frame() {
   camera.lookAt(0, 0, zOff);
 
   floorUniforms.uTime.value       = t;
+  floorUniforms.uCausticT.value   = causticT;
   floorUniforms.uAudioLevel.value = audioLevel;
   waterUniforms.uTime.value       = t;
   waterUniforms.uAudioLevel.value = audioLevel;

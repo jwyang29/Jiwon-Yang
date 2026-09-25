@@ -127,6 +127,7 @@ export function buildLeaves(scene, count = 34) {
 }
 
 const _grad = [0, 0];
+const SWELL = 0.0;   // keep in step with SWELL in main.js
 
 export function animateLeaves(leaves, t) {
   for (const leaf of leaves) {
@@ -136,10 +137,11 @@ export function animateLeaves(leaves, t) {
     const wx = ((x + 11) % 22 + 22) % 22 - 11;
     const wz = ((z + 10) % 56 + 56) % 56 - 10;
 
+    // SWELL mirrors main.js: with the surface still there is no slope to ride,
+    // so the leaves keep their drift and spin but stop bobbing and tilting.
     const g = waveGradient(wx, wz, t, _grad);
-    leaf.mesh.position.set(wx, waveHeight(wx, wz, t) + 0.02, wz);
-
-    // Lie along the local water slope, with a slow spin about the vertical
-    leaf.mesh.rotation.set(g[1] * 1.6, leaf.angle + leaf.spin * t, -g[0] * 1.6, 'YXZ');
+    leaf.mesh.position.set(wx, waveHeight(wx, wz, t) * SWELL + 0.02, wz);
+    leaf.mesh.rotation.set(g[1] * 1.6 * SWELL, leaf.angle + leaf.spin * t,
+                           -g[0] * 1.6 * SWELL, 'YXZ');
   }
 }
