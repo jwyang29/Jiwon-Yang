@@ -85,19 +85,21 @@ void main() {
   float cosT = max(dot(N, V), 0.0);
   float F    = 0.02 + 0.98 * pow(1.0 - cosT, 5.0);
 
-  // Narrow Blinn-Phong specular — pool sparkle, not broad streaks
-  vec3  H    = normalize(uSunDir + V);
-  float spec = pow(max(dot(N, H), 0.0), 340.0) * 0.90;
+  // No specular here, deliberately. The swell is a sum of plane waves, so the
+  // set of normals that satisfies a tight Blinn-Phong lobe is not scattered
+  // points but ridges lying along the wavefronts — which is what drew the
+  // straight bars, and then the orange diagonals once the sun went warm.
+  // The surface gets its life from the floor: refraction, caustics and the
+  // wave-depth shading all read through this layer.
 
   // Deep veil-blue dusk water, warmed where the low sun catches a slope
   // No warm mix on the crests — it followed the wavefronts and painted rust
   // diagonals across the pool. Fresnel already lifts toward the sun below.
   vec3 tint = vec3(0.115, 0.170, 0.235) * (1.0 + uAudioLevel * 0.25);
 
-  vec3  color = mix(tint, uSunColor * 0.80, F * 0.20) + uSunColor * spec * 0.90;
+  vec3  color = mix(tint, uSunColor * 0.80, F * 0.20);
   // Slightly denser than the summer water so the pool reads as deeper
-  float alpha = 0.16 + F * 0.20 + min(spec * 0.28, 0.18);
-  alpha = clamp(alpha, 0.10, 0.68);
+  float alpha = clamp(0.16 + F * 0.20, 0.10, 0.68);
 
   gl_FragColor = vec4(clamp(color, 0.0, 1.0), alpha);
 }
