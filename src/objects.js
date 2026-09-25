@@ -282,10 +282,15 @@ function normalizeModel(model, targetSize = 1.56) {   // 1.95 × 0.8 ≈ 1.56
 // The models are close to neutral already, so most of their colour on the pool
 // comes from the warm lights. Dropping saturation alone is a faint change —
 // pairing it with a small dip in brightness is what makes the state legible.
+// Unselected objects read as one tone rather than neutral grey. WING is
+// #FDDAB8 converted to linear space and divided by its own luminance, so the
+// tint shifts hue without darkening the object the way a straight multiply
+// would. Hue now carries most of the state, so the brightness dip is small.
 const SAT_CHUNK = `
+  const vec3 WING = vec3( 1.318, 0.941, 0.644 );
   float _lum = dot( gl_FragColor.rgb, vec3( 0.2126, 0.7152, 0.0722 ) );
-  gl_FragColor.rgb = mix( vec3( _lum ), gl_FragColor.rgb, uSat );
-  gl_FragColor.rgb *= 0.82 + 0.18 * uSat;`;
+  gl_FragColor.rgb = mix( _lum * WING, gl_FragColor.rgb, uSat );
+  gl_FragColor.rgb *= 0.88 + 0.12 * uSat;`;
 
 function makeDesaturable(root, group) {
   root.traverse((c) => {
