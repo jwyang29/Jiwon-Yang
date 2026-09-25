@@ -2,6 +2,9 @@ precision highp float;
 
 uniform float uTime;
 uniform float uAudioLevel;
+uniform vec2  uRipPos[12];
+uniform float uRipTime[12];
+uniform float uRipAmp[12];
 uniform vec2  uObjPos[9];
 uniform float uObjStrength[9];
 
@@ -36,7 +39,8 @@ void main() {
   addWaveY(y,  1.68, -3.20, 0.016, 2.30, t, pos);
   addWaveY(y, -3.45, -1.80, 0.014, 3.10, t, pos);
   // Eight overlapping swells; more than this and the surface reads as busy noise.
-  y *= boost;
+  // Swell is the quiet bed now; the cursor rings carry the motion
+  y *= boost * 0.30;
 
   // Object-driven radial ripples (Y-only)
   for (int i = 0; i < 9; i++) {
@@ -44,6 +48,18 @@ void main() {
     float env = exp(-d * d * 0.45);
     float rip = sin(d * 3.8 - t * 1.8 + float(i) * 1.3) * 0.055;
     y += rip * uObjStrength[i] * env;
+  }
+
+
+  // Cursor ripples — a ring is born where the pointer crossed the water and
+  // travels outward, fading with age. `fr` is the distance ahead of the front.
+  for (int i = 0; i < 12; i++) {
+    if (uRipAmp[i] <= 0.0) continue;
+    float age = t - uRipTime[i];
+    if (age < 0.0 || age > 3.0) continue;
+    float d  = length(pos - uRipPos[i]);
+    float fr = d - age * 1.9;
+    y += sin(fr * 7.0) * exp(-fr * fr * 2.2) * exp(-age * 1.35) * uRipAmp[i] * 0.095;
   }
 
   wpos.y   += y;                 // displace in world Y, whatever the mesh rotation

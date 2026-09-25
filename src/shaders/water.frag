@@ -6,6 +6,9 @@ uniform vec3  uSunDir;
 uniform vec3  uSunColor;
 uniform vec3  uWaterColor;
 uniform vec3  uCameraPos;
+uniform vec2  uRipPos[12];
+uniform float uRipTime[12];
+uniform float uRipAmp[12];
 uniform vec2  uObjPos[9];
 uniform float uObjStrength[9];
 
@@ -44,8 +47,26 @@ void waveGradient(vec2 pos, float t, float boost,
   c=cos(-2.10*pos.x+2.80*pos.y-2.80*t);  gx+=0.018*-2.10*c; gz+=0.018* 2.80*c;
   c=cos( 1.68*pos.x-3.20*pos.y-2.30*t);  gx+=0.016* 1.68*c; gz+=0.016*-3.20*c;
   c=cos(-3.45*pos.x-1.80*pos.y-3.10*t);  gx+=0.014*-3.45*c; gz+=0.014*-1.80*c;
-  gx *= boost;
-  gz *= boost;
+  // Swell is the quiet bed now; the cursor rings carry the motion
+  gx *= boost * 0.30;
+  gz *= boost * 0.30;
+
+  // Matching gradient for the cursor rings: d/dd of the height term above,
+  // projected onto the radial direction.
+  for (int i = 0; i < 12; i++) {
+    if (uRipAmp[i] <= 0.0) continue;
+    float age = t - uRipTime[i];
+    if (age < 0.0 || age > 3.0) continue;
+    vec2  dr = pos - uRipPos[i];
+    float d  = length(dr);
+    if (d < 0.001) continue;
+    float fr = d - age * 1.9;
+    float e  = exp(-fr * fr * 2.2) * exp(-age * 1.35) * uRipAmp[i] * 0.095;
+    float df = e * (7.0 * cos(fr * 7.0) - 4.4 * fr * sin(fr * 7.0));
+    gx += df * dr.x / d;
+    gz += df * dr.y / d;
+  }
+
 
   // Object ripple gradient: ∂/∂r [A*sin(kr-ωt)*exp(-αr²)] × (unit radial vec)
   for (int i = 0; i < 9; i++) {

@@ -59,6 +59,15 @@ const sunDir      = new THREE.Vector3(5, 12, 8).normalize();
 const objPositions = PROJECTS.map(() => new THREE.Vector2());
 const objStrengths = PROJECTS.map((p) => p.rippleStrength);
 
+// ─── Cursor ripples ───────────────────────────────────────────────────────────
+// A ring buffer of rings: the shader reads position, birth time and strength,
+// and decides everything else from age, so JS never has to tick them down.
+const RIPPLE_COUNT = 12;
+const ripplePos  = Array.from({ length: RIPPLE_COUNT }, () => new THREE.Vector2());
+const rippleTime = new Float32Array(RIPPLE_COUNT).fill(-999);
+const rippleAmp  = new Float32Array(RIPPLE_COUNT);
+let   rippleSlot = 0;
+
 // Per-object shadow ellipse semi-axes and current rotation angles
 const objShadowRx    = new Float32Array(PROJECTS.map(p => p.shadowRx));
 const objShadowRz    = new Float32Array(PROJECTS.map(p => p.shadowRz));
@@ -70,6 +79,9 @@ const floorUniforms = {
   uAudioLevel: { value: 0 },
   uSunDir:     { value: sunDir },
   uObjPos:     { value: objPositions },
+  uRipPos:     { value: ripplePos },
+  uRipTime:    { value: rippleTime },
+  uRipAmp:     { value: rippleAmp },
   uObjRx:      { value: objShadowRx },
   uObjRz:      { value: objShadowRz },
   uObjAngle:   { value: objShadowAngle },
@@ -93,6 +105,9 @@ const waterUniforms = {
   uCameraPos:   { value: camera.position },
   uObjPos:      { value: objPositions },
   uObjStrength: { value: objStrengths },
+  uRipPos:      { value: ripplePos },
+  uRipTime:     { value: rippleTime },
+  uRipAmp:      { value: rippleAmp },
 };
 const water = new THREE.Mesh(
   new THREE.PlaneGeometry(22, 88, 96, 300),
@@ -154,7 +169,43 @@ window.addEventListener('mousemove', (e) => {
   const r = renderer.domElement.getBoundingClientRect();
   pointer.x =  ((e.clientX - r.left) / r.width)  * 2 - 1;
   pointer.y = -((e.clientY - r.top)  / r.height) * 2 + 1;
+  spawnRipple(e.clientX, e.clientY);
 });
+
+// The ray meets the mathematical plane, not the water mesh — the mesh is
+// 96 x 300 quads and raycasting it on every mousemove would not be free.
+const waterPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+const ripplePoint = new THREE.Vector3();
+const rippleNdc   = new THREE.Vector2();
+let   lastRipX = 1e9, lastRipZ = 1e9;
+
+function spawnRipple(clientX, clientY) {
+  const r = renderer.domElement.getBoundingClientRect();
+  rippleNdc.set(
+     ((clientX - r.left) / r.width)  * 2 - 1,
+    -((clientY - r.top)  / r.height) * 2 + 1,
+  );
+  raycaster.setFromCamera(rippleNdc, camera);
+  if (!raycaster.ray.intersectPlane(waterPlane, ripplePoint)) return;
+
+  // Spawn by distance travelled, not by event — a fast mouse fires far more
+  // mousemoves than a slow one, and the trail should not thin out because of it
+  const step = Math.hypot(ripplePoint.x - lastRipX, ripplePoint.z - lastRipZ);
+  if (step < 0.38) return;
+  lastRipX = ripplePoint.x;
+  lastRipZ = ripplePoint.z;
+
+  ripplePos[rippleSlot].set(ripplePoint.x, ripplePoint.z);
+  rippleTime[rippleSlot] = clock.getElapsedTime();
+  // A longer step means the pointer was moving faster — let it hit harder
+  rippleAmp[rippleSlot]  = THREE.MathUtils.clamp(step / 1.2, 0.4, 1.0);
+  rippleSlot = (rippleSlot + 1) % RIPPLE_COUNT;
+}
+
+// Touch has no hover, so a tap is the only way to disturb the water there
+window.addEventListener('pointerdown', (e) => {
+  if (e.pointerType !== 'mouse') { lastRipX = 1e9; spawnRipple(e.clientX, e.clientY); }
+}, { passive: true });
 
 function raycastRootAt(clientX, clientY) {
   const r = renderer.domElement.getBoundingClientRect();
