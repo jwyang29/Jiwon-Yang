@@ -59,6 +59,12 @@ const sunDir      = new THREE.Vector3(5, 12, 8).normalize();
 const objPositions = PROJECTS.map(() => new THREE.Vector2());
 const objStrengths = PROJECTS.map((p) => p.rippleStrength);
 
+// Devices with a real hover pointer (mouse/trackpad) drive the water with the
+// cursor, so their ambient swell drops almost to nothing. Touch has no cursor,
+// so it keeps the swell — otherwise the pool would sit still between taps.
+const canHover = window.matchMedia('(hover: hover)').matches;
+const SWELL = canHover ? 0.03 : 0.30;
+
 // ─── Cursor ripples ───────────────────────────────────────────────────────────
 // A ring buffer of rings: the shader reads position, birth time and strength,
 // and decides everything else from age, so JS never has to tick them down.
@@ -79,6 +85,7 @@ const floorUniforms = {
   uAudioLevel: { value: 0 },
   uSunDir:     { value: sunDir },
   uObjPos:     { value: objPositions },
+  uSwell:      { value: SWELL },
   uRipPos:     { value: ripplePos },
   uRipTime:    { value: rippleTime },
   uRipAmp:     { value: rippleAmp },
@@ -105,6 +112,7 @@ const waterUniforms = {
   uCameraPos:   { value: camera.position },
   uObjPos:      { value: objPositions },
   uObjStrength: { value: objStrengths },
+  uSwell:       { value: SWELL },
   uRipPos:      { value: ripplePos },
   uRipTime:     { value: rippleTime },
   uRipAmp:      { value: rippleAmp },
@@ -161,9 +169,6 @@ const raycaster   = new THREE.Raycaster();
 const pointer     = new THREE.Vector2(-10, -10);
 const bboxOverlay = new BBoxOverlay();
 let   selectedRoot = null;
-
-// Devices with a real hover pointer (mouse/trackpad) update selection on move
-const canHover = window.matchMedia('(hover: hover)').matches;
 
 window.addEventListener('mousemove', (e) => {
   const r = renderer.domElement.getBoundingClientRect();

@@ -3,6 +3,7 @@ precision highp float;
 uniform float uTime;
 uniform float uAudioLevel;
 uniform vec3  uSunDir;
+uniform float uSwell;
 uniform vec2  uRipPos[12];
 uniform float uRipTime[12];
 uniform float uRipAmp[12];
@@ -56,8 +57,8 @@ float waveHeight(vec2 pos, float t, float boost) {
   y += 0.052 * sin(-0.88*pos.x + 1.02*pos.y - 1.20*t);
   y += 0.048 * sin( 0.56*pos.x - 1.24*pos.y - 1.10*t);
   y += 0.040 * sin(-1.30*pos.x - 0.62*pos.y - 1.55*t);
-  // Swell is the quiet bed now; the cursor rings carry the motion
-  y *= boost * 0.30;
+  // Swell level is set per device — see uSwell in main.js
+  y *= boost * uSwell;
 
   // Cursor ripples — a ring is born where the pointer crossed the water and
   // travels outward, fading with age. `fr` is the distance ahead of the front.
@@ -83,9 +84,9 @@ vec2 waveGrad(vec2 pos, float t, float boost) {
   c=cos(-2.10*pos.x+2.80*pos.y-2.80*t);  gx+=0.018*-2.10*c; gz+=0.018* 2.80*c;
   c=cos( 1.68*pos.x-3.20*pos.y-2.30*t);  gx+=0.016* 1.68*c; gz+=0.016*-3.20*c;
   c=cos(-3.45*pos.x-1.80*pos.y-3.10*t);  gx+=0.014*-3.45*c; gz+=0.014*-1.80*c;
-  // Swell is the quiet bed now; the cursor rings carry the motion
-  gx *= boost * 0.30;
-  gz *= boost * 0.30;
+  // Swell level is set per device — see uSwell in main.js
+  gx *= boost * uSwell;
+  gz *= boost * uSwell;
 
   // Matching gradient for the cursor rings: d/dd of the height term above,
   // projected onto the radial direction.

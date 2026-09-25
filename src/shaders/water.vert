@@ -2,6 +2,7 @@ precision highp float;
 
 uniform float uTime;
 uniform float uAudioLevel;
+uniform float uSwell;
 uniform vec2  uRipPos[12];
 uniform float uRipTime[12];
 uniform float uRipAmp[12];
@@ -39,8 +40,8 @@ void main() {
   addWaveY(y,  1.68, -3.20, 0.016, 2.30, t, pos);
   addWaveY(y, -3.45, -1.80, 0.014, 3.10, t, pos);
   // Eight overlapping swells; more than this and the surface reads as busy noise.
-  // Swell is the quiet bed now; the cursor rings carry the motion
-  y *= boost * 0.30;
+  // Swell level is set per device — see uSwell in main.js
+  y *= boost * uSwell;
 
   // Object-driven radial ripples (Y-only)
   for (int i = 0; i < 9; i++) {
