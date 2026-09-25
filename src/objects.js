@@ -274,61 +274,6 @@ function normalizeModel(model, targetSize = 1.56) {   // 1.95 × 0.8 ≈ 1.56
 // ─── Build all floating objects ───────────────────────────────────────────────
 // onFootprint(i, rx, rz) lets main.js update shadow-ellipse uniforms once a
 // GLB's real bounding box is known.
-// ─── Greyscale until selected ─────────────────────────────────────────────────
-// A GLB carries its colour in the texture as often as in material.color, so the
-// desaturation has to happen in the shader rather than on the material. The mix
-// sits right after opaque_fragment — still in linear space, so tone mapping and
-// fog apply to the grey object the same way they apply to the coloured one.
-// The models are close to neutral already, so most of their colour on the pool
-// comes from the warm lights. Dropping saturation alone is a faint change —
-// pairing it with a small dip in brightness is what makes the state legible.
-// Unselected objects read as one tone rather than neutral grey. WING is
-// #FDDAB8 converted to linear space and divided by its own luminance, so the
-// tint shifts hue without darkening the object the way a straight multiply
-// would. Hue now carries most of the state, so the brightness dip is small.
-const SAT_CHUNK = `
-  const vec3 WING = vec3( 1.318, 0.941, 0.644 );
-  float _lum = dot( gl_FragColor.rgb, vec3( 0.2126, 0.7152, 0.0722 ) );
-  gl_FragColor.rgb = mix( _lum * WING, gl_FragColor.rgb, uSat );
-  gl_FragColor.rgb *= 0.88 + 0.12 * uSat;`;
-
-function makeDesaturable(root, group) {
-  root.traverse((c) => {
-    if (!c.isMesh || !c.material) return;
-    const patch = (src) => {
-      // Clone so each object owns its uniform — GLB materials are often shared
-      const mat = src.clone();
-      mat.onBeforeCompile = (shader) => {
-        shader.uniforms.uSat = { value: group.userData.sat ?? 0 };
-        const anchor = ['<opaque_fragment>', '<output_fragment>', '<dithering_fragment>']
-          .find((tag) => shader.fragmentShader.includes(`#include ${tag}`));
-        if (!anchor) return;          // unknown shader layout — leave it coloured
-        shader.fragmentShader = shader.fragmentShader
-          .replace('void main() {', 'uniform float uSat;\nvoid main() {')
-          .replace(`#include ${anchor}`, `#include ${anchor}${SAT_CHUNK}`);
-        group.userData.satShaders.push(shader);
-      };
-      mat.needsUpdate = true;
-      return mat;
-    };
-    c.material = Array.isArray(c.material) ? c.material.map(patch) : patch(c.material);
-  });
-}
-
-/**
- * Drive every object toward full colour when it is the selected one and back to
- * grey when it is not. The ease is exponential so it is frame-rate independent.
- */
-export function animateObjectColor(meshes, selected, dt) {
-  const k = 1 - Math.exp(-dt * 9);
-  for (const m of meshes) {
-    const u = m.userData;
-    u.sat += ((m === selected ? 1 : 0) - u.sat) * k;
-    if (u.sat < 0.0005) u.sat = 0;
-    for (const sh of u.satShaders) sh.uniforms.uSat.value = u.sat;
-  }
-}
-
 export function buildObjects(scene, onFootprint) {
   const loader = new GLTFLoader();
   const base   = import.meta.env.BASE_URL || '/';
@@ -336,8 +281,6 @@ export function buildObjects(scene, onFootprint) {
 
   PROJECTS.forEach((p, i) => {
     const group = new THREE.Group();
-    // Set before the loader callbacks fire — they push into satShaders
-    group.userData = { sat: 0, satShaders: [] };
 
     // Invisible oversized hit sphere — big touch target (raycaster still
     // tests invisible meshes).
@@ -361,7 +304,6 @@ export function buildObjects(scene, onFootprint) {
         }
         const fp = normalizeModel(model);
         model.traverse((c) => { if (c.isMesh) c.castShadow = true; });
-        makeDesaturable(model, group);
         group.add(model);
         if (onFootprint) onFootprint(i, fp.rx, fp.rz);
       },
@@ -371,20 +313,19 @@ export function buildObjects(scene, onFootprint) {
         const fb = buildFallback(p.id);
         fb.scale.setScalar(1.35);   // 1.69 × 0.8
         fb.traverse((c) => { if (c.isMesh) c.castShadow = true; });
-        makeDesaturable(fb, group);
         group.add(fb);
       },
     );
 
     group.position.set(p.rx, 0.18, p.rz ?? 0);
-    Object.assign(group.userData, {
+    group.userData = {
       project: p,
       bobPhase:    Math.random() * Math.PI * 2,
       driftFreqX:  0.10 + Math.random() * 0.05,
       driftFreqZ:  0.08 + Math.random() * 0.05,
       driftRadius: 0.35 + Math.random() * 0.20,
       rotSpeed:    p.spin ?? (Math.random() < 0.5 ? 1 : -1) * (0.0008 + Math.random() * 0.0012),
-    });
+    };
     scene.add(group);
     meshes.push(group);
   });
