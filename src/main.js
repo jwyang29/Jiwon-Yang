@@ -74,7 +74,7 @@ const objStrengths = PROJECTS.map((p) => p.rippleStrength * OBJ_RIPPLE);
 // ─── Cursor ripples ───────────────────────────────────────────────────────────
 // A ring buffer of rings: the shader reads position, birth time and strength,
 // and decides everything else from age, so JS never has to tick them down.
-const RIPPLE_COUNT = 12;
+const RIPPLE_COUNT = 28;
 const ripplePos  = Array.from({ length: RIPPLE_COUNT }, () => new THREE.Vector2());
 const rippleTime = new Float32Array(RIPPLE_COUNT).fill(-999);
 const rippleAmp  = new Float32Array(RIPPLE_COUNT);
@@ -190,6 +190,14 @@ const ripplePoint = new THREE.Vector3();
 const rippleNdc   = new THREE.Vector2();
 let   lastRipX = 1e9, lastRipZ = 1e9;
 
+/** Drop a ring at a world XZ. Strength follows the same curve as the cursor's. */
+function addRipple(x, z, step, scale) {
+  ripplePos[rippleSlot].set(x, z);
+  rippleTime[rippleSlot] = clock.getElapsedTime();
+  rippleAmp[rippleSlot]  = THREE.MathUtils.clamp(step / 1.2, 0.4, 1.0) * scale;
+  rippleSlot = (rippleSlot + 1) % RIPPLE_COUNT;
+}
+
 function spawnRipple(clientX, clientY) {
   const r = renderer.domElement.getBoundingClientRect();
   rippleNdc.set(
@@ -206,11 +214,28 @@ function spawnRipple(clientX, clientY) {
   lastRipX = ripplePoint.x;
   lastRipZ = ripplePoint.z;
 
-  ripplePos[rippleSlot].set(ripplePoint.x, ripplePoint.z);
-  rippleTime[rippleSlot] = clock.getElapsedTime();
   // A longer step means the pointer was moving faster — let it hit harder
-  rippleAmp[rippleSlot]  = THREE.MathUtils.clamp(step / 1.2, 0.4, 1.0);
-  rippleSlot = (rippleSlot + 1) % RIPPLE_COUNT;
+  addRipple(ripplePoint.x, ripplePoint.z, step, 1.0);
+}
+
+// ─── Fish wakes ───────────────────────────────────────────────────────────────
+// Each fish lays the same rings the cursor does, at half strength. They spawn by
+// distance swum, and only while the fish is in frame: a ring the camera can't
+// see still costs every pixel a loop iteration.
+const FISH_RIPPLE_SCALE = 0.5;
+const FISH_RIPPLE_STEP  = 0.9;
+const fishLast = fishField.fish.map(() => ({ x: 1e9, z: 1e9 }));
+
+function spawnFishWakes(camZ, halfZ) {
+  fishField.fish.forEach((f, i) => {
+    const p = f.group.position;
+    if (Math.abs(p.z - camZ) > halfZ + 2.0) return;
+    const last = fishLast[i];
+    const step = Math.hypot(p.x - last.x, p.z - last.z);
+    if (step < FISH_RIPPLE_STEP) return;
+    last.x = p.x; last.z = p.z;
+    addRipple(p.x, p.z, step, FISH_RIPPLE_SCALE);
+  });
 }
 
 // Touch has no hover, so a tap is the only way to disturb the water there
@@ -265,6 +290,7 @@ const POOL_HALF_Z  = 44;   // pool plane is 88 deep
 const SCROLL_PX_PER_UNIT = 90;
 let cameraY  = 11;
 let scrollMaxZ = 10;       // how far the camera can pan down the pool
+let halfZ      = 5.4;      // half the pool depth currently in frame
 
 const scrollSpace = document.getElementById('scroll-space');
 
@@ -278,6 +304,7 @@ function resize() {
   cameraY = camera.aspect >= 1 ? 11 : Math.min(17, 11 / Math.max(camera.aspect, 0.45));
   // Pan range: stop before the pool's far edge enters the view
   const visibleHalfZ = TAN_HALF_FOV * cameraY;
+  halfZ = visibleHalfZ;
   scrollMaxZ = Math.max(0, POOL_HALF_Z - visibleHalfZ - 0.5);
   scrollSpace.style.height = `${Math.round(h + scrollMaxZ * SCROLL_PX_PER_UNIT)}px`;
   // Opening frame is open water — leaves and fish only. The objects start just
@@ -345,6 +372,7 @@ function frame() {
 
   animateObjects(objects, t);
   fishField.update(t);
+  spawnFishWakes(camera.position.z, halfZ);
   animateLeaves(leaves, t);
 
   // Sync object XZ positions and rotation angles into shader uniforms

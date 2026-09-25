@@ -3,9 +3,9 @@ precision highp float;
 uniform float uTime;
 uniform float uAudioLevel;
 uniform float uSwell;
-uniform vec2  uRipPos[12];
-uniform float uRipTime[12];
-uniform float uRipAmp[12];
+uniform vec2  uRipPos[28];
+uniform float uRipTime[28];
+uniform float uRipAmp[28];
 uniform vec2  uObjPos[9];
 uniform float uObjStrength[9];
 
@@ -55,7 +55,7 @@ void main() {
 
   // Cursor ripples — a ring is born where the pointer crossed the water and
   // travels outward, fading with age. `fr` is the distance ahead of the front.
-  for (int i = 0; i < 12; i++) {
+  for (int i = 0; i < 28; i++) {
     if (uRipAmp[i] <= 0.0) continue;
     float age = t - uRipTime[i];
     if (age < 0.0 || age > 3.0) continue;
