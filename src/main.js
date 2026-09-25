@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { AudioAnalyser }                  from './audio.js';
-import { buildObjects, layoutObjects, animateObjects, PROJECTS } from './objects.js';
+import { buildObjects, layoutObjects, animateObjects, animateObjectColor, PROJECTS } from './objects.js';
 import { buildFishField }                   from './fish.js';
 import { buildLeaves, animateLeaves }       from './leaves.js';
 import { BBoxOverlay, worldToScreenRect } from './bbox.js';
@@ -260,10 +260,13 @@ window.addEventListener('keydown', (e) => {
 
 // ─── Render Loop ──────────────────────────────────────────────────────────────
 const clock = new THREE.Clock();
+let prevT = 0;
 
 function frame() {
   requestAnimationFrame(frame);
   const t          = clock.getElapsedTime();
+  const dt         = Math.min(t - prevT, 0.1);   // clamped: tab-switch returns a huge delta
+  prevT = t;
   const audioLevel = audio.update();
 
   // Scroll position → camera pans down the pool; name stays fixed via CSS
@@ -313,6 +316,9 @@ function frame() {
   } else {
     bboxOverlay.hide();
   }
+
+  // Objects sit grey until one is selected, then bloom back to their own colour
+  animateObjectColor(objects, selectedRoot, dt);
 
   fishField.renderPass(camera);
   renderer.render(scene, camera);
