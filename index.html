@@ -97,10 +97,7 @@
       align-items: center;
       justify-content: space-between;
       padding: 16px 28px;
-      background: rgba(250, 245, 238, 0.72);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      border-bottom: 1.5px solid var(--ink);
+      background: none;
       z-index: 20;
     }
 
@@ -118,55 +115,52 @@
       transition: opacity 0.4s ease;
     }
 
-    /* Left slot reads as the project pages' back link */
-    #pool-btn {
+    /* Both labels sit straight on the water now, so they share one treatment
+       and carry a dark shadow to stay legible over a moving surface. */
+    #pool-btn, #mic-btn {
       background: none;
       border: none;
       padding: 0;
-      color: var(--ink);
-      font: bold 13px var(--ui);
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      text-decoration: underline;
-      text-underline-offset: 4px;
-      text-decoration-thickness: 2px;
-      cursor: pointer;
-    }
-    #pool-btn:hover { background: var(--wing); text-decoration: none; }
-
-    .ui-right { display: flex; align-items: center; gap: 18px; }
-
-    /* Right slot matches .nav-name — quiet until it has something to say */
-    #mic-btn {
-      background: none;
-      border: none;
-      padding: 0;
-      color: var(--ink);
+      color: rgba(226, 142, 73, 0.97);
       font: 12px var(--ui);
       letter-spacing: 0.28em;
       text-transform: uppercase;
       cursor: pointer;
+      text-shadow:
+        0 1px 10px rgba(14, 30, 44, 0.7),
+        0 0px  3px rgba(14, 30, 44, 0.5);
       transition: color 0.2s;
     }
-    #mic-btn:hover { color: var(--monarch); }
+    /* The underline keeps the left slot reading as a link, not a toggle */
+    #pool-btn {
+      text-decoration: underline;
+      text-underline-offset: 4px;
+      text-decoration-thickness: 1.5px;
+    }
+    #pool-btn:hover { color: rgba(253, 202, 148, 1); }
+
+    .ui-right { display: flex; align-items: center; gap: 18px; }
+
+    #mic-btn:hover { color: rgba(253, 202, 148, 1); }
+    /* Listening — pale wing light against the resting orange */
     #mic-btn.active {
-      color: var(--monarch);
+      color: var(--wing);
       font-weight: bold;
       text-decoration: underline;
       text-underline-offset: 4px;
-      text-decoration-thickness: 2px;
+      text-decoration-thickness: 1.5px;
     }
 
     #lang-btn {
       background: none;
-      border: 2px solid var(--ink);
-      color: var(--ink);
-      font: bold 11px var(--ui);
+      border: 1.5px solid rgba(226, 142, 73, 0.8);
+      color: rgba(226, 142, 73, 0.97);
+      font: 11px var(--ui);
       letter-spacing: 0.1em;
       padding: 4px 10px;
       cursor: pointer;
     }
-    #lang-btn:hover { background: var(--wing); }
+    #lang-btn:hover { color: rgba(253, 202, 148, 1); border-color: rgba(253, 202, 148, 0.9); }
     /* Language toggle hidden until i18n is enabled (JS adds .i18n-on to <html>) */
     html:not(.i18n-on) #lang-btn { display: none; }
 

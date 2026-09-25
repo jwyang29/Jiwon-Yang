@@ -95,7 +95,11 @@ void main() {
 
   // ── Caustic light blobs — warm amber shimmer ──────────────────────────────
   float cv = poolCaustic(vWorldXZ, t);
-  vec3 causticCol = vec3(0.992, 0.855, 0.722) * clamp(cv, 0.0, 1.0) * 0.55;
+  // Warmth rides the caustic's own intensity, so the faint ones stay pale and
+  // only the bright cores pick up orange — the variation is the point.
+  float cvn = clamp(cv, 0.0, 1.0);
+  vec3 causticCol = mix(vec3(0.992, 0.855, 0.722),
+                        vec3(1.000, 0.620, 0.220), cvn * 0.55) * cvn * 0.55;
 
   // ── Wave-depth darkening ───────────────────────────────────────────────────
   float wh          = waveHeight(vWorldXZ, t, boost);
