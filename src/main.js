@@ -23,8 +23,8 @@ renderer.toneMappingExposure = 0.92;   // autumn dusk — a touch under-exposed
 
 // ─── Scene ────────────────────────────────────────────────────────────────────
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x11304a);
-scene.fog        = new THREE.Fog(0x0d2740, 18, 38);
+scene.background = new THREE.Color(0x223140);
+scene.fog        = new THREE.Fog(0x1a2733, 18, 38);
 
 // ─── Camera ───────────────────────────────────────────────────────────────────
 const camera = new THREE.PerspectiveCamera(52, 1, 0.1, 40);
@@ -37,7 +37,7 @@ camera.lookAt(0, 0, 0);
 // of these lights touch them. Lighting here only shapes the floating project
 // objects and the leaves — which lets the pool stay dusky while the objects
 // themselves read bright and crisp.
-const sun = new THREE.DirectionalLight(0xffd9a2, 3.1);   // warm autumn key light
+const sun = new THREE.DirectionalLight(0xfddab8, 3.1);   // wing light — warm key
 sun.position.set(2, 14, 3);
 sun.castShadow = true;
 sun.shadow.mapSize.set(2048, 2048);
@@ -47,10 +47,10 @@ sun.shadow.camera.left   = sun.shadow.camera.bottom = -10;
 sun.shadow.camera.right  = sun.shadow.camera.top    =  10;
 sun.shadow.bias          = -0.001;
 scene.add(sun);
-scene.add(new THREE.AmbientLight(0xe0c6a4, 0.85));       // warm fill
+scene.add(new THREE.AmbientLight(0xf0d4b4, 0.85));       // warm fill
 // Sky-warm / water-cool wrap so object colours stay saturated, not muddy
-scene.add(new THREE.HemisphereLight(0xffdba4, 0x25566e, 1.00));
-const fill = new THREE.PointLight(0xff9d4d, 0.95, 24);   // warm amber counter-light
+scene.add(new THREE.HemisphereLight(0xfddab8, 0x3c4c5e, 1.00));
+const fill = new THREE.PointLight(0xd05b00, 0.95, 24);   // monarch counter-light
 fill.position.set(-4, 6, -3);
 scene.add(fill);
 
@@ -88,8 +88,8 @@ const waterUniforms = {
   uTime:        { value: 0 },
   uAudioLevel:  { value: 0 },
   uSunDir:      { value: sunDir },
-  uSunColor:    { value: new THREE.Color(0xffe0b0) },
-  uWaterColor:  { value: new THREE.Color(0x18465f) },
+  uSunColor:    { value: new THREE.Color(0xfddab8) },
+  uWaterColor:  { value: new THREE.Color(0x33475b) },
   uCameraPos:   { value: camera.position },
   uObjPos:      { value: objPositions },
   uObjStrength: { value: objStrengths },

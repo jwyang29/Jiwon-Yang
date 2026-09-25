@@ -89,9 +89,9 @@ void main() {
   vec3  H    = normalize(uSunDir + V);
   float spec = pow(max(dot(N, H), 0.0), 340.0) * 0.90;
 
-  // Deep navy dusk water, warmed where the low sun catches a slope
-  vec3 tint = vec3(0.10, 0.27, 0.39) * (1.0 + uAudioLevel * 0.25);
-  tint = mix(tint, vec3(0.48, 0.30, 0.15), F * 0.35);   // amber glance off crests
+  // Deep veil-blue dusk water, warmed where the low sun catches a slope
+  vec3 tint = vec3(0.115, 0.170, 0.235) * (1.0 + uAudioLevel * 0.25);
+  tint = mix(tint, vec3(0.52, 0.26, 0.06), F * 0.35);   // monarch glance off crests
 
   vec3  color = mix(tint, uSunColor * 0.80, F * 0.20) + uSunColor * spec * 0.90;
   // Slightly denser than the summer water so the pool reads as deeper

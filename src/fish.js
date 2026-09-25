@@ -17,7 +17,7 @@ const RT_SCALE  = 0.34;        // render fish small → cheap, and blurry by its
 const BLUR_PASSES = 2;
 
 // The water the fish are seen through.
-const HAZE_COLOR = 0x1d4560;
+const HAZE_COLOR = 0x2c3c4c;
 
 // ─── Fish shaders ─────────────────────────────────────────────────────────────
 const BODY_VERT = /* glsl */ `
@@ -207,9 +207,9 @@ function makeFanGeometry({ rootX, len, spread, notch = 0, curl = 0, segS = 14, s
 
 // ─── Palettes — vivid red-orange with white fin tips, as in the reference ─────
 const FISH_PALETTES = [
-  { deep: 0xd23a10, mid: 0xef5c1e, pale: 0xf6a874, finI: 0xf07a3c, finO: 0xfff2e4 },
-  { deep: 0xe2551a, mid: 0xf87a2c, pale: 0xfac89a, finI: 0xf59456, finO: 0xfff8ee },
-  { deep: 0xbf300c, mid: 0xdf4a16, pale: 0xef9a60, finI: 0xe86c2c, finO: 0xffeeda },
+  { deep: 0xa34700, mid: 0xd05b00, pale: 0xfdd0a2, finI: 0xe3772a, finO: 0xfddab8 },
+  { deep: 0xb85200, mid: 0xe06a12, pale: 0xfddab8, finI: 0xea8a3e, finO: 0xfee7cf },
+  { deep: 0x8f3e00, mid: 0xc25400, pale: 0xf8c491, finI: 0xd96c1e, finO: 0xfdd6b0 },
 ];
 
 const TWO_PI = Math.PI * 2;

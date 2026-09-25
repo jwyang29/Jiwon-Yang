@@ -1,28 +1,31 @@
 /* ────────────────────────────────────────────────────────────────
-   Project detail pages — brutalist editorial, autumn palette
-   Base: warm cream paper + near-black ink. Accents echo the pool:
-   deep teal water and the amber / burnt-orange of fallen leaves.
+   Project detail pages — editorial, typographic, one grotesque.
+   Palette is the monarch wing: pale peach, slate blue, burnt orange
+   on an off-white ground. Colour is an accent here, never the field.
 ──────────────────────────────────────────────────────────────── */
 
 :root {
-  --ink:    #171310;   /* warm near-black */
-  --paper:  #f4ede1;   /* autumn cream */
-  --teal:   #4f8f93;   /* light decorative teal (rules, dividers) */
-  --teal-d: #2b6f76;   /* deeper decorative teal */
-  --salmon: #e8a24a;   /* amber fill — hovers, highlight marks */
-  --accent: #b8551a;   /* burnt orange — display titles */
-  /* text-safe accents — WCAG-friendly contrast on --paper */
-  --teal-text: #16565e;
-  --pink-text: #a8431a;
-  /* Pretendard leads both stacks — Latin and Korean come from one family */
-  --ui:     'Pretendard Variable', Pretendard, 'Noto Sans KR', -apple-system,
-            BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
-  --sans:   'Helvetica Neue', Helvetica, 'Pretendard Variable', Pretendard, 'Noto Sans KR', Arial, sans-serif;
-}
+  --wing:    #FDDAB8;  /* wing light — soft fills, marks, hovers */
+  --veil:    #93A4B7;  /* veil blue — rules and dividers */
+  --monarch: #D05B00;  /* monarch orange — accents, display marks */
+  --ink:     #16120F;  /* the wing's dark bands */
+  --paper:   #FAF5EE;  /* off-white ground */
+  /* Veil blue at body size sits at 2.3:1 on paper, so text takes a
+     darkened cut of the same hue (6.6:1) and the light one stays decorative. */
+  --veil-d:  #4A5A6D;
 
-/* Korean mode: Pretendard leads the body stack for readability */
-html[lang="ko"] {
-  --sans: 'Pretendard Variable', Pretendard, 'Noto Sans KR', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  /* Older selectors still name the autumn tokens — alias, don't duplicate */
+  --teal:      var(--veil);
+  --teal-d:    var(--veil-d);
+  --salmon:    var(--wing);
+  --accent:    var(--monarch);
+  --teal-text: var(--veil-d);
+  --pink-text: var(--monarch);
+
+  /* One family throughout, as in the references */
+  --ui:   'Pretendard Variable', Pretendard, 'Noto Sans KR', -apple-system,
+          BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+  --sans: var(--ui);
 }
 
 /* ── Language toggle (nav) ────────────────────────────────────── */
@@ -59,8 +62,8 @@ nav {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 14px 24px;
-  border-bottom: 2px solid var(--ink);
+  padding: 16px 28px;
+  border-bottom: 1.5px solid var(--ink);
   position: sticky;
   top: 0;
   background: var(--paper);
@@ -90,30 +93,33 @@ nav {
 
 /* ── Frame ────────────────────────────────────────────────────── */
 main {
-  max-width: 880px;
+  max-width: 940px;
   margin: 0 auto;
-  padding: 56px 24px 90px;
+  padding: 72px 28px 120px;
 }
 
 /* ── Hero ─────────────────────────────────────────────────────── */
 .hero-tag {
-  font-size: 12px;
-  letter-spacing: 0.20em;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--veil-d);
+  margin-bottom: 22px;
+}
+.hero-tag::before { content: '* '; color: var(--monarch); }
+.hero-tag::after  { content: ' *'; color: var(--monarch); }
+
+/* Display type carries the page: heavy, uppercase, set tight enough
+   that the words read as one mass rather than a line of letters. */
+.hero-title {
+  font-family: var(--ui);
+  font-weight: 800;
+  font-size: clamp(44px, 9.5vw, 108px);
+  letter-spacing: -0.035em;
   text-transform: uppercase;
   color: var(--ink);
-  margin-bottom: 18px;
-}
-.hero-tag::before { content: '*** '; color: var(--teal-d); }
-.hero-tag::after  { content: ' ***'; color: var(--teal-d); }
-
-.hero-title {
-  font-family: 'Jacquarda Bastarda 9', serif;
-  font-weight: normal;
-  font-size: clamp(38px, 7.5vw, 84px);
-  letter-spacing: -0.01em;
-  text-transform: uppercase;
-  color: var(--accent);   /* accent: matches the floating name on the pool page */
-  line-height: 1.08;
+  line-height: 0.92;
   margin-bottom: 30px;
   word-break: keep-all;
 }
@@ -121,10 +127,10 @@ main {
 /* small plain-font legibility title next to the decorative one */
 .title-alt {
   font-family: var(--ui);
-  font-weight: bold;
-  font-size: clamp(13px, 1.6vw, 16px);
-  letter-spacing: 0.22em;
-  color: var(--ink);
+  font-weight: 700;
+  font-size: clamp(11px, 1.3vw, 13px);
+  letter-spacing: 0.26em;
+  color: var(--monarch);
   vertical-align: baseline;
   margin-left: 14px;
   white-space: nowrap;
@@ -135,11 +141,11 @@ main {
 .hero-intro {
   display: inline;
   background: var(--ink);
-  color: #fff;
+  color: var(--paper);
   font-family: var(--sans);
-  font-weight: 600;
-  font-size: clamp(15px, 2vw, 19px);
-  line-height: 1.8;
+  font-weight: 500;
+  font-size: clamp(16px, 2.1vw, 20px);
+  line-height: 1.85;
   text-transform: none;
   letter-spacing: 0.01em;
   padding: 3px 8px;
@@ -190,37 +196,40 @@ main {
   padding: 4px 12px;
   margin-bottom: 16px;
 }
-.meta-rows { font-size: 15px; }
+.meta-rows { font-size: 14.5px; border-top: 1.5px solid var(--ink); }
 .meta-rows .row {
   display: grid;
-  grid-template-columns: 130px 1fr;
-  gap: 18px;
-  padding: 5px 0;
+  grid-template-columns: 150px 1fr;
+  gap: 20px;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--veil);
   color: var(--ink);
-  letter-spacing: 0.02em;
+  letter-spacing: 0.01em;
+  align-items: baseline;
 }
 .meta-rows .row label {
-  color: var(--ink);
-  font-weight: bold;
+  color: var(--veil-d);
+  font-weight: 700;
+  font-size: 11px;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.15em;
 }
-.meta-rows .row span { color: var(--teal-text); font-weight: 600; }
+.meta-rows .row span { color: var(--ink); font-weight: 500; }
 
 /* ── Browser-window image frame ───────────────────────────────── */
 .window {
-  border: 2px solid var(--ink);
-  background: #fff;
-  margin: 46px 0;
+  border: 1.5px solid var(--ink);
+  background: var(--paper);
+  margin: 52px 0;
 }
 .window-bar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 2px solid var(--ink);
-  padding: 7px 12px;
-  font-size: 11px;
-  letter-spacing: 0.14em;
+  border-bottom: 1.5px solid var(--ink);
+  padding: 8px 13px;
+  font-size: 10.5px;
+  letter-spacing: 0.16em;
   color: var(--ink);
   text-transform: lowercase;
 }
@@ -234,9 +243,8 @@ main {
   font-size: 12px;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  background:
-    repeating-linear-gradient(0deg,   transparent 0 31px, #eee 31px 32px),
-    repeating-linear-gradient(90deg,  transparent 0 31px, #eee 31px 32px);
+  color: var(--veil-d);
+  background: var(--wing);
 }
 .window-body img   { width: 100%; height: auto; display: block; }
 .window-body video { width: 100%; height: auto; display: block; background: #000; }
@@ -246,9 +254,9 @@ main {
 .window-body--embed iframe { width: 100%; height: 640px; border: 0; display: block; }
 @media (max-width: 640px) { .window-body--embed iframe { height: 480px; } }
 .window-caption {
-  border-top: 2px solid var(--ink);
-  padding: 8px 12px;
-  font-size: 11.5px;
+  border-top: 1.5px solid var(--ink);
+  padding: 9px 13px;
+  font-size: 11px;
   letter-spacing: 0.08em;
   color: var(--ink);
   text-transform: uppercase;
@@ -273,45 +281,50 @@ main {
 .section-bracket {
   font-family: var(--sans);
   font-weight: 800;
-  font-size: clamp(22px, 3.4vw, 32px);
-  letter-spacing: 0.01em;
+  font-size: clamp(30px, 5vw, 52px);
+  letter-spacing: -0.025em;
   color: var(--ink);
   text-transform: uppercase;
-  margin-bottom: 20px;
+  line-height: 1;
+  margin-bottom: 26px;
 }
 
 .section h2 {
   font-family: var(--ui);
-  font-weight: bold;
-  font-size: 16px;
-  letter-spacing: 0.06em;
+  font-weight: 700;
+  font-size: clamp(17px, 2.1vw, 20px);
+  letter-spacing: 0.02em;
   text-transform: uppercase;
   color: var(--ink);
-  margin-bottom: 16px;
+  margin-bottom: 18px;
 }
-.section h2::before { content: '>> '; color: var(--pink-text); }
+.section h2::before { content: '>> '; color: var(--monarch); }
 
 /* Body copy — readability first: sentence case, regular weight,
    left-aligned, comfortable measure (~68ch) and line height */
+/* Justified, as in the reference — but keep-all so Korean never breaks
+   mid-word, and hyphens so the Latin rag doesn't open rivers. */
 .section p {
   font-family: var(--sans);
   font-weight: 400;
-  font-size: clamp(15.5px, 1.8vw, 17px);
-  line-height: 1.8;
-  text-align: left;
+  font-size: clamp(16px, 1.9vw, 18px);
+  line-height: 1.78;
+  text-align: justify;
+  hyphens: auto;
+  word-break: keep-all;
   text-transform: none;
-  letter-spacing: 0.005em;
-  color: #1d1d1d;
-  max-width: 68ch;
-  margin-bottom: 18px;
+  letter-spacing: 0.004em;
+  color: var(--ink);
+  max-width: 72ch;
+  margin-bottom: 20px;
 }
 
 /* keyword highlights — darkened for WCAG-friendly text contrast */
-.hl-blue   { color: var(--teal-text); font-weight: 600; }
-.hl-pink   { color: var(--pink-text); font-weight: 600; }
-.hl-yellow { color: var(--teal-text); font-weight: 600; }
-.hl-teal   { color: var(--teal-text); font-weight: 600; }
-.hl-mark   { background: var(--salmon); color: var(--ink); padding: 0 5px; font-weight: 600; }
+.hl-blue   { color: var(--veil-d);  font-weight: 700; }
+.hl-pink   { color: var(--monarch); font-weight: 700; }
+.hl-yellow { color: var(--monarch); font-weight: 700; }
+.hl-teal   { color: var(--veil-d);  font-weight: 700; }
+.hl-mark   { background: var(--wing); color: var(--ink); padding: 0 5px; font-weight: 700; }
 
 /* ── Tags ─────────────────────────────────────────────────────── */
 .tags {
@@ -368,21 +381,21 @@ main {
   gap: 18px;
   align-items: baseline;
   padding: 9px 2px;
-  border-bottom: 1px solid rgba(17, 17, 17, 0.18);
+  border-bottom: 1px solid var(--veil);
 }
 .skills-row label {
   font-family: var(--ui);
-  font-weight: bold;
-  font-size: 12.5px;
-  letter-spacing: 0.07em;
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.15em;
   text-transform: uppercase;
-  color: var(--ink);
+  color: var(--veil-d);
 }
 .skills-row span {
   font-family: var(--sans);
   font-size: 15px;
   line-height: 1.55;
-  color: #1d1d1d;
+  color: var(--ink);
 }
 @media (max-width: 640px) {
   .skills-row { grid-template-columns: 128px 1fr; gap: 12px; }
@@ -391,25 +404,25 @@ main {
 }
 
 /* ── Works archive list (about page) ──────────────────────────── */
-.works-list { border-top: 2px solid var(--ink); margin-top: 18px; }
+.works-list { border-top: 1.5px solid var(--ink); margin-top: 18px; }
 .works-row {
   display: grid;
   grid-template-columns: 46px 1fr auto 64px;
   gap: 16px;
   align-items: baseline;
-  padding: 13px 6px;
-  border-bottom: 2px solid var(--ink);
+  padding: 15px 6px;
+  border-bottom: 1px solid var(--veil);
   font-family: var(--ui);
-  font-weight: bold;
+  font-weight: 700;
   text-transform: uppercase;
   color: var(--ink);
   text-decoration: none;
 }
 a.works-row:hover { background: var(--salmon); }
-.works-row .no    { color: var(--teal-d); font-size: 12px; letter-spacing: 0.08em; }
-.works-row .title { font-size: clamp(15px, 2vw, 19px); letter-spacing: 0.08em; }
-.works-row .cat   { font-size: 11.5px; letter-spacing: 0.1em; color: #777; }
-.works-row .yr    { font-size: 12px; letter-spacing: 0.08em; text-align: right; }
+.works-row .no    { color: var(--veil-d); font-size: 11px; letter-spacing: 0.12em; }
+.works-row .title { font-size: clamp(16px, 2.2vw, 22px); letter-spacing: -0.005em; font-weight: 800; }
+.works-row .cat   { font-size: 10.5px; letter-spacing: 0.15em; color: var(--veil-d); }
+.works-row .yr    { font-size: 11px; letter-spacing: 0.1em; text-align: right; color: var(--veil-d); }
 .works-row.soon   { opacity: 0.45; }
 .works-row.soon .yr { color: var(--accent); }
 @media (max-width: 640px) {
@@ -435,9 +448,9 @@ a.works-row:hover { background: var(--salmon); }
 /* ── Asterisk deco ────────────────────────────────────────────── */
 .deco-asterisk {
   font-family: var(--sans);
-  font-size: 80px;
+  font-size: 92px;
   font-weight: 300;
-  color: var(--accent);
+  color: var(--monarch);
   line-height: 1;
   margin: 10px 0;
   user-select: none;
@@ -445,33 +458,31 @@ a.works-row:hover { background: var(--salmon); }
 
 /* ── Next project ─────────────────────────────────────────────── */
 .next-project {
-  margin-top: 80px;
-  border-top: 2px solid var(--ink);
-  padding-top: 28px;
+  margin-top: 96px;
+  border-top: 1.5px solid var(--ink);
+  padding-top: 26px;
 }
 .next-label {
-  display: inline-block;
-  background: var(--ink);
-  color: #fff;
-  font-weight: bold;
-  font-size: 12px;
-  letter-spacing: 0.16em;
+  display: block;
+  color: var(--veil-d);
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
-  padding: 3px 10px;
-  margin-bottom: 14px;
+  margin-bottom: 10px;
 }
+/* Sized to land as the last mass on the page, not as a link in a line */
 .next-name {
   display: block;
   color: var(--ink);
-  font-weight: bold;
-  font-size: clamp(26px, 4.6vw, 46px);
-  letter-spacing: 0.12em;
+  font-weight: 800;
+  font-size: clamp(34px, 7.5vw, 82px);
+  letter-spacing: -0.035em;
+  line-height: 0.95;
   text-transform: uppercase;
-  text-decoration: underline;
-  text-underline-offset: 8px;
-  text-decoration-thickness: 3px;
+  text-decoration: none;
 }
-.next-name:hover { background: var(--salmon); color: var(--ink); text-decoration: none; }
+.next-name:hover { color: var(--monarch); text-decoration: none; }
 
 /* ── Mobile (iPhone) ──────────────────────────────────────────── */
 @media (max-width: 640px) {
@@ -482,7 +493,7 @@ a.works-row:hover { background: var(--salmon); }
 
   .hero-tag { font-size: 10.5px; letter-spacing: 0.12em; }
 
-  .hero-title { font-size: clamp(34px, 11vw, 48px); }
+  .hero-title { font-size: clamp(36px, 12vw, 54px); letter-spacing: -0.03em; }
   .title-alt {
     display: block;                    /* drop below the decorative title */
     margin-left: 0;
@@ -501,7 +512,7 @@ a.works-row:hover { background: var(--salmon); }
   .skill label { font-size: 11px; padding: 3px 5px; }
 
   .section { margin: 44px 0; }
-  .section-bracket { font-size: clamp(22px, 7vw, 30px); }
+  .section-bracket { font-size: clamp(26px, 8vw, 36px); }
   .section p { text-align: left; }     /* justify creates rivers on narrow columns */
 
   .window-body { min-height: 200px; }

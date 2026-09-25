@@ -18,7 +18,7 @@
     }
 
     body {
-      background: #11304a;
+      background: #223140;
       overflow-x: hidden;
       font-family: var(--ui);
     }
@@ -41,9 +41,9 @@
     #bbox-border {
       position: absolute;
       inset: 0;
-      border: 1.5px solid #F0913C;
-      box-shadow: 0 0 18px rgba(240, 145, 60, 0.45),
-                  inset 0 0 18px rgba(240, 145, 60, 0.08);
+      border: 1.5px solid #D05B00;
+      box-shadow: 0 0 18px rgba(208, 91, 0, 0.45),
+                  inset 0 0 18px rgba(208, 91, 0, 0.08);
     }
     /* Corner brackets */
     #bbox-border::before {
@@ -51,22 +51,22 @@
       position: absolute;
       top: -3px; left: -3px;
       width: 11px; height: 11px;
-      border-top: 2.5px solid #F0913C;
-      border-left: 2.5px solid #F0913C;
+      border-top: 2.5px solid #D05B00;
+      border-left: 2.5px solid #D05B00;
     }
     #bbox-border::after {
       content: '';
       position: absolute;
       bottom: -3px; right: -3px;
       width: 11px; height: 11px;
-      border-bottom: 2.5px solid #F0913C;
-      border-right: 2.5px solid #F0913C;
+      border-bottom: 2.5px solid #D05B00;
+      border-right: 2.5px solid #D05B00;
     }
 
     #bbox-label {
       position: absolute;
       top: -24px; left: -1px;
-      background: #C2611C;
+      background: #D05B00;
       color: #fff;
       font: bold 10px/1 var(--ui);
       padding: 4px 9px;
@@ -76,7 +76,7 @@
     #bbox-sub {
       position: absolute;
       bottom: -20px; left: 0;
-      color: #F5A65A;
+      color: #FDDAB8;
       font: 9px/1 var(--ui);
       letter-spacing: 0.06em;
       white-space: nowrap;
@@ -105,7 +105,7 @@
     #hint {
       margin-top: 20px;
       text-align: center;
-      color: rgba(246, 170, 96, 0.96);
+      color: rgba(226, 142, 73, 0.97);
       font-size: 14px;
       font-weight: 300;
       letter-spacing: 0.18em;
@@ -119,9 +119,9 @@
       position: absolute;
       top: 18px;
       pointer-events: all;
-      background: rgba(9, 32, 50, 0.52);
+      background: rgba(20, 30, 40, 0.55);
       border: 1px solid rgba(255, 255, 255, 0.15);
-      color: rgba(240, 232, 220, 0.95);
+      color: rgba(253, 218, 184, 0.95);
       font: 500 10px var(--ui);
       letter-spacing: 0.14em;
       padding: 8px 16px;
@@ -137,14 +137,14 @@
     html:not(.i18n-on) #lang-btn { display: none; }
     #pool-btn { left: 18px; }
     #mic-btn:hover, #pool-btn:hover, #lang-btn:hover {
-      background: rgba(13, 44, 68, 0.72);
+      background: rgba(26, 39, 51, 0.74);
       border-color: rgba(255, 255, 255, 0.3);
     }
     /* Listening — with the marker glyph gone, the filled state carries it */
     #mic-btn.active {
-      background: rgba(194, 97, 28, 0.88);
-      border-color: rgba(240, 145, 60, 0.9);
-      color: #fdf3e6;
+      background: rgba(208, 91, 0, 0.9);
+      border-color: rgba(224, 112, 32, 0.92);
+      color: #FDDAB8;
     }
 
     /* ── "The Pool" concept popup ───────────────────────── */
@@ -156,7 +156,7 @@
       align-items: center;
       justify-content: center;
       padding: 24px;
-      background: rgba(18, 52, 60, 0.38);
+      background: rgba(22, 34, 44, 0.42);
       backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(14px);
     }
@@ -179,7 +179,7 @@
       font-weight: normal;
       font-size: 44px;
       letter-spacing: -0.01em;
-      color: rgba(217, 118, 38, 1);
+      color: rgba(208, 91, 0, 1);
       margin-bottom: 4px;
     }
     #pool-card .card-sub {
@@ -210,7 +210,7 @@
       cursor: pointer;
       padding: 4px 8px;
     }
-    #pool-close:hover { color: rgba(217, 118, 38, 1); }
+    #pool-close:hover { color: rgba(208, 91, 0, 1); }
 
     @media (max-width: 640px) {
       #pool-btn { top: calc(14px + env(safe-area-inset-top)); left: 14px; }
@@ -241,11 +241,11 @@
     #floating-name {
       font-family: 'Jacquarda Bastarda 9', serif;
       font-size: clamp(52px, 8.5vw, 128px);
-      color: rgba(240, 136, 64, 0.97); /* autumn amber, leaning red */
+      color: rgba(232, 126, 48, 0.97); /* monarch, lifted to read on the water */
       text-shadow:
         0 3px  2px rgba(12, 42, 50, 0.55),   /* crisp dark drop for contrast */
         0 8px 22px rgba(8, 32, 40, 0.45),    /* soft depth below */
-        0 2px 30px rgba(224, 100, 40, 0.48); /* warm red-orange glow */
+        0 2px 30px rgba(208, 91, 0, 0.5);   /* monarch glow */
       letter-spacing: -0.01em;
       white-space: nowrap;
       text-align: center;
@@ -258,9 +258,9 @@
       transition: color 0.25s ease, text-shadow 0.25s ease;
     }
     #floating-name:hover {
-      color: rgba(250, 160, 94, 1);
+      color: rgba(253, 202, 148, 1);
       text-shadow:
-        0 2px 34px rgba(234, 114, 46, 0.72),
+        0 2px 34px rgba(208, 91, 0, 0.72),
         0 0px 10px rgba(255, 255, 255, 0.35);
     }
 

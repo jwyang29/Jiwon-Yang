@@ -74,8 +74,8 @@ function makeMapleShape() {
 
 // Autumn leaf colours sampled from the moodboard — rust through amber
 const LEAF_COLORS = [
-  0x9c4a1e, 0xb35a20, 0xc86a26, 0xd98a33,
-  0xe0a341, 0x8a3d1c, 0xbf7a2c, 0xa8551f,
+  0x8f3e00, 0xa34700, 0xd05b00, 0xdc7a1e,
+  0xe89a44, 0x7d3600, 0xc06412, 0xb05200,
 ];
 
 // ─── Public API ───────────────────────────────────────────────────────────────
