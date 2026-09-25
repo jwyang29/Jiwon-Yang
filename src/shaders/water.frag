@@ -90,8 +90,9 @@ void main() {
   float spec = pow(max(dot(N, H), 0.0), 340.0) * 0.90;
 
   // Deep veil-blue dusk water, warmed where the low sun catches a slope
+  // No warm mix on the crests — it followed the wavefronts and painted rust
+  // diagonals across the pool. Fresnel already lifts toward the sun below.
   vec3 tint = vec3(0.115, 0.170, 0.235) * (1.0 + uAudioLevel * 0.25);
-  tint = mix(tint, vec3(0.52, 0.26, 0.06), F * 0.35);   // monarch glance off crests
 
   vec3  color = mix(tint, uSunColor * 0.80, F * 0.20) + uSunColor * spec * 0.90;
   // Slightly denser than the summer water so the pool reads as deeper

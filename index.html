@@ -15,6 +15,12 @@
     :root {
       --ui: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont,
             'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      /* Same values as public/projects/layout.css, so the bar below matches
+         the one on every project page */
+      --paper:   #FAF5EE;
+      --ink:     #16120F;
+      --monarch: #D05B00;
+      --wing:    #FDDAB8;
     }
 
     body {
@@ -83,21 +89,26 @@
       text-shadow: 0 1px 6px rgba(0,0,0,0.35);
     }
 
-    /* ── UI chrome ──────────────────────────────────────── */
+    /* ── UI chrome — the same bar the project pages carry ── */
     #ui {
       position: fixed;
-      inset: 0;
-      pointer-events: none;
+      top: 0; left: 0; right: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 28px;
+      background: var(--paper);
+      border-bottom: 1.5px solid var(--ink);
+      z-index: 20;
     }
 
     #name-tag {
       position: absolute;
-      top: 22px;
       left: 50%;
       transform: translateX(-50%);
-      color: rgba(10, 45, 60, 0.6);
-      font-size: 11px;
-      letter-spacing: 0.22em;
+      color: var(--ink);
+      font-size: 12px;
+      letter-spacing: 0.28em;
       text-transform: uppercase;
       white-space: nowrap;
     }
@@ -115,37 +126,57 @@
       transition: opacity 0.4s ease;
     }
 
-    #mic-btn, #pool-btn, #lang-btn {
-      position: absolute;
-      top: 18px;
-      pointer-events: all;
-      background: rgba(20, 30, 40, 0.55);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      color: rgba(253, 218, 184, 0.95);
-      font: 500 10px var(--ui);
-      letter-spacing: 0.14em;
-      padding: 8px 16px;
-      border-radius: 999px;
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
+    /* Left slot reads as the project pages' back link */
+    #pool-btn {
+      background: none;
+      border: none;
+      padding: 0;
+      color: var(--ink);
+      font: bold 13px var(--ui);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      text-decoration: underline;
+      text-underline-offset: 4px;
+      text-decoration-thickness: 2px;
       cursor: pointer;
-      transition: background 0.2s, color 0.2s, border-color 0.2s;
     }
-    #mic-btn  { right: 18px; }
-    #lang-btn { right: 96px; }
+    #pool-btn:hover { background: var(--wing); text-decoration: none; }
+
+    .ui-right { display: flex; align-items: center; gap: 18px; }
+
+    /* Right slot matches .nav-name — quiet until it has something to say */
+    #mic-btn {
+      background: none;
+      border: none;
+      padding: 0;
+      color: var(--ink);
+      font: 12px var(--ui);
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+    #mic-btn:hover { color: var(--monarch); }
+    #mic-btn.active {
+      color: var(--monarch);
+      font-weight: bold;
+      text-decoration: underline;
+      text-underline-offset: 4px;
+      text-decoration-thickness: 2px;
+    }
+
+    #lang-btn {
+      background: none;
+      border: 2px solid var(--ink);
+      color: var(--ink);
+      font: bold 11px var(--ui);
+      letter-spacing: 0.1em;
+      padding: 4px 10px;
+      cursor: pointer;
+    }
+    #lang-btn:hover { background: var(--wing); }
     /* Language toggle hidden until i18n is enabled (JS adds .i18n-on to <html>) */
     html:not(.i18n-on) #lang-btn { display: none; }
-    #pool-btn { left: 18px; }
-    #mic-btn:hover, #pool-btn:hover, #lang-btn:hover {
-      background: rgba(26, 39, 51, 0.74);
-      border-color: rgba(255, 255, 255, 0.3);
-    }
-    /* Listening — with the marker glyph gone, the filled state carries it */
-    #mic-btn.active {
-      background: rgba(208, 91, 0, 0.9);
-      border-color: rgba(224, 112, 32, 0.92);
-      color: #FDDAB8;
-    }
 
     /* ── "The Pool" concept popup ───────────────────────── */
     #pool-modal {
@@ -271,8 +302,10 @@
         white-space: normal;
         max-width: 90vw;
       }
-      #name-tag { top: calc(16px + env(safe-area-inset-top)); font-size: 10px; }
-      #mic-btn  { top: calc(14px + env(safe-area-inset-top)); right: 14px; }
+      #ui       { padding: 12px 16px; }
+      #name-tag { display: none; }
+      #pool-btn { font-size: 11px; }
+      #mic-btn  { font-size: 10px; letter-spacing: 0.2em; }
       #hint     { font-size: 11px; margin-top: 14px; }
     }
   </style>
@@ -295,10 +328,12 @@
 
   <!-- UI chrome -->
   <div id="ui">
-    <div id="name-tag" data-i18n="main.nametag">Portfolio</div>
     <button id="pool-btn">THE POOL</button>
-    <button id="lang-btn" class="lang-toggle">KO</button>
-    <button id="mic-btn">MIC</button>
+    <div id="name-tag" data-i18n="main.nametag">Portfolio</div>
+    <div class="ui-right">
+      <button id="lang-btn" class="lang-toggle">KO</button>
+      <button id="mic-btn">MIC</button>
+    </div>
   </div>
 
   <!-- "The Pool" concept popup -->
