@@ -40,8 +40,9 @@ void main() {
   addWaveY(y,  1.68, -3.20, 0.016, 2.30, t, pos);
   addWaveY(y, -3.45, -1.80, 0.014, 3.10, t, pos);
   // Eight overlapping swells; more than this and the surface reads as busy noise.
-  // Swell level is set per device — see uSwell in main.js
-  y *= boost * uSwell;
+  // uSwell is the resting swell; the mic adds to it rather than
+  // scaling it, so silence can be perfectly still and sound still moves water
+  y *= (uSwell + uAudioLevel * 0.9);
 
   // Object-driven radial ripples (Y-only)
   for (int i = 0; i < 9; i++) {

@@ -59,11 +59,12 @@ const sunDir      = new THREE.Vector3(5, 12, 8).normalize();
 const objPositions = PROJECTS.map(() => new THREE.Vector2());
 const objStrengths = PROJECTS.map((p) => p.rippleStrength);
 
-// Devices with a real hover pointer (mouse/trackpad) drive the water with the
-// cursor, so their ambient swell drops almost to nothing. Touch has no cursor,
-// so it keeps the swell — otherwise the pool would sit still between taps.
 const canHover = window.matchMedia('(hover: hover)').matches;
-const SWELL = canHover ? 0.03 : 0.30;
+
+// Resting swell. At zero the pool only moves when something touches it — the
+// cursor on desktop, a tap on touch — and when the mic hears something, which
+// the shaders add on top of this rather than multiplying into it.
+const SWELL = 0.0;
 
 // ─── Cursor ripples ───────────────────────────────────────────────────────────
 // A ring buffer of rings: the shader reads position, birth time and strength,

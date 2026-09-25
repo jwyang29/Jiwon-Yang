@@ -48,9 +48,10 @@ void waveGradient(vec2 pos, float t, float boost,
   c=cos(-2.10*pos.x+2.80*pos.y-2.80*t);  gx+=0.018*-2.10*c; gz+=0.018* 2.80*c;
   c=cos( 1.68*pos.x-3.20*pos.y-2.30*t);  gx+=0.016* 1.68*c; gz+=0.016*-3.20*c;
   c=cos(-3.45*pos.x-1.80*pos.y-3.10*t);  gx+=0.014*-3.45*c; gz+=0.014*-1.80*c;
-  // Swell level is set per device — see uSwell in main.js
-  gx *= boost * uSwell;
-  gz *= boost * uSwell;
+  // uSwell is the resting swell; the mic adds to it rather than
+  // scaling it, so silence can be perfectly still and sound still moves water
+  gx *= (uSwell + uAudioLevel * 0.9);
+  gz *= (uSwell + uAudioLevel * 0.9);
 
   // Matching gradient for the cursor rings: d/dd of the height term above,
   // projected onto the radial direction.
