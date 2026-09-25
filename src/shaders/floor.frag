@@ -4,7 +4,6 @@ uniform float uTime;
 uniform float uAudioLevel;
 uniform vec3  uSunDir;
 uniform float uSwell;
-uniform float uCausticT;   // caustic clock — held still while the water is
 uniform vec2  uRipPos[12];
 uniform float uRipTime[12];
 uniform float uRipAmp[12];
@@ -15,41 +14,6 @@ uniform float uObjAngle[9]; // object rotation.y — rotates the ellipse with th
 
 varying vec2 vUv;
 varying vec2 vWorldXZ;
-
-// ─── 2-D Simplex Noise ────────────────────────────────────────────────────────
-vec3 _p3(vec3 x) { return x - floor(x*(1.0/289.0))*289.0; }
-vec2 _p2(vec2 x) { return x - floor(x*(1.0/289.0))*289.0; }
-float snoise(vec2 v) {
-  const vec4 C = vec4(0.211324865405187, 0.366025403784439,
-                      -0.577350269189626, 0.024390243902439);
-  vec2 i  = floor(v + dot(v, C.yy));
-  vec2 x0 = v - i + dot(i, C.xx);
-  vec2 i1  = (x0.x > x0.y) ? vec2(1,0) : vec2(0,1);
-  vec4 x12 = x0.xyxy + C.xxzz; x12.xy -= i1;
-  i = _p2(i);
-  vec3 p = _p3(_p3(i.y + vec3(0.0,i1.y,1.0)) + i.x + vec3(0.0,i1.x,1.0));
-  vec3 m = max(0.5 - vec3(dot(x0,x0),dot(x12.xy,x12.xy),dot(x12.zw,x12.zw)), 0.0);
-  m = m*m*m*m;
-  vec3 x  = 2.0*fract(p*C.www) - 1.0;
-  vec3 h  = abs(x) - 0.5;
-  vec3 a0 = x - floor(x+0.5);
-  m *= 1.79284291400159 - 0.85373472095314*(a0*a0+h*h);
-  vec3 g = vec3(a0.x*x0.x+h.x*x0.y, a0.yz*x12.xz+h.yz*x12.yw);
-  return 130.0 * dot(m, g);
-}
-
-// ─── Pool caustic ─────────────────────────────────────────────────────────────
-float poolCaustic(vec2 p, float t) {
-  float audioBoost = 1.0 + uAudioLevel * 1.4;
-  float wx = snoise(p * 0.22 + vec2(t*0.05, 1.30));
-  float wz = snoise(p * 0.22 + vec2(2.80, t*0.04));
-  vec2 wp  = p + vec2(wx, wz) * 0.85;
-  float n1 = snoise(wp * 0.32 + vec2( t*0.16, t*0.07));
-  float n2 = snoise(wp * 0.39 + vec2(-t*0.11, t*0.21) + vec2(3.71, 1.97));
-  float c   = pow(max(0.0, n1 * n2), 2.2) * 4.0;
-  float env = 0.55 + 0.45 * snoise(p * 0.14 + vec2(t*0.06, t*0.04));
-  return c * max(0.3, env) * audioBoost;
-}
 
 // ─── Wave height (mirrors water.vert, large waves only) ───────────────────────
 float waveHeight(vec2 pos, float t, float boost) {
@@ -128,23 +92,9 @@ void main() {
   vec3 tileGrout = vec3(0.055, 0.085, 0.125);
   vec3 floorCol  = mix(tileBase, tileGrout, tileGrid(refractW, 0.048));
 
-  // Slow wash toward veil blue where light still reaches the bottom
-  float lit = 0.5 + 0.5 * snoise(vWorldXZ * 0.11 + vec2(uCausticT * 0.035, uCausticT * 0.02));
-  floorCol = mix(floorCol, vec3(0.300, 0.375, 0.445), lit * 0.28);
-
-  // ── Caustic light blobs — warm amber shimmer ──────────────────────────────
-  float cv = poolCaustic(vWorldXZ, uCausticT);
-  // Warmth rides the caustic's own intensity, so the faint ones stay pale and
-  // only the bright cores pick up orange — the variation is the point.
-  float cvn = clamp(cv, 0.0, 1.0);
-  vec3 causticCol = mix(vec3(0.992, 0.855, 0.722),
-                        vec3(1.000, 0.620, 0.220), cvn * 0.55) * cvn * 0.55;
-
-  // ── Wave-depth darkening ───────────────────────────────────────────────────
-  float wh          = waveHeight(vWorldXZ, t, boost);
-  float depthShadow = 1.0 - wh * 0.30;
-  floorCol   *= depthShadow;
-  causticCol *= depthShadow;
+  // ── Wave-depth darkening — only a ripple reaches this now ─────────────────
+  float wh = waveHeight(vWorldXZ, t, boost);
+  floorCol *= 1.0 - wh * 0.30;
 
   // ── Per-object elliptical shadows (shape-correct, rotate with object) ──────
   // Sun at (2,14,3); object height ≈ 0.18, floor at -0.80 → depth 0.98
@@ -172,12 +122,11 @@ void main() {
       poolShadow = min(poolShadow, 1.0 - s * 0.32);
     }
   }
-  floorCol   *= poolShadow;
-  causticCol *= (poolShadow * 0.55 + 0.45);
+  floorCol *= poolShadow;
 
   // ── Edge vignette — deeper, for the dusk mood ─────────────────────────────
-  float edge  = 1.0 - length(vUv - 0.5) * 0.72;
-  floorCol   *= 0.66 + edge * 0.34;
+  float edge = 1.0 - length(vUv - 0.5) * 0.72;
+  floorCol  *= 0.66 + edge * 0.34;
 
-  gl_FragColor = vec4(clamp(floorCol + causticCol, 0.0, 1.0), 1.0);
+  gl_FragColor = vec4(clamp(floorCol, 0.0, 1.0), 1.0);
 }

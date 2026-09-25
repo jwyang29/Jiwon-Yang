@@ -63,11 +63,6 @@ const canHover = window.matchMedia('(hover: hover)').matches;
 // the shaders add on top of this rather than multiplying into it.
 const SWELL = 0.0;
 
-// Caustics are the water surface projected onto the floor, so with the surface
-// still they have no reason to drift. Their clock only advances on sound; the
-// cursor's rings already warp the floor locally through the refraction.
-let causticT = 0;
-
 // Objects used to radiate a ring each, always on. That is a default ripple too,
 // so it rests at zero — raise it to let them disturb the water again.
 const OBJ_RIPPLE = 0.0;
@@ -90,14 +85,13 @@ const objShadowRx    = new Float32Array(PROJECTS.map(p => p.shadowRx));
 const objShadowRz    = new Float32Array(PROJECTS.map(p => p.shadowRz));
 const objShadowAngle = new Float32Array(PROJECTS.length);
 
-// ─── Pool Floor (caustic + procedural shadow shader) ─────────────────────────
+// ─── Pool Floor (tile, refraction and procedural shadow shader) ──────────────
 const floorUniforms = {
   uTime:       { value: 0 },
   uAudioLevel: { value: 0 },
   uSunDir:     { value: sunDir },
   uObjPos:     { value: objPositions },
   uSwell:      { value: SWELL },
-  uCausticT:   { value: 0 },
   uRipPos:     { value: ripplePos },
   uRipTime:    { value: rippleTime },
   uRipAmp:     { value: rippleAmp },
@@ -336,7 +330,6 @@ function frame() {
   const dt         = Math.min(t - prevT, 0.1);   // clamped: a hidden tab returns a huge delta
   prevT = t;
   const audioLevel = audio.update();
-  causticT += dt * audioLevel * 2.2;
 
   // Scroll position → camera pans down the pool; name stays fixed via CSS
   const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
@@ -345,7 +338,6 @@ function frame() {
   camera.lookAt(0, 0, zOff);
 
   floorUniforms.uTime.value       = t;
-  floorUniforms.uCausticT.value   = causticT;
   floorUniforms.uAudioLevel.value = audioLevel;
   waterUniforms.uTime.value       = t;
   waterUniforms.uAudioLevel.value = audioLevel;
