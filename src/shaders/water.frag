@@ -119,7 +119,7 @@ void main() {
   // No warm mix on the crests — it followed the wavefronts and painted rust
   // diagonals across the pool. Fresnel already lifts toward the sun below.
   // sRGB, like the floor: nothing converts this on the way out.
-  vec3 tint = vec3(0.261, 0.515, 0.814) * (1.0 + uAudioLevel * 0.25);
+  vec3 tint = vec3(0.235, 0.464, 0.733) * (1.0 + uAudioLevel * 0.25);
 
   vec3  color = mix(tint, uSunColor * 0.80, F * 0.20);
   // Slightly denser than the summer water so the pool reads as deeper

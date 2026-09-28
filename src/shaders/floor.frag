@@ -91,8 +91,10 @@ void main() {
   // These are sRGB, not linear. This shader writes gl_FragColor without
   // <colorspace_fragment>, so whatever is written here lands in the framebuffer
   // unconverted: feeding it linear values makes the pool come out near-black.
-  vec3 tileBase  = vec3(0.227, 0.447, 0.708);
-  vec3 tileGrout = vec3(0.124, 0.246, 0.390);
+  // The grout sits at 0.86 of the tile, not half of it: the grid is meant to
+  // give the floor a sense of scale, not to read as a chequerboard.
+  vec3 tileBase  = vec3(0.204, 0.402, 0.637);
+  vec3 tileGrout = vec3(0.176, 0.346, 0.548);
   vec3 floorCol  = mix(tileBase, tileGrout, tileGrid(refractW, 0.048));
 
   // ── Wave-depth darkening — only a ripple reaches this now ─────────────────
