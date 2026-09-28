@@ -87,9 +87,12 @@ void main() {
   // 1.4 world units ≈ 0.065 in old UV space — clear pool-water distortion.
   vec2 refractW = vWorldXZ + waveGrad(vWorldXZ, t, boost) * 1.4;
 
-  // ── Pool tile — deep veil blue, the way a dusk pond floor reads ───────────
-  vec3 tileBase  = vec3(0.105, 0.150, 0.205);
-  vec3 tileGrout = vec3(0.055, 0.085, 0.125);
+  // ── Pool tile — lit azure, #3D78BE once the water layer is over it ────────
+  // These are sRGB, not linear. This shader writes gl_FragColor without
+  // <colorspace_fragment>, so whatever is written here lands in the framebuffer
+  // unconverted: feeding it linear values makes the pool come out near-black.
+  vec3 tileBase  = vec3(0.227, 0.447, 0.708);
+  vec3 tileGrout = vec3(0.124, 0.246, 0.390);
   vec3 floorCol  = mix(tileBase, tileGrout, tileGrid(refractW, 0.048));
 
   // ── Wave-depth darkening — only a ripple reaches this now ─────────────────

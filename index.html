@@ -24,7 +24,7 @@
     }
 
     body {
-      background: #223140;
+      background: #1c3555;
       overflow-x: hidden;
       font-family: var(--ui);
     }
@@ -234,6 +234,29 @@
       #pool-card h2 { font-size: 34px; }
     }
 
+    /* ── Landing haze ───────────────────────────────────── */
+    /* A warm bloom over the water on the first screen, so the pool opens
+       looking sun-bleached and clears as the objects drift up. Sits below
+       the name and the top bar (z 5 and 20) so the type stays crisp;
+       `screen` lifts the water's darks, which is what reads as faded. */
+    #landing-haze {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 3;
+      mix-blend-mode: screen;
+      background:
+        radial-gradient(58% 46% at 50% 34%,
+          rgba(253, 218, 184, 0.30) 0%,
+          rgba(253, 218, 184, 0.13) 40%,
+          rgba(253, 218, 184, 0.00) 70%),
+        linear-gradient(to bottom,
+          rgba(253, 218, 184, 0.12) 0%,
+          rgba(253, 218, 184, 0.05) 48%,
+          rgba(253, 218, 184, 0.00) 100%);
+      transition: opacity 0.4s ease-out;
+    }
+
     /* ── Floating name typography ───────────────────────── */
     /* Flexbox wrapper guarantees true centering on every aspect ratio;
        the animation only nudges translateY so it can't break alignment. */
@@ -296,6 +319,7 @@
 </head>
 <body>
   <canvas id="canvas"></canvas>
+  <div id="landing-haze"></div>
 
   <!-- Bounding box HTML overlay -->
   <div id="bbox">

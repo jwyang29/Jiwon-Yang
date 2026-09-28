@@ -23,8 +23,8 @@ renderer.toneMappingExposure = 0.92;   // autumn dusk — a touch under-exposed
 
 // ─── Scene ────────────────────────────────────────────────────────────────────
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x223140);
-scene.fog        = new THREE.Fog(0x1a2733, 18, 38);
+scene.background = new THREE.Color(0x1c3555);
+scene.fog        = new THREE.Fog(0x19304c, 18, 38);
 
 // ─── Camera ───────────────────────────────────────────────────────────────────
 const camera = new THREE.PerspectiveCamera(52, 1, 0.1, 40);
@@ -114,7 +114,7 @@ const waterUniforms = {
   uAudioLevel:  { value: 0 },
   uSunDir:      { value: sunDir },
   uSunColor:    { value: new THREE.Color(0xfddab8) },
-  uWaterColor:  { value: new THREE.Color(0x33475b) },
+  uWaterColor:  { value: new THREE.Color(0x3a72b4) },
   uCameraPos:   { value: camera.position },
   uObjPos:      { value: objPositions },
   uObjStrength: { value: objStrengths },
@@ -323,7 +323,8 @@ resize();
 // over the stretch where the first objects drift up into frame.
 const hintEl = document.getElementById('hint');
 const nameEl = document.getElementById('floating-name');
-window.addEventListener('scroll', () => {
+const hazeEl = document.getElementById('landing-haze');
+function onScroll() {
   hintEl.style.opacity = window.scrollY > 80 ? '0' : '';
 
   const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
@@ -331,7 +332,14 @@ window.addEventListener('scroll', () => {
   const o = 1 - THREE.MathUtils.smoothstep(f, 0.08, 0.26);
   nameEl.style.opacity      = o.toFixed(3);
   nameEl.style.pointerEvents = o < 0.15 ? 'none' : 'auto';
-}, { passive: true });
+
+  // The bloom belongs to the opening shot only; it clears a little ahead of
+  // the name so the water is its own colour by the time the objects arrive.
+  hazeEl.style.opacity = (1 - THREE.MathUtils.smoothstep(f, 0.03, 0.20)).toFixed(3);
+}
+window.addEventListener('scroll', onScroll, { passive: true });
+// Browsers restore scroll position on reload, so settle the overlays once now.
+onScroll();
 
 // ─── "The Pool" concept popup ─────────────────────────────────────────────────
 const poolBtn   = document.getElementById('pool-btn');

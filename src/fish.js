@@ -17,7 +17,7 @@ const RT_SCALE  = 0.34;        // render fish small → cheap, and blurry by its
 const BLUR_PASSES = 2;
 
 // The water the fish are seen through.
-const HAZE_COLOR = 0x2c3c4c;
+const HAZE_COLOR = 0x2e5785;
 
 // ─── Fish shaders ─────────────────────────────────────────────────────────────
 const BODY_VERT = /* glsl */ `
