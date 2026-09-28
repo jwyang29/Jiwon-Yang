@@ -17,7 +17,8 @@ const RT_SCALE  = 0.34;        // render fish small → cheap, and blurry by its
 const BLUR_PASSES = 2;
 
 // The water the fish are seen through.
-const HAZE_COLOR = 0x294e78;
+// Exported so the dev colour panel can scale it alongside the pool tile.
+export const HAZE_COLOR = 0x3771ae;
 
 // ─── Fish shaders ─────────────────────────────────────────────────────────────
 const BODY_VERT = /* glsl */ `

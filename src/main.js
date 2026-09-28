@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { AudioAnalyser }                  from './audio.js';
 import { buildObjects, layoutObjects, animateObjects, PROJECTS } from './objects.js';
-import { buildFishField }                   from './fish.js';
+import { buildFishField, HAZE_COLOR }       from './fish.js';
 import { buildLeaves, animateLeaves }       from './leaves.js';
 import { BBoxOverlay, worldToScreenRect } from './bbox.js';
 
@@ -23,8 +23,8 @@ renderer.toneMappingExposure = 0.92;   // autumn dusk — a touch under-exposed
 
 // ─── Scene ────────────────────────────────────────────────────────────────────
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x19304d);
-scene.fog        = new THREE.Fog(0x172b44, 18, 38);
+scene.background = new THREE.Color(0x2c4053);
+scene.fog        = new THREE.Fog(0x223342, 18, 38);
 
 // ─── Camera ───────────────────────────────────────────────────────────────────
 const camera = new THREE.PerspectiveCamera(52, 1, 0.1, 40);
@@ -76,6 +76,7 @@ const objStrengths = PROJECTS.map((p) => p.rippleStrength * OBJ_RIPPLE);
 // and decides everything else from age, so JS never has to tick them down.
 const RIPPLE_COUNT = 28;
 const ripplePos  = Array.from({ length: RIPPLE_COUNT }, () => new THREE.Vector2());
+const rippleDir  = Array.from({ length: RIPPLE_COUNT }, () => new THREE.Vector2(1, 0));
 const rippleTime = new Float32Array(RIPPLE_COUNT).fill(-999);
 const rippleAmp  = new Float32Array(RIPPLE_COUNT);
 let   rippleSlot = 0;
@@ -85,14 +86,32 @@ const objShadowRx    = new Float32Array(PROJECTS.map(p => p.shadowRx));
 const objShadowRz    = new Float32Array(PROJECTS.map(p => p.shadowRz));
 const objShadowAngle = new Float32Array(PROJECTS.length);
 
+// ─── Pool palette ────────────────────────────────────────────────────────────
+// Vector3, not THREE.Color, on purpose. The pool shaders write gl_FragColor
+// without <colorspace_fragment>, so what they output lands in the framebuffer
+// unconverted — these have to reach the GPU as sRGB fractions. THREE.Color
+// would convert them to linear on the way in and the pool would come out dark.
+// Mutated in place so the uniforms below stay pointed at the same objects.
+export const POOL = {
+  // Tuned in the dev panel: tile #224877, grid 0.85, water film 0.94. The film
+  // sitting below 1.0 means the surface reads a shade darker than the floor,
+  // which is what keeps this blue from going bright.
+  tile:  new THREE.Vector3(0.133, 0.282, 0.467),
+  grout: new THREE.Vector3(0.113, 0.240, 0.397),
+  tint:  new THREE.Vector3(0.125, 0.265, 0.439),
+};
+
 // ─── Pool Floor (tile, refraction and procedural shadow shader) ──────────────
 const floorUniforms = {
   uTime:       { value: 0 },
   uAudioLevel: { value: 0 },
   uSunDir:     { value: sunDir },
+  uTileBase:   { value: POOL.tile },
+  uTileGrout:  { value: POOL.grout },
   uObjPos:     { value: objPositions },
   uSwell:      { value: SWELL },
   uRipPos:     { value: ripplePos },
+  uRipDir:     { value: rippleDir },
   uRipTime:    { value: rippleTime },
   uRipAmp:     { value: rippleAmp },
   uObjRx:      { value: objShadowRx },
@@ -114,12 +133,13 @@ const waterUniforms = {
   uAudioLevel:  { value: 0 },
   uSunDir:      { value: sunDir },
   uSunColor:    { value: new THREE.Color(0xfddab8) },
-  uWaterColor:  { value: new THREE.Color(0x3467a3) },
+  uWaterColor:  { value: POOL.tint },
   uCameraPos:   { value: camera.position },
   uObjPos:      { value: objPositions },
   uObjStrength: { value: objStrengths },
   uSwell:       { value: SWELL },
   uRipPos:      { value: ripplePos },
+  uRipDir:      { value: rippleDir },
   uRipTime:     { value: rippleTime },
   uRipAmp:      { value: rippleAmp },
 };
@@ -190,15 +210,34 @@ const ripplePoint = new THREE.Vector3();
 const rippleNdc   = new THREE.Vector2();
 let   lastRipX = 1e9, lastRipZ = 1e9;
 
-/** Drop a ring at a world XZ. Strength follows the same curve as the cursor's. */
-function addRipple(x, z, step, scale) {
+/** Drop a ring at a world XZ. `drive` is a 0..1 impulse, already speed-shaped. */
+function addRipple(x, z, drive, scale, dx, dz) {
   ripplePos[rippleSlot].set(x, z);
   rippleTime[rippleSlot] = clock.getElapsedTime();
-  rippleAmp[rippleSlot]  = THREE.MathUtils.clamp(step / 1.2, 0.4, 1.0) * scale;
+  // A wide range on purpose: the shaders read this one number as thickness,
+  // depth and lifetime together, so a slow drag and a flick leave visibly
+  // different rings. The old 0.4–1.0 span made every ripple look alike.
+  rippleAmp[rippleSlot]  = THREE.MathUtils.clamp(drive * 1.6, 0.16, 1.60) * scale;
+  // Travel direction, so the shaders can stretch the ring along it instead of
+  // stamping another perfect circle. A tap arrives with no direction (the
+  // tracker is reset to a sentinel first), so it falls back to an angle that
+  // advances per slot and successive taps still differ from each other.
+  const len = Math.hypot(dx, dz);
+  if (len > 1e-4 && len < 1e3) {
+    rippleDir[rippleSlot].set(dx / len, dz / len);
+  } else {
+    const a = rippleSlot * 2.399;
+    rippleDir[rippleSlot].set(Math.cos(a), Math.sin(a));
+  }
   rippleSlot = (rippleSlot + 1) % RIPPLE_COUNT;
 }
 
-function spawnRipple(clientX, clientY) {
+// Pace at which the water answers hardest, in world units per second. Below it
+// the pointer has not disturbed much yet; well above it the pointer is skimming.
+const RIPPLE_PEAK_SPEED = 10.0;
+let lastRipT = -1;
+
+function spawnRipple(clientX, clientY, tapDrive) {
   const r = renderer.domElement.getBoundingClientRect();
   rippleNdc.set(
      ((clientX - r.left) / r.width)  * 2 - 1,
@@ -209,13 +248,33 @@ function spawnRipple(clientX, clientY) {
 
   // Spawn by distance travelled, not by event — a fast mouse fires far more
   // mousemoves than a slow one, and the trail should not thin out because of it
-  const step = Math.hypot(ripplePoint.x - lastRipX, ripplePoint.z - lastRipZ);
-  if (step < 0.38) return;
+  const dx  = ripplePoint.x - lastRipX;
+  const dz  = ripplePoint.z - lastRipZ;
+  const now = clock.getElapsedTime();
+
+  let drive = tapDrive;
+  if (drive === undefined) {
+    const step  = Math.hypot(dx, dz);
+    const dt    = lastRipT < 0 ? 1 : Math.max(now - lastRipT, 1e-3);
+    const speed = step / dt;
+
+    // Two ways the water stops keeping up once the pointer is racing. First the
+    // rings are laid further apart, so a frantic sweep leaves a sparse trail
+    // rather than a solid wall of them.
+    if (step < 0.38 + THREE.MathUtils.clamp((speed - 8) * 0.10, 0, 1.4)) return;
+
+    // Second, the impulse itself peaks and then falls away. s·e^(1−s) is 1 at
+    // the peak speed and decays on both sides, so crawling barely marks the
+    // surface, a normal sweep marks it most, and a very fast one skims it and
+    // fades back out instead of piling up ever deeper rings.
+    const s = speed / RIPPLE_PEAK_SPEED;
+    drive = s * Math.exp(1.0 - s);
+  }
+
   lastRipX = ripplePoint.x;
   lastRipZ = ripplePoint.z;
-
-  // A longer step means the pointer was moving faster — let it hit harder
-  addRipple(ripplePoint.x, ripplePoint.z, step, 1.0);
+  lastRipT = now;
+  addRipple(ripplePoint.x, ripplePoint.z, drive, 1.0, dx, dz);
 }
 
 // ─── Fish wakes ───────────────────────────────────────────────────────────────
@@ -231,16 +290,20 @@ function spawnFishWakes(camZ, halfZ) {
     const p = f.group.position;
     if (Math.abs(p.z - camZ) > halfZ + 2.0) return;
     const last = fishLast[i];
-    const step = Math.hypot(p.x - last.x, p.z - last.z);
+    const dx = p.x - last.x, dz = p.z - last.z;
+    const step = Math.hypot(dx, dz);
     if (step < FISH_RIPPLE_STEP) return;
     last.x = p.x; last.z = p.z;
-    addRipple(p.x, p.z, step, FISH_RIPPLE_SCALE);
+    // Fish swim at a steady pace, so their wake takes a fixed impulse rather
+    // than the cursor's speed curve — it has no fast end to fall off.
+    addRipple(p.x, p.z, 0.66, FISH_RIPPLE_SCALE, dx, dz);
   });
 }
 
 // Touch has no hover, so a tap is the only way to disturb the water there
 window.addEventListener('pointerdown', (e) => {
-  if (e.pointerType !== 'mouse') { lastRipX = 1e9; spawnRipple(e.clientX, e.clientY); }
+  // A tap has no pace to measure, so it is handed a strong fixed impulse.
+  if (e.pointerType !== 'mouse') { lastRipX = 1e9; lastRipT = -1; spawnRipple(e.clientX, e.clientY, 0.95); }
 }, { passive: true });
 
 function raycastRootAt(clientX, clientY) {
@@ -435,3 +498,11 @@ window.__pool = {
   // headless checks, where requestAnimationFrame is paused).
   stepTo: (t) => { fishField.update(t); animateLeaves(leaves, t); },
 };
+
+// ─── Dev-only colour panel ────────────────────────────────────────────────────
+// Guarded by import.meta.env.DEV and loaded dynamically, so Vite drops both the
+// branch and the module from the production bundle.
+if (import.meta.env.DEV) {
+  import('./colorpanel.js').then(({ mountColorPanel }) =>
+    mountColorPanel({ scene, POOL, fishHaze: HAZE_COLOR }));
+}

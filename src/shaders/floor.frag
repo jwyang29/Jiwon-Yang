@@ -4,7 +4,10 @@ uniform float uTime;
 uniform float uAudioLevel;
 uniform vec3  uSunDir;
 uniform float uSwell;
+uniform vec3  uTileBase;    // sRGB fractions, see the note in main()
+uniform vec3  uTileGrout;
 uniform vec2  uRipPos[28];
+uniform vec2  uRipDir[28];
 uniform float uRipTime[28];
 uniform float uRipAmp[28];
 uniform vec2  uObjPos[9];
@@ -32,9 +35,25 @@ float waveHeight(vec2 pos, float t, float boost) {
     if (uRipAmp[i] <= 0.0) continue;
     float age = t - uRipTime[i];
     if (age < 0.0 || age > 3.0) continue;
-    float d  = length(pos - uRipPos[i]);
-    float fr = d - age * 1.9;
-    y += sin(fr * 7.0) * exp(-fr * fr * 2.2) * exp(-age * 1.35) * uRipAmp[i] * 0.095;
+    // Mirrors water.vert exactly: stretched frame, per-slot wobble, then one
+    // number setting wavelength, packing, lifetime and depth.
+    float amp = uRipAmp[i];
+    float sh  = clamp(amp / 1.6, 0.0, 1.0);
+    vec2  dr   = pos - uRipPos[i];
+    vec2  dir  = uRipDir[i];
+    vec2  perp = vec2(-dir.y, dir.x);
+    float st   = mix(1.25, 1.95, sh);
+    vec2  q    = vec2(dot(dr, dir) / st, dot(dr, perp));
+    float d    = length(q);
+    if (d < 0.001) continue;
+    vec2  nd   = q / d;
+    float ph   = float(i) * 2.399;
+    float wob  = sin(nd.x * 3.1 + ph) + sin(nd.y * 2.6 - ph * 1.7);
+    float fr   = d - age * 1.9 + wob * 0.085;
+    float k   = mix(4.2, 10.5, sh);
+    float w   = mix(1.1,  3.6, sh);
+    float dec = mix(1.05, 1.70, sh);
+    y += sin(fr * k) * exp(-fr * fr * w) * exp(-age * dec) * amp * 0.105;
   }
   return y;
 }
@@ -61,14 +80,35 @@ vec2 waveGrad(vec2 pos, float t, float boost) {
     if (uRipAmp[i] <= 0.0) continue;
     float age = t - uRipTime[i];
     if (age < 0.0 || age > 3.0) continue;
-    vec2  dr = pos - uRipPos[i];
-    float d  = length(dr);
+    // Same terms as waveHeight, then its derivative. d/dfr of
+    // sin(fr·k)·exp(-fr²·w) is exp(-fr²·w)·(k·cos(fr·k) - 2w·fr·sin(fr·k)),
+    // and fr is measured in the stretched frame, so the chain rule brings that
+    // frame back out: grad(|q|) = nd.x·(dir/st) + nd.y·perp. If the height above
+    // changes, this has to change with it or the refraction stops agreeing with
+    // the surface it is supposed to be bending through.
+    // The wobble's tangential term is left out — it is a small perturbation on
+    // fr and dropping it costs a little accuracy around the ring, not the shape.
+    float amp = uRipAmp[i];
+    float sh  = clamp(amp / 1.6, 0.0, 1.0);
+    vec2  dr   = pos - uRipPos[i];
+    vec2  dir  = uRipDir[i];
+    vec2  perp = vec2(-dir.y, dir.x);
+    float st   = mix(1.25, 1.95, sh);
+    vec2  q    = vec2(dot(dr, dir) / st, dot(dr, perp));
+    float d    = length(q);
     if (d < 0.001) continue;
-    float fr = d - age * 1.9;
-    float e  = exp(-fr * fr * 2.2) * exp(-age * 1.35) * uRipAmp[i] * 0.095;
-    float df = e * (7.0 * cos(fr * 7.0) - 4.4 * fr * sin(fr * 7.0));
-    gx += df * dr.x / d;
-    gz += df * dr.y / d;
+    vec2  nd   = q / d;
+    float ph   = float(i) * 2.399;
+    float wob  = sin(nd.x * 3.1 + ph) + sin(nd.y * 2.6 - ph * 1.7);
+    float fr   = d - age * 1.9 + wob * 0.085;
+    float k   = mix(4.2, 10.5, sh);
+    float w   = mix(1.1,  3.6, sh);
+    float dec = mix(1.05, 1.70, sh);
+    vec2  gd = nd.x * (dir / st) + nd.y * perp;
+    float e  = exp(-fr * fr * w) * exp(-age * dec) * amp * 0.105;
+    float df = e * (k * cos(fr * k) - 2.0 * w * fr * sin(fr * k));
+    gx += df * gd.x;
+    gz += df * gd.y;
   }
   return vec2(gx, gz);
 }
@@ -85,21 +125,23 @@ void main() {
 
   // ── Refraction: tile wobble through 0.8m of water (world units) ──────────
   // 1.4 world units ≈ 0.065 in old UV space — clear pool-water distortion.
-  vec2 refractW = vWorldXZ + waveGrad(vWorldXZ, t, boost) * 1.4;
+  // The ambient swell is off, so this now scales the cursor rings alone. It is
+  // the main thing that makes a ripple visible: the depth shading below only
+  // shifts the tile a few percent, while this bends the grid lines through it.
+  vec2 refractW = vWorldXZ + waveGrad(vWorldXZ, t, boost) * 2.6;
 
-  // ── Pool tile — lit azure, #3D78BE once the water layer is over it ────────
-  // These are sRGB, not linear. This shader writes gl_FragColor without
-  // <colorspace_fragment>, so whatever is written here lands in the framebuffer
-  // unconverted: feeding it linear values makes the pool come out near-black.
-  // The grout sits at 0.86 of the tile, not half of it: the grid is meant to
-  // give the floor a sense of scale, not to read as a chequerboard.
-  vec3 tileBase  = vec3(0.204, 0.402, 0.637);
-  vec3 tileGrout = vec3(0.176, 0.346, 0.548);
-  vec3 floorCol  = mix(tileBase, tileGrout, tileGrid(refractW, 0.048));
+  // ── Pool tile ─────────────────────────────────────────────────────────────
+  // uTileBase and uTileGrout arrive as sRGB fractions, not linear: this shader
+  // writes gl_FragColor without <colorspace_fragment>, so what it outputs lands
+  // in the framebuffer unconverted. Feeding it linear values makes the pool
+  // come out near-black. Both are set from POOL in main.js.
+  vec3 floorCol = mix(uTileBase, uTileGrout, tileGrid(refractW, 0.048));
 
   // ── Wave-depth darkening — only a ripple reaches this now ─────────────────
+  // Troughs brighten as crests darken, so a deep ring reads as relief rather
+  // than as a smudge. At 0.30 the strongest ripple moved the tile by 5%.
   float wh = waveHeight(vWorldXZ, t, boost);
-  floorCol *= 1.0 - wh * 0.30;
+  floorCol *= 1.0 - wh * 0.85;
 
   // ── Per-object elliptical shadows (shape-correct, rotate with object) ──────
   // Sun at (2,14,3); object height ≈ 0.18, floor at -0.80 → depth 0.98

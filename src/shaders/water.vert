@@ -4,6 +4,7 @@ uniform float uTime;
 uniform float uAudioLevel;
 uniform float uSwell;
 uniform vec2  uRipPos[28];
+uniform vec2  uRipDir[28];
 uniform float uRipTime[28];
 uniform float uRipAmp[28];
 uniform vec2  uObjPos[9];
@@ -59,9 +60,31 @@ void main() {
     if (uRipAmp[i] <= 0.0) continue;
     float age = t - uRipTime[i];
     if (age < 0.0 || age > 3.0) continue;
-    float d  = length(pos - uRipPos[i]);
-    float fr = d - age * 1.9;
-    y += sin(fr * 7.0) * exp(-fr * fr * 2.2) * exp(-age * 1.35) * uRipAmp[i] * 0.095;
+    // sh runs 0..1 with the speed the ring was born at and carries wavelength,
+    // packing, lifetime and depth together: broad, shallow and slow to fade when
+    // the cursor crawls; tight, deep and short-lived when it flicks.
+    // Kept identical in floor.frag's waveHeight and waveGrad.
+    float amp = uRipAmp[i];
+    float sh  = clamp(amp / 1.6, 0.0, 1.0);
+    // Measuring the radius in a frame stretched along the direction of travel
+    // turns the ring into an ellipse pointing the way the cursor went, and the
+    // per-slot phase lumps its edge. Without these every ripple is the same
+    // perfect circle and the pool looks stamped rather than disturbed.
+    vec2  dr   = pos - uRipPos[i];
+    vec2  dir  = uRipDir[i];
+    vec2  perp = vec2(-dir.y, dir.x);
+    float st   = mix(1.25, 1.95, sh);
+    vec2  q    = vec2(dot(dr, dir) / st, dot(dr, perp));
+    float d    = length(q);
+    if (d < 0.001) continue;
+    vec2  nd   = q / d;
+    float ph   = float(i) * 2.399;
+    float wob  = sin(nd.x * 3.1 + ph) + sin(nd.y * 2.6 - ph * 1.7);
+    float fr   = d - age * 1.9 + wob * 0.085;
+    float k   = mix(4.2, 10.5, sh);
+    float w   = mix(1.1,  3.6, sh);
+    float dec = mix(1.05, 1.70, sh);
+    y += sin(fr * k) * exp(-fr * fr * w) * exp(-age * dec) * amp * 0.105;
   }
 
   wpos.y   += y;                 // displace in world Y, whatever the mesh rotation

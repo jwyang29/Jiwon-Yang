@@ -24,7 +24,7 @@
     }
 
     body {
-      background: #19304d;
+      background: #224775;
       overflow-x: hidden;
       font-family: var(--ui);
     }
@@ -131,11 +131,15 @@
         0 0px  3px rgba(14, 30, 44, 0.5);
       transition: color 0.2s;
     }
+    /* No rule at rest. It comes back on hover so the affordance survives, and
+       stays on MIC while it is listening, where it marks state rather than
+       decorating. */
     #pool-btn, #mic-btn {
-      text-decoration: underline;
+      text-decoration: none;
       text-underline-offset: 4px;
       text-decoration-thickness: 1.5px;
     }
+    #pool-btn:hover, #mic-btn:hover { text-decoration: underline; }
     #pool-btn:hover { color: rgba(253, 202, 148, 1); }
 
     .ui-right { display: flex; align-items: center; gap: 18px; }
