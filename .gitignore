@@ -1,6 +1,10 @@
 node_modules/
 dist/
+# reportlab lives here for scripts/make_cv.py; Python self-ignores a venv from
+# inside it, which is easy to lose when the directory is recreated by hand
+.venv*/
 .DS_Store
 *.local
 .claude/
-Icon
+Icon
+Icon?
