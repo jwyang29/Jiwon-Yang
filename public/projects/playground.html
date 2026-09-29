@@ -29,11 +29,7 @@
 <div class="row"><label data-i18n="g.meta.year">Year</label><span>2026</span></div>
 <div class="row"><label data-i18n="g.meta.role">Role</label><span data-i18n="playground.meta.role">Concept, interaction design, system implementation, fabrication</span></div>
 <div class="row"><label data-i18n="g.meta.credit">Credit</label><span data-i18n="playground.meta.credit">Jiwon Yang, advised by Chang Hee Lee</span></div>
-<div class="row"><label data-i18n="g.meta.medium">Medium</label><span data-i18n="playground.meta.medium">Stretchable fabric, ToF sensor array, XY gantry, sand</span></div>
 <div class="row"><label data-i18n="g.meta.exhibition">Exhibition</label><span data-i18n="playground.meta.exhibition">SIGGRAPH Asia 2026 Art Gallery — Selected</span></div>
-<div class="row"><label data-i18n="g.meta.duration">Duration</label><span data-i18n="playground.meta.duration">About 2 to 3 minutes per visitor, one at a time</span></div>
-<div class="row"><label data-i18n="g.meta.footprint">Footprint</label><span data-i18n="playground.meta.footprint">200 × 130 cm of floor; the work itself 80 × 40 × 25 cm, about 5 kg</span></div>
-<div class="row"><label data-i18n="g.meta.power">Power</label><span data-i18n="playground.meta.power">About 65 W from one wall outlet. Runs entirely offline</span></div>
 
 </div>
 </div>
@@ -54,61 +50,89 @@
 </div>
 <div class="window-body"><video controls="" playsinline="" preload="metadata" src="../media/playground/demo.mp4"></video></div>
 </div>
+<div class="section-grid">
 <div class="section">
 <div class="section-bracket">[ .Overview ]</div>
 <h2 data-i18n="playground.h2.1">Touch × Sand: A Physical Interface</h2>
-<p data-i18n="playground.p.1">Playground explores the boundary between <span class="hl-blue">physical material</span> and <span class="hl-pink">digital feedback</span>. Beneath a sheet of elastic fabric, an array of ToF sensors tracks a visitor's drawing in units of pressure and speed. The machine recreates in sand the gestures it feels through its own skin, and — continuing from the drawing style it has learned — <span class="hl-teal">adds its own lines behind yours</span>.</p>
-<p data-i18n="playground.p.5">A turn runs in six steps. The sand starts flat. A finger presses and moves, and the sensors build a trajectory. On lift, the trajectory is measured and a description appears on the display. The arm retraces the line in sand, then draws a short sequence of its own in an empty area. The visitor smooths the sand flat again. <span class="hl-mark">Nothing is saved, nothing is uploaded, and the installation never connects to a network.</span></p>
-</div>
-</div>
-<div class="div-slash"></div>
-<div class="window-grid">
-<div class="window">
-<div class="window-bar">
-<span></span>
-<span class="controls">─ □ ×</span>
-</div>
-<div class="window-body"><img alt="Detail 01" loading="lazy" onerror="this.parentElement.textContent='[ Detail 01 ]'" src="../media/playground/detail1.jpg"/></div>
+<p data-i18n="playground.p.1">A visitor draws on stretchable fabric with one fingertip. Beneath it, a grid of <span class="hl-blue">time-of-flight sensors</span> tracks the gesture in pressure and speed. The machine retraces it in sand, then <span class="hl-teal">adds a few marks of its own</span>.</p>
+<p data-i18n="playground.p.5">A turn takes two to three minutes and runs offline. <span class="hl-mark">Nothing is saved.</span> The visitor smooths the sand flat again for whoever comes next.</p>
 </div>
 <div class="window">
 <div class="window-bar">
 <span></span>
 <span class="controls">─ □ ×</span>
 </div>
-<div class="window-body"><img alt="Detail 02" loading="lazy" onerror="this.parentElement.textContent='[ Detail 02 ]'" src="../media/playground/detail2.jpg"/></div>
+<div class="window-body"><img alt="THE PIECE IN USE, A HAND ON THE FABRIC" loading="lazy" onerror="this.parentElement.textContent='[ THE PIECE IN USE, A HAND ON THE FABRIC ]'" src="../media/playground/overview.jpg"/></div>
 </div>
 </div>
+
+<div class="section-grid">
 <div class="section">
 <div class="section-bracket">[ .Reading ]</div>
 <h2 data-i18n="playground.h2.4">Two axes, not a picture</h2>
-<p data-i18n="playground.p.6">Nothing in the system classifies what was drawn. Once the finger lifts, the whole trajectory is measured on two axes: <span class="hl-blue">pressure</span>, how far the fabric was pushed down, and <span class="hl-pink">speed</span>, how fast the finger moved along the line.</p>
-<p data-i18n="playground.p.7">Those two values select one of a small set of descriptions, which is printed on the display beside the tray. They also set two parameters of the reply: <span class="hl-teal">pressure becomes groove depth in the sand, and speed becomes the pace at which the arm draws.</span></p>
+<p data-i18n="playground.p.6">Nothing classifies what was drawn. The finished stroke is measured on two axes: <span class="hl-blue">pressure</span>, how far the fabric was pushed down, and <span class="hl-pink">speed</span>, how fast the finger moved.</p>
+<p data-i18n="playground.p.7">Those two values pick a description for the display, and set two parameters of the reply: <span class="hl-teal">pressure becomes groove depth, speed becomes drawing pace.</span></p>
 </div>
+<div class="window">
+<div class="window-bar">
+<span></span>
+<span class="controls">─ □ ×</span>
+</div>
+<div class="window-body"><img alt="THE DISPLAY, MID-SENTENCE" loading="lazy" onerror="this.parentElement.textContent='[ THE DISPLAY, MID-SENTENCE ]'" src="../media/playground/reading.jpg"/></div>
+</div>
+</div>
+
+<div class="section-grid">
 <div class="section">
 <div class="section-bracket">[ .System ]</div>
 <h2 data-i18n="playground.h2.5">Sensing, understanding, answering</h2>
-<p data-i18n="playground.p.8">A stretchable cloth is pulled over an aluminium frame. Beneath it, a square grid of <span class="hl-blue">time-of-flight distance sensors</span> faces upward, each measuring the gap to the fabric above it. When a finger presses, the cloth dips toward the sensor and that gap shrinks: the amount becomes pressure, and the pattern across neighbouring sensors becomes position. An ESP32 runs the array over a shared I2C bus and streams the readings out.</p>
-<p data-i18n="playground.p.9">A small stick PC does the interpreting. It filters and fits the noisy samples into one continuous line, analyses the finished gesture for speed and pressure, and composes the reply: gantry coordinates, depths, and an empty patch of sand to answer in. It runs headless and offline for the whole exhibition.</p>
-<p data-i18n="playground.p.10">The reply is drawn by an <span class="hl-pink">XY gantry</span> over a shallow tray of fine sand. Two stepper motors carry the drawing head along X and Y; a servo raises and lowers it, so a hard press in the fabric becomes a deep groove and a light touch a shallow one. The head follows the reconstructed line point by point, interpolating between them so curves come out smooth rather than as visible straight segments. A 20 by 4 character display beside the tray prints the descriptions.</p>
+<p data-i18n="playground.p.8">Each sensor measures the gap to the fabric above it, so a press shrinks that gap. Position comes from combining neighbouring readings. An ESP32 runs the array; a stick PC filters the samples into one line and composes the reply; an Arduino drives the motion.</p>
+<p data-i18n="playground.p.10">An <span class="hl-pink">XY gantry</span> draws it. Two steppers carry the head, a servo sets its height. Points are interpolated so curves stay curves.</p>
+<p data-i18n="playground.meta.specs">200 × 130 cm of floor, about 5 kg, 65 W from one outlet.</p>
 </div>
+<div class="window">
+<div class="window-bar">
+<span></span>
+<span class="controls">─ □ ×</span>
+</div>
+<div class="window-body"><img alt="SENSOR ARRAY AND WIRING UNDER THE FABRIC" loading="lazy" onerror="this.parentElement.textContent='[ SENSOR ARRAY AND WIRING UNDER THE FABRIC ]'" src="../media/playground/system.jpg"/></div>
+</div>
+</div>
+
+<div class="section-grid">
 <div class="section">
 <div class="section-bracket">[ .Process ]</div>
 <h2 data-i18n="playground.h2.2">From Material to Interaction</h2>
-<p data-i18n="playground.p.2">Human skin receives stimuli not through a continuous surface but through <span class="hl-mark">touch receptors scattered at intervals</span>, and the brain stitches those discontinuous signals into a single sensation. The way this machine perceives a drawing mirrors that same human sense of touch.</p>
-<p data-i18n="playground.p.3">As it redraws the gesture in sand, the machine reads whether it was <span class="hl-blue">soft or rough, quick or slow</span>, and passes that impression to the screen. It isn't trying to guess what you drew, but to sense <span class="hl-pink">how you felt while drawing it</span>. All of this unfolds gently, without hurry.</p>
-<p data-i18n="playground.p.11">Three problems took the most iteration, and all three were tuned against real drawings on the real fabric rather than in simulation. Catching a light, continuous press across a soft surface, which is what decided the sensor count and the grid layout. Keeping the reconstructed line faithful without <span class="hl-blue">over-smoothing away its character</span>. And getting the gantry to draw genuine curves without stalling, by interpolating between points and tuning the motor timing.</p>
-<p data-i18n="playground.p.12">The reconstruction is the crux. With sensors on a grid, a reading that leans too hard toward whichever sensor happens to be closest will bend straight lines and pull shapes toward the sensor points. <span class="hl-mark">A square grid was chosen precisely because it makes that distortion symmetric, and therefore correctable.</span></p>
+<p data-i18n="playground.p.11">Three problems took the most iteration, all tuned against real drawings rather than in simulation: catching a light continuous press on a soft surface, keeping the reconstructed line faithful without <span class="hl-blue">over-smoothing away its character</span>, and drawing genuine curves without the gantry stalling.</p>
+<p data-i18n="playground.p.12">The reconstruction is the crux. A reading that leans toward whichever sensor is closest bends straight lines. <span class="hl-mark">A square grid keeps that distortion symmetric, and so correctable.</span></p>
 </div>
-<div class="div-stars"></div>
+<div class="window">
+<div class="window-bar">
+<span></span>
+<span class="controls">─ □ ×</span>
+</div>
+<div class="window-body"><img alt="BENCH TEST, CARDBOARD RIG AND LOOSE SENSORS" loading="lazy" onerror="this.parentElement.textContent='[ BENCH TEST, CARDBOARD RIG AND LOOSE SENSORS ]'" src="../media/playground/process.jpg"/></div>
+</div>
+</div>
+
+<div class="section-grid">
 <div class="section">
 <div class="deco-asterisk">✳</div>
 <div class="section-bracket">[ .Context ]</div>
 <h2 data-i18n="playground.h2.3">What the Hands Know</h2>
-<p data-i18n="playground.p.13">The work began with two games. Tracing a shape on a friend's back with a fingertip and waiting for them to guess, never quite sure it arrived intact. And drawing in sand, knowing it would be smoothed away. Both were ways of speaking before we had the right words, and both were gone almost as soon as they were made.</p>
-<p data-i18n="playground.p.14">A scanner and a plotter could have copied the drawing exactly. It was deliberately not built that way. <span class="hl-pink">A mirror returns you to yourself; a translation risks getting something wrong</span>, and in that risk there is the possibility of being met by something that is not you.</p>
-<p data-i18n="playground.p.15">Touch receptors in skin are scattered, each responding only to its own small region, and the brain combines them into one sensation. The sensor array works the same way, so <span class="hl-teal">the roughness of its reading is not a defect to be corrected.</span></p>
+<p data-i18n="playground.p.13">It began with two games: tracing a shape on a friend's back and waiting for them to guess, and drawing in sand knowing it would be smoothed away.</p>
+<p data-i18n="playground.p.14">A scanner and a plotter could have copied the drawing exactly. <span class="hl-pink">A mirror returns you to yourself; a translation risks getting something wrong</span>, and in that risk there is the possibility of being met.</p>
 <p data-i18n="playground.p.4">And in the end, the marks in the sand are erased — following the unspoken rule of every playground.</p>
 </div>
+<div class="window">
+<div class="window-bar">
+<span></span>
+<span class="controls">─ □ ×</span>
+</div>
+<div class="window-body"><img alt="A VISITOR SMOOTHING THE SAND FLAT" loading="lazy" onerror="this.parentElement.textContent='[ A VISITOR SMOOTHING THE SAND FLAT ]'" src="../media/playground/context.jpg"/></div>
+</div>
+</div>
+
 <div class="next-project">
 <span class="next-label" data-i18n="g.next">Next Project</span>
 <a class="next-name" href="chorus.html">Chorus ↘</a>

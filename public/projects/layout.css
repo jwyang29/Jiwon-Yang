@@ -522,3 +522,24 @@ a.works-row:hover { background: var(--salmon); }
   .deco-asterisk { font-size: 56px; }
   .next-project { margin-top: 56px; }
 }
+
+/* ── Section with its figure beside it ─────────────────────────── */
+/* The picture that belongs to a passage sits next to it rather than in a
+   separate band further down, so the reader is not holding the text in
+   memory while scrolling to find what it refers to. */
+.section-grid {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: 34px;
+  align-items: start;
+  margin: 60px 0;
+}
+.section-grid .section { margin: 0; }
+.section-grid .window  { margin: 0; }
+.section-grid .window-body { min-height: 0; }
+.section-grid .window-body:not(:has(img)) { min-height: 250px; }
+.section-grid .window-body img { width: 100%; height: auto; object-fit: unset; }
+@media (max-width: 640px) {
+  .section-grid { grid-template-columns: 1fr; gap: 18px; margin: 44px 0; }
+  .section-grid .window-body:not(:has(img)) { min-height: 180px; }
+}
