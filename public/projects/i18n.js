@@ -54,7 +54,7 @@
  "playground.p.4": "그리고 모래 위의 흔적은 결국 지워집니다. 놀이터에서의 암묵적인 규칙에 따라.",
  "playground.meta.role": "콘셉트, 인터랙션 설계, 시스템 구현, 제작",
  "playground.p.16": "서울대학교 사물인터랙션디자인 수업(강사 박주홍)에서 처음 개발했고, 이후 SIGGRAPH Asia 2026 Art Gallery 전시를 위해 이창희 교수와 발전시키고 있습니다.",
- "playground.meta.exhibition": "SIGGRAPH Asia 2026 Art Gallery 선정",
+ "playground.meta.exhibition": "<a href=\"https://asia.siggraph.org/2026/\" rel=\"noopener\" target=\"_blank\">SIGGRAPH Asia 2026 Art Gallery</a> 선정",
  "playground.meta.medium": "피지컬 컴퓨팅 (아두이노–ESP32 통신, 갠트리 구현)",
  "chorus.tag": "인터랙티브 설치 · 2025",
  "chorus.intro": "코러스는 소리와 빛을 하나의 재료로 다루는 인터랙티브 설치입니다. <span class=\"hl-blue\">오르간을 연주하는 듯한 손짓</span>에 따라 여러 악기가 합주하며 <span class=\"hl-pink\">빛의 하모니</span>를 만들어 냅니다.",
