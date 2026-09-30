@@ -95,10 +95,10 @@ story = []
 
 # ══ Header ════════════════════════════════════════════════════════════════════
 story.append(Paragraph('JIWON YANG&nbsp;&nbsp;<font name="NotoSansKR" size="15">양지원</font>', S['name']))
-story.append(Paragraph('DESIGN UNDERGRADUATE · AFFECTIVE &amp; MULTISENSORY INTERACTION · HCI', S['sub']))
+story.append(Paragraph('DESIGN UNDERGRADUATE&nbsp;&nbsp;|&nbsp;&nbsp;AFFECTIVE &amp; MULTISENSORY INTERACTION&nbsp;&nbsp;|&nbsp;&nbsp;HCI', S['sub']))
 story.append(Paragraph(
-  'jwyang29@snu.ac.kr &nbsp;·&nbsp; '
-  'Portfolio: <link href="https://jwyang29.github.io/Jiwon-Yang/" color="#245da1">jwyang29.github.io/Jiwon-Yang</link> &nbsp;·&nbsp; '
+  'jwyang29@snu.ac.kr &nbsp;|&nbsp; '
+  'Portfolio: <link href="https://jwyang29.github.io/Jiwon-Yang/" color="#245da1">jwyang29.github.io/Jiwon-Yang</link> &nbsp;|&nbsp; '
   'GitHub: <link href="https://github.com/jwyang29" color="#245da1">github.com/jwyang29</link>', S['contact']))
 story.append(Spacer(1, 2))
 
@@ -113,46 +113,53 @@ story.append(Paragraph(
 
 # ══ Education ═════════════════════════════════════════════════════════════════
 story += sec('EDUCATION')
-story.append(Paragraph('Seoul National University — B.F.A. in Design &nbsp;<font name="Pretendard" size="8.6" color="#6b7f99">· 2022–2027 (expected)</font>', S['item']))
+story.append(Paragraph('Seoul National University, B.F.A. in Design &nbsp;<font name="Pretendard" size="8.6" color="#6b7f99">2023 to Feb 2028 (expected)</font>', S['item']))
 story.append(B('Major GPA: 4.0 / 4.3'))
 story.append(B('<b>HCI &amp; Interaction:</b> Human Behavior and Design (A+), Object Interaction Design (A+), '
                'Product Service Design (A+), UI Design Programming (A0), Media Design Programming (A0)'))
 story.append(B('<b>AI &amp; Engineering:</b> Design for Machine Learning (A+), Extended Reality Design (A+), '
                'Data Visualization (S), Introduction to AI (S)'))
-story.append(Paragraph('University of Sydney — Exchange Student, Interaction Design &nbsp;<font name="Pretendard" size="8.6" color="#6b7f99">· 2024 (Sem. 2)</font>', S['item']))
+story.append(Paragraph('University of Sydney, Exchange Student, Interaction Design &nbsp;<font name="Pretendard" size="8.6" color="#6b7f99">2024 (Sem. 2)</font>', S['item']))
 
 # ══ Research Experience ═══════════════════════════════════════════════════════
 story += sec('RESEARCH EXPERIENCE')
-story.append(Paragraph('ASC Lab, KAIST — Student Intern &nbsp;<font name="Pretendard" size="8.6" color="#6b7f99">· Sep 2026–Present</font>', S['item']))
-story.append(Paragraph('Independent Research — Researcher (First Author) &nbsp;<font name="Pretendard" size="8.6" color="#6b7f99">· Feb 2026–Jul 2026</font>', S['item']))
+story.append(Paragraph('ASC Lab, KAIST, Student Intern &nbsp;<font name="Pretendard" size="8.6" color="#6b7f99">Sep 2026 to Present</font>', S['item']))
+story.append(Paragraph('Independent Research, Researcher (First Author) &nbsp;<font name="Pretendard" size="8.6" color="#6b7f99">Feb 2026 to Jul 2026</font>', S['item']))
 story.append(Paragraph('<i>"Beyond Parentheses: Personalizing Graphical Sound Captions through Interactive Machine Learning"</i>', S['body']))
 story.append(B('Led the entire project end-to-end: problem framing, system design, implementation, user study, and manuscript writing.'))
-story.append(B('Built the <b>IML Audio Workstation</b> — a dual-head (multi-task) neural network mapping '
+story.append(B('Built the <b>IML Audio Workstation</b>, a dual-head (multi-task) neural network mapping '
                'psychoacoustic features to personalized 2D motion graphics, rendered in WebGL / Three.js.'))
-story.append(B('Designed a <b>"Listen–Sculpt–Train"</b> human-in-the-loop workflow for accessible, personalized sound '
+story.append(B('Designed a <b>"Listen / Sculpt / Train"</b> human-in-the-loop workflow for accessible, personalized sound '
                'captioning (incl. Deaf and hard-of-hearing viewers); pilot study (n=4) raised perceptual agreement '
                'from 3.2 to 6.4 on a 7-point scale.'))
-story.append(Paragraph('Medical AI Lab (IMSI), Seoul National University — Undergraduate Research Intern &nbsp;<font name="Pretendard" size="8.6" color="#6b7f99">· Feb 2026–Aug 2026</font>', S['item']))
+story.append(Paragraph('Medical AI Lab (IMSI), Seoul National University, Undergraduate Research Intern &nbsp;<font name="Pretendard" size="8.6" color="#6b7f99">Feb 2026 to Aug 2026</font>', S['item']))
 story.append(B('Implemented and experimented with medical-imaging models and tasks in PyTorch.'))
-story.append(B('Led data visualization and paper-figure design for medical imaging research — bridging design and ML.'))
+story.append(B('Led data visualization and paper-figure design for medical imaging research, bridging design and ML.'))
+
+# ══ Teaching ══════════════════════════════════════════════════════════════════
+story += sec('TEACHING')
+story.append(Paragraph('CIT Code Academy, AI Design Instructor &nbsp;<font name="Pretendard" size="8.6" color="#6b7f99">2023 to Present</font>', S['item']))
+story.append(B('Teaching AI design to 10+ students in grades 10 to 12, sustained across three years.'))
+story.append(B('The academy is a partner in ITU\'s <b>AI Skills Coalition</b> (AI for Good), the UN initiative for '
+               'open AI education launched in January 2025.'))
 
 # ══ Selected Projects ═════════════════════════════════════════════════════════
 story += sec('SELECTED PROJECTS')
-story.append(Paragraph('Playground: A Line Between Us &nbsp;<font name="Pretendard" size="8.6" color="#6b7f99">· 2026</font>', S['item']))
+story.append(Paragraph('Playground: A Line Between Us &nbsp;<font name="Pretendard" size="8.6" color="#6b7f99">2026</font>', S['item']))
 story.append(B('Interactive installation that reads a visitor\'s touch gesture through a sparse sensor grid and '
-               '"answers" by drawing back in sand — translating the feel of a gesture (pressure, pace) rather than '
-               'copying it. · Tools: physical computing (sensor grid), actuated drawing machine. · '
+               '"answers" by drawing back in sand, translating the feel of a gesture (pressure, pace) rather than '
+               'copying it. Tools: physical computing (sensor grid), actuated drawing machine. '
                '<b>Selected for SIGGRAPH Asia 2026 Art Gallery.</b>'))
-story.append(Paragraph('Chorus — Team &nbsp;<font name="Pretendard" size="8.6" color="#6b7f99">· 2025</font>', S['item']))
+story.append(Paragraph('Chorus, Team &nbsp;<font name="Pretendard" size="8.6" color="#6b7f99">2025</font>', S['item']))
 story.append(B('Medieval-organ-inspired interactive artwork: light sensors detect a visitor\'s playing gestures to '
-               'control four "door" structures — modulating emitted light and four-track audio levels so the visitor '
+               'control four "door" structures, modulating emitted light and four-track audio levels so the visitor '
                'conducts an orchestral harmony in real time.'))
 story.append(B('Role: overall system design and code implementation (teammate: modeling, fabrication &amp; '
-               'installation). · Tools: light sensors, sound/lighting control.'))
-story.append(Paragraph('SendLove — Individual &nbsp;<font name="Pretendard" size="8.6" color="#6b7f99">· 2025</font>', S['item']))
+               'installation). Tools: light sensors, sound/lighting control.'))
+story.append(Paragraph('SendLove, Individual &nbsp;<font name="Pretendard" size="8.6" color="#6b7f99">2025</font>', S['item']))
 story.append(B('Interactive sculpture: layered acrylic panels form the waveform of a recorded voice saying '
                '"<font name="NotoSansKR">사랑해</font>" (I love you); an ultrasonic sensor detects a "sending" '
-               'hand gesture, lighting per-panel LED strips in sequence to evoke a message being sent. · '
+               'hand gesture, lighting per-panel LED strips in sequence to evoke a message being sent. '
                'Tools: ultrasonic sensor, LED strips, sound visualization.'))
 
 # ══ Preprints & Manuscripts ═══════════════════════════════════════════════════
@@ -204,15 +211,15 @@ story.append(t)
 
 # ══ Leadership & Activities ═══════════════════════════════════════════════════
 story += sec('LEADERSHIP &amp; ACTIVITIES')
-story.append(B('XREAL (XR Society), SNU — Design Lead · 2025 Summer–2026 Summer'))
-story.append(B('SNU Design Alliance — Member · 2025'))
-story.append(B('ISEA 2025 — Student Volunteer · 2025'))
-story.append(B('Gwangju Design Biennale Challenge · 2025'))
+story.append(B('XREAL (XR Society), SNU. Design Lead, 2025 Summer to 2026 Summer'))
+story.append(B('SNU Design Alliance. Member, 2025'))
+story.append(B('ISEA 2025. Student Volunteer, 2025'))
+story.append(B('Gwangju Design Biennale Challenge, 2025'))
 
 # ══ Certifications & Languages ════════════════════════════════════════════════
 story += sec('CERTIFICATIONS &amp; LANGUAGES')
-story.append(B('NVIDIA DLI — Generative AI with Diffusion Models · 2025'))
-story.append(B('IELTS — Overall 7.5 · 2024'))
+story.append(B('NVIDIA DLI. Generative AI with Diffusion Models, 2025'))
+story.append(B('IELTS. Overall 7.5, 2024'))
 
 doc.build(story)
 print(f'생성 완료: {os.path.abspath(OUT)}')

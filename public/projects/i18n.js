@@ -4,6 +4,8 @@
   const KO = {
  "main.nametag": "Portfolio",
  "main.hint": "SCROLL DOWN  ↓",
+ "main.statement": "당신을 <span class=\"st-feelwrap\"><span class=\"st-feel\">Feel</span><span class=\"st-gloss\">느끼고</span></span> <span class=\"st-back\">되돌려주는</span> 것을 만듭니다.",
+ "main.statement.sub": "하나하나가 스크린만으로는 닿지 않는 것을 <b>감지하고</b>,<br>그것을 <b>놀이의 순간</b>으로 되돌려줍니다.",
  "main.pool.sub": "— 포트폴리오 소개",
  "main.pool.p1": "이 사이트는 하나의 작은 수영장입니다. 물 위에 떠 있는 오브젝트 하나하나가 <b>하나의 프로젝트</b>예요. 프로젝트들은 물 위를 유영하며 여러분께 건져지기를 기다리고 있어요!",
  "main.pool.p2": "<b>SCROLL</b> — 수영장 아래쪽으로 스크롤하면 더 많은 작업을 만날 수 있어요.",
@@ -28,7 +30,7 @@
  "about.meta.basedin": "Based in",
  "about.meta.basedin.v": "서울, 대한민국",
  "about.meta.study": "학력",
- "about.meta.study.v": "서울대학교 — 미술대학 디자인과 산업디자인 전공",
+ "about.meta.study.v": "서울대학교 미술대학 디자인과, 산업디자인 전공",
  "about.meta.focus": "관심 분야",
  "about.meta.focus.v": "디자인과 피지컬 컴퓨팅, 크리에이티브 코딩의 융합",
  "about.meta.contact": "Contact",

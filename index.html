@@ -6,7 +6,7 @@
   <title>Jiwon Yang — Portfolio</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Jacquarda+Bastarda+9&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Jacquarda+Bastarda+9&family=Urbanist:wght@100;200;300;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -102,7 +102,10 @@
     }
 
 
-    #hint {
+    /* One treatment for both cues: the one under the name and the one under
+       the statement, which carries the same "there is more below" job across
+       the long stretch of open water before the first object. */
+    #hint, #st-hint {
       margin-top: 20px;
       text-align: center;
       color: rgba(226, 142, 73, 0.97);
@@ -284,6 +287,69 @@
         0 0px 10px rgba(255, 255, 255, 0.35);
     }
 
+    /* ── Intro statement ────────────────────────────────── */
+    /* The opening line of the PDF portfolio, set in the same faces. It
+       surfaces once the name has cleared and drifts back out just before the
+       first objects crest the bottom edge — main.js drives both. */
+    #statement {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 0 22px;
+      pointer-events: none;
+      opacity: 0;
+      z-index: 6;
+      text-align: center;
+      color: #fff;
+      /* Every size below is a ratio of this one, taken from the Figma frame
+         (81.9 / 103 / 30.3 / 37.9 px against a 1920 artboard). */
+      --st: clamp(25px, 3.9vw, 60px);
+      text-shadow:
+        0 2px 14px rgba(10, 34, 52, 0.55),
+        0 1px  3px rgba(10, 34, 52, 0.40);
+    }
+
+    .st-line {
+      font-family: 'Urbanist', var(--ui);
+      font-weight: 500;
+      font-size: var(--st);
+      line-height: 1.38;
+      text-wrap: balance;
+    }
+    /* Jacquarda is near-illegible at a glance, so the small roman "feel" rides
+       alongside as its own gloss, the way it sits in the PDF. The pair must
+       never break across lines. */
+    .st-feelwrap { white-space: nowrap; }
+    .st-feel {
+      font-family: 'Jacquarda Bastarda 9', serif;
+      font-weight: 400;
+      font-size: calc(var(--st) * 1.258);
+      color: #f09330;
+    }
+    .st-gloss {
+      font-family: 'Urbanist', var(--ui);
+      font-weight: 300;
+      font-size: calc(var(--st) * 0.370);
+    }
+    .st-back { font-weight: 200; }
+
+    .st-sub {
+      font-family: 'Urbanist', var(--ui);
+      font-weight: 100;
+      font-size: calc(var(--st) * 0.463);
+      line-height: 1.38;
+      margin-top: calc(var(--st) * 0.26);
+      text-wrap: balance;
+    }
+    .st-sub b { font-weight: 300; }
+
+    /* Scaled off the statement rather than fixed, so it sits the same
+       distance below the block at every size. */
+    #st-hint { margin-top: calc(var(--st) * 0.9); }
+
     /* ── Mobile ─────────────────────────────────────────── */
     @media (max-width: 640px) {
       #floating-name {
@@ -291,10 +357,14 @@
         white-space: normal;
         max-width: 90vw;
       }
+      /* Below ~640px the clamp floor stops the line shrinking with the
+         viewport, so it needs its own scale or it runs off the edge. */
+      #statement { --st: clamp(19px, 5.4vw, 25px); }
       #ui       { padding: 22px 16px 12px; }
       #pool-btn { font-size: 11px; }
       #mic-btn  { font-size: 10px; letter-spacing: 0.2em; }
       #hint     { font-size: 9.2px; margin-top: 14px; }
+      #st-hint  { font-size: 9.2px; }
     }
   </style>
 </head>
@@ -312,6 +382,14 @@
   <div id="name-wrap">
     <a id="floating-name" href="./projects/about.html">Jiwon Yang</a>
     <div id="hint" data-i18n="main.hint">SCROLL DOWN  ↓</div>
+  </div>
+
+  <!-- Intro statement — the opening line of the PDF portfolio, surfacing in
+       the stretch of open water between the name and the first object -->
+  <div id="statement">
+    <p class="st-line" data-i18n="main.statement">I make things that <span class="st-feelwrap"><span class="st-feel">Feel</span><span class="st-gloss">feel</span></span> you <span class="st-back">(back).</span></p>
+    <p class="st-sub" data-i18n="main.statement.sub">Every one of them <b>senses</b> what a screen alone can't,<br>and gives it back as <b>playful moments</b>.</p>
+    <div id="st-hint" data-i18n="main.hint">SCROLL DOWN  ↓</div>
   </div>
 
   <!-- UI chrome -->

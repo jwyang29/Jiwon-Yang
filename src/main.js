@@ -306,9 +306,22 @@ const POOL_HALF_Z  = 44;   // pool plane is 88 deep
 // tall phone — which sees more of the pool at once — doesn't end up racing past
 // the objects in the same 300vh a desktop gets.
 const SCROLL_PX_PER_UNIT = 90;
+// The opening stretch, before the pool starts panning at full rate: the name
+// clears, the water sits empty for a beat, then the statement reads. Measured
+// in viewport heights so the beats land the same on a laptop and a phone. The
+// camera still creeps forward a little across it, so the water is never frozen.
+const INTRO_H       = 3.80;
+const INTRO_CREEP_Z = 2.2;
+// Statement beats, also in viewport heights. It is on screen for 2.4 of them,
+// most of that at full opacity, so the slow rise in onScroll() is what keeps
+// it from reading as a banner pinned to the middle of the window.
+const ST_IN   = 1.40;   // starts surfacing, a full screen after the name has gone
+const ST_FULL = 1.85;
+const ST_OUT  = 3.30;   // starts leaving; gone by INTRO_H
 let cameraY  = 11;
 let scrollMaxZ = 10;       // how far the camera can pan down the pool
 let halfZ      = 5.4;      // half the pool depth currently in frame
+let introPx    = 0;        // scroll length of that opening stretch
 
 const scrollSpace = document.getElementById('scroll-space');
 
@@ -324,33 +337,63 @@ function resize() {
   const visibleHalfZ = TAN_HALF_FOV * cameraY;
   halfZ = visibleHalfZ;
   scrollMaxZ = Math.max(0, POOL_HALF_Z - visibleHalfZ - 0.5);
-  scrollSpace.style.height = `${Math.round(h + scrollMaxZ * SCROLL_PX_PER_UNIT)}px`;
+  // The pan is shortened by the creep the intro already spends, so the camera
+  // still stops exactly at scrollMaxZ.
+  introPx = Math.round(h * INTRO_H);
+  const panPx = Math.max(0, scrollMaxZ - INTRO_CREEP_Z) * SCROLL_PX_PER_UNIT;
+  scrollSpace.style.height = `${Math.round(h + introPx + panPx)}px`;
   // Opening frame is open water — leaves and fish only. The objects start just
   // past its bottom edge, spread down the pool, and stop short of the far end so
   // the last one isn't pinned to the bottom of the final frame.
+  // 5.0 rather than 3.0 leaves a beat of empty water after the statement has
+  // gone, so the first object doesn't crest while it is still on screen. It has
+  // to clear INTRO_CREEP_Z by enough to cover that beat.
   // 1.35 ≈ an object's half-width plus its drift, so its outer edge stays inside
   const xLimit = visibleHalfZ * camera.aspect - 1.35;
-  layoutObjects(objects, visibleHalfZ + 3.0, POOL_HALF_Z - 5.0, xLimit);
+  layoutObjects(objects, visibleHalfZ + 5.0, POOL_HALF_Z - 5.0, xLimit);
   camera.updateProjectionMatrix();
   fishField.setSize();
 }
 window.addEventListener('resize', resize);
 resize();
 
-// Fade the scroll hint once the user starts scrolling, and clear the name away
-// over the stretch where the first objects drift up into frame.
+// Scroll position → how far the camera has panned down the pool. A slow creep
+// across the intro, then the full-rate pan once the statement has cleared.
+function cameraZOffset(y) {
+  const panZ   = Math.max(0, scrollMaxZ - INTRO_CREEP_Z);
+  const panPx  = panZ * SCROLL_PX_PER_UNIT;
+  const introT = introPx > 0 ? THREE.MathUtils.clamp(y / introPx, 0, 1) : 1;
+  const panT   = panPx   > 0 ? THREE.MathUtils.clamp((y - introPx) / panPx, 0, 1) : 0;
+  return introT * INTRO_CREEP_Z + panT * panZ;
+}
+
+// The opening runs name → open water → statement → objects, one after another
+// rather than on top of each other. Every beat below is in viewport heights.
 const hintEl = document.getElementById('hint');
 const nameEl = document.getElementById('floating-name');
+const stEl   = document.getElementById('statement');
 function onScroll() {
-  hintEl.style.opacity = window.scrollY > 80 ? '0' : '';
+  const y = window.scrollY;
+  const v = y / (window.innerHeight || 1);
+  hintEl.style.opacity = y > 80 ? '0' : '';
 
-  const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-  const f = maxScroll > 0 ? window.scrollY / maxScroll : 0;
-  const o = 1 - THREE.MathUtils.smoothstep(f, 0.08, 0.26);
-  nameEl.style.opacity      = o.toFixed(3);
-  nameEl.style.pointerEvents = o < 0.15 ? 'none' : 'auto';
+  const nameO = 1 - THREE.MathUtils.smoothstep(v, 0.10, 0.45);
+  nameEl.style.opacity       = nameO.toFixed(3);
+  nameEl.style.pointerEvents = nameO < 0.15 ? 'none' : 'auto';
+
+  // Holds off a full screen past the name so the pool is empty for a beat
+  // first, and clears again before the first object crests the bottom edge.
+  const stO = THREE.MathUtils.smoothstep(v, ST_IN, ST_FULL)
+            * (1 - THREE.MathUtils.smoothstep(v, ST_OUT, INTRO_H));
+  stEl.style.opacity = stO.toFixed(3);
+  // Rides upward across its life, so it reads as drifting with the water
+  // rather than being pinned to the middle of the screen.
+  const rise = THREE.MathUtils.clamp((v - ST_IN) / (INTRO_H - ST_IN), 0, 1);
+  stEl.style.transform = `translateY(${(50 - rise * 100).toFixed(1)}px)`;
 }
 window.addEventListener('scroll', onScroll, { passive: true });
+// introPx is derived from the viewport, so the timeline shifts under a resize.
+window.addEventListener('resize', onScroll);
 // Browsers restore scroll position on reload, so settle the overlays once now.
 onScroll();
 
@@ -379,9 +422,8 @@ function frame() {
   prevT = t;
   const audioLevel = audio.update();
 
-  // Scroll position → camera pans down the pool; name stays fixed via CSS
-  const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-  const zOff = maxScroll > 0 ? (window.scrollY / maxScroll) * scrollMaxZ : 0;
+  // Scroll position → camera pans down the pool; overlays stay fixed via CSS
+  const zOff = cameraZOffset(window.scrollY);
   camera.position.set(0, cameraY, zOff + 0.001);
   camera.lookAt(0, 0, zOff);
 

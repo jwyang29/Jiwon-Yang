@@ -431,6 +431,23 @@ a.works-row:hover { background: var(--salmon); }
 }
 
 /* ── Contact links list ───────────────────────────────────────── */
+/* Institution links inside the CV rows. Quiet at rest so the rows still read
+   as a list rather than a field of links, with the rule coming forward on
+   hover. Scoped to .meta-rows so the project pages' meta blocks match. */
+.meta-rows a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  text-decoration-color: rgba(22, 18, 15, 0.38);
+  transition: color 0.15s ease, text-decoration-color 0.15s ease;
+}
+.meta-rows a:hover {
+  color: var(--monarch);
+  text-decoration-color: var(--monarch);
+  text-decoration-thickness: 2px;
+}
+
 .contact-links { margin-top: 10px; font-size: 15px; }
 .contact-links a {
   display: inline-block;
