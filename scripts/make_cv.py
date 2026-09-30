@@ -120,6 +120,11 @@ story.append(B('<b>HCI &amp; Interaction:</b> Human Behavior and Design (A+), Ob
 story.append(B('<b>AI &amp; Engineering:</b> Design for Machine Learning (A+), Extended Reality Design (A+), '
                'Data Visualization (S), Introduction to AI (S)'))
 story.append(Paragraph('University of Sydney, Exchange Student, Interaction Design &nbsp;<font name="Pretendard" size="8.6" color="#6b7f99">2024 (Sem. 2)</font>', S['item']))
+story.append(Paragraph('Seoul National University, Micro Degree (two tracks) &nbsp;<font name="Pretendard" size="8.6" color="#6b7f99">In progress, expected 2027</font>', S['item']))
+story.append(B('<b>Computational Design</b> (introductory, 12 credits): data-driven UX design, machine learning '
+               'design, generative design, digital color theory.'))
+story.append(B('<b>Cognitive Computing and Human-Interactive AI</b> (advanced, 12 credits): deep learning, '
+               'generative AI development, natural language processing, big data capstone design.'))
 
 # ══ Research Experience ═══════════════════════════════════════════════════════
 story += sec('RESEARCH EXPERIENCE')
