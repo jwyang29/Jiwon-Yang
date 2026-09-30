@@ -14,8 +14,8 @@ export const PROJECTS = [
     id: 'playground',
     name: 'PLAYGROUND',
     conf: '94',
-    sub: 'touch × sand  ·  physical computing',
-    rx: -2.7, lane: 0.060,
+    sub: 'touch × sand  /  physical computing',
+    rx: -2.7, lane: 0.042,
     rippleStrength: 0.8,
     shadowRx: 0.90, shadowRz: 0.62,
   },
@@ -23,7 +23,7 @@ export const PROJECTS = [
     id: 'chorus',
     name: 'CHORUS',
     conf: '88',
-    sub: 'light × sound  ·  interactive installation',
+    sub: 'light × sound  /  interactive installation',
     rx:  2.4, lane: 0.000,
     rippleStrength: 0.5,
     shadowRx: 0.65, shadowRz: 0.11,
@@ -32,8 +32,8 @@ export const PROJECTS = [
     id: 'sendlove',
     name: 'SEND LOVE',
     conf: '96',
-    sub: 'voice waveform  ·  acrylic sculpture',
-    rx: -0.9, lane: 0.320,
+    sub: 'voice waveform  /  acrylic sculpture',
+    rx: -0.9, lane: 0.224,
     rippleStrength: 0.4,
     shadowRx: 0.58, shadowRz: 0.22,
   },
@@ -41,8 +41,8 @@ export const PROJECTS = [
     id: 'cocoon',
     name: 'COCOON',
     conf: '92',
-    sub: 'breathing motion  ·  interactive lighting',
-    rx:  2.7, lane: 0.190,
+    sub: 'breathing motion  /  interactive lighting',
+    rx:  2.7, lane: 0.133,
     rippleStrength: 0.6,
     shadowRx: 0.55, shadowRz: 0.55,
   },
@@ -50,8 +50,8 @@ export const PROJECTS = [
     id: 'foldit',
     name: 'FOLDIT',
     conf: '89',
-    sub: 'origami × AI detection  ·  mobile game',
-    rx: -2.9, lane: 0.450,
+    sub: 'origami × AI detection  /  mobile game',
+    rx: -2.9, lane: 0.315,
     rippleStrength: 0.5,
     shadowRx: 0.55, shadowRz: 0.55,
   },
@@ -59,8 +59,8 @@ export const PROJECTS = [
     id: 'tidepool',
     name: 'TIDEPOOL',
     conf: '90',
-    sub: 'clicker diorama  ·  AR fish keeping',
-    rx:  2.2, lane: 0.580,
+    sub: 'clicker diorama  /  AR fish keeping',
+    rx:  2.2, lane: 0.406,
     rippleStrength: 0.7,
     shadowRx: 0.60, shadowRz: 0.60,
   },
@@ -68,8 +68,8 @@ export const PROJECTS = [
     id: 'silhouette',
     name: 'SILHOUETTE SERIES',
     conf: '87',
-    sub: 'AUD + VIB  ·  fidget puzzle toys',
-    rx: -0.5, lane: 0.710,
+    sub: 'AUD + VIB  /  fidget puzzle toys',
+    rx: -0.5, lane: 0.497,
     rippleStrength: 0.45,
     shadowRx: 0.75, shadowRz: 0.40,
   },
@@ -77,16 +77,43 @@ export const PROJECTS = [
     id: 'bubblelink',
     name: 'BUBBLELINK',
     conf: '85',
-    sub: 'NFC message bubble  ·  keyring',
-    rx:  2.5, lane: 0.840,
+    sub: 'NFC message bubble  /  keyring',
+    rx:  2.5, lane: 0.588,
     rippleStrength: 0.4,
     shadowRx: 0.50, shadowRz: 0.45,
   },
   {
+    id: 'nothingtohide',
+    name: 'NOTHING TO HIDE',
+    conf: '86',
+    sub: 'shadow + load cell  /  interactive installation',
+    rx: -2.4, lane: 0.679,
+    rippleStrength: 0.6,
+    shadowRx: 0.70, shadowRz: 0.70,
+  },
+  {
+    id: 'ripple',
+    name: 'RIPPLE',
+    conf: '82',
+    sub: 'voice on a screen  /  the pool before the pool',
+    rx:  2.6, lane: 0.770,
+    rippleStrength: 0.9,
+    shadowRx: 0.62, shadowRz: 0.62,
+  },
+  {
+    id: 'gameboy',
+    name: 'GAMEBOY',
+    conf: '84',
+    sub: 'arduino buttons  /  a model that comes apart',
+    rx: -1.2, lane: 0.861,
+    rippleStrength: 0.4,
+    shadowRx: 0.42, shadowRz: 0.62,
+  },
+  {
     id: 'wip',
     name: 'WORK IN PROGRESS',
-    conf: '···',
-    sub: 'currently swimming  ·  ongoing experiments',
+    conf: '...',
+    sub: 'currently swimming  /  ongoing experiments',
     rx: -2.0, lane: 1.000,
     rippleStrength: 1.0,
     shadowRx: 0.60, shadowRz: 0.60,
@@ -217,6 +244,70 @@ function buildFallback(id) {
     );
     ring.position.set(0.32, 0.3, 0);
     g.add(bubble, tail, ring);
+  }
+
+  else if (id === 'nothingtohide') {
+    // the hoop read from above, with the load-cell pyramid at its centre
+    const hoop = new THREE.Mesh(
+      new THREE.TorusGeometry(0.52, 0.05, 12, 44),
+      new THREE.MeshStandardMaterial({ color: 0xe9e3d7, roughness: 0.55 }),
+    );
+    hoop.rotation.x = Math.PI / 2;
+    // Tall and narrow: the camera looks almost straight down, so a squat cone
+    // would read as a flat square rather than as a pyramid.
+    const pyramid = new THREE.Mesh(
+      new THREE.ConeGeometry(0.23, 0.68, 4),
+      new THREE.MeshStandardMaterial({ color: 0xd8663a, roughness: 0.45, flatShading: true }),
+    );
+    pyramid.position.y = 0.34;
+    pyramid.rotation.y = Math.PI / 4;
+    g.add(hoop, pyramid);
+  }
+
+  else if (id === 'ripple') {
+    // rings drawn as pixels rather than as circles, the way the sketch renders
+    // them: every cell is snapped to the same grid, so the steps stay visible
+    const mat  = new THREE.MeshStandardMaterial({ color: 0xff7fbf, roughness: 0.5 });
+    const cell = 0.1;
+    const px   = new THREE.BoxGeometry(cell, 0.06, cell);
+    const seen = new Set();
+    [[0.17, 10, 0.10], [0.33, 18, 0.05], [0.49, 26, 0.00]].forEach(([r, n, y]) => {
+      for (let i = 0; i < n; i++) {
+        const a = (i / n) * Math.PI * 2;
+        const x = Math.round(Math.cos(a) * r / cell) * cell;
+        const z = Math.round(Math.sin(a) * r / cell) * cell;
+        const key = x.toFixed(2) + ',' + z.toFixed(2);
+        if (seen.has(key)) continue;          // the snap collapses neighbours
+        seen.add(key);
+        const m = new THREE.Mesh(px, mat);
+        m.position.set(x, y, z);
+        g.add(m);
+      }
+    });
+  }
+
+  else if (id === 'gameboy') {
+    // the handset itself: body, screen, d-pad and two buttons
+    const body = new THREE.Mesh(
+      new THREE.BoxGeometry(0.62, 0.12, 0.95),
+      new THREE.MeshStandardMaterial({ color: 0xc9c6bb, roughness: 0.75 }),
+    );
+    const screen = new THREE.Mesh(
+      new THREE.BoxGeometry(0.42, 0.04, 0.34),
+      new THREE.MeshStandardMaterial({ color: 0x5c6b3f, roughness: 0.4 }),
+    );
+    screen.position.set(0, 0.07, -0.22);
+    const dark = new THREE.MeshStandardMaterial({ color: 0x3a3a40, roughness: 0.6 });
+    const padH = new THREE.Mesh(new THREE.BoxGeometry(0.20, 0.05, 0.07), dark);
+    const padV = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.05, 0.20), dark);
+    padH.position.set(-0.17, 0.07, 0.24);
+    padV.position.copy(padH.position);
+    const btnMat = new THREE.MeshStandardMaterial({ color: 0x8e3b62, roughness: 0.5 });
+    const btnA = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.05, 16), btnMat);
+    const btnB = btnA.clone();
+    btnA.position.set(0.23, 0.07, 0.18);
+    btnB.position.set(0.10, 0.07, 0.28);
+    g.add(body, screen, padH, padV, btnA, btnB);
   }
 
   else if (id === 'wip') {

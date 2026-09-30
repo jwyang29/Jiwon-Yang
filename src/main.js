@@ -116,9 +116,9 @@ const floorUniforms = {
   uObjRz:      { value: objShadowRz },
   uObjAngle:   { value: objShadowAngle },
 };
-// Pool is elongated along Z (22 x 88) so scrolling pans down to more objects
+// Pool is elongated along Z (22 x 112) so scrolling pans down to more objects
 const floor = new THREE.Mesh(
-  new THREE.PlaneGeometry(22, 88),
+  new THREE.PlaneGeometry(22, 112),
   new THREE.ShaderMaterial({ vertexShader: floorVert, fragmentShader: floorFrag, uniforms: floorUniforms }),
 );
 floor.rotation.x = -Math.PI / 2;
@@ -141,7 +141,7 @@ const waterUniforms = {
   uRipAmp:      { value: rippleAmp },
 };
 const water = new THREE.Mesh(
-  new THREE.PlaneGeometry(22, 88, 96, 300),
+  new THREE.PlaneGeometry(22, 112, 96, 300),
   new THREE.ShaderMaterial({
     vertexShader:   waterVert,
     fragmentShader: waterFrag,
@@ -301,7 +301,7 @@ window.addEventListener('pointerup', (e) => {
 
 // ─── Resize + scroll-driven camera pan ────────────────────────────────────────
 const TAN_HALF_FOV = Math.tan(THREE.MathUtils.degToRad(52 / 2));
-const POOL_HALF_Z  = 44;   // pool plane is 88 deep
+const POOL_HALF_Z  = 56;   // pool plane is 112 deep
 // Scroll distance is derived from the pan distance rather than a fixed vh, so a
 // tall phone — which sees more of the pool at once — doesn't end up racing past
 // the objects in the same 300vh a desktop gets.
