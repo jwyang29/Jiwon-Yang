@@ -5,6 +5,9 @@ uniform float uAudioLevel;
 uniform vec3  uSunDir;
 uniform vec3  uSunColor;
 uniform vec3  uWaterColor;
+uniform vec3  uDriftCool;   // same two fields the floor drifts through
+uniform vec3  uDriftWarm;
+uniform vec3  uDriftMix;
 uniform vec3  uCameraPos;
 uniform float uSwell;
 uniform vec2  uRipPos[28];
@@ -120,6 +123,20 @@ void main() {
   // diagonals across the pool. Fresnel already lifts toward the sun below.
   // sRGB, like the floor: nothing converts this on the way out. Set from POOL.
   vec3 tint = uWaterColor * (1.0 + uAudioLevel * 0.25);
+
+  // The film carries the same slow drift as the floor, at the same scales and
+  // speeds. Left flat it averages the floor's colour fields back toward one
+  // navy, which is most of why the first attempt at this was invisible.
+  float cool = gnoise(pos * 0.105 + vec2( t * 0.013, -t * 0.009))
+             + gnoise(pos * 0.240 + vec2(-t * 0.021,  t * 0.015)) * 0.34;
+  float warm = gnoise(pos * 0.082 + vec2(-t * 0.011,  t * 0.016) + 31.7)
+             + gnoise(pos * 0.190 + vec2( t * 0.018,  t * 0.012) + 11.3) * 0.34;
+  cool /= 1.34;
+  warm /= 1.34;
+  tint = mix(tint, uDriftCool,
+             smoothstep(0.30, 0.70, cool * 0.5 + 0.5) * uDriftMix.x);
+  tint = mix(tint, uDriftWarm,
+             smoothstep(uDriftMix.z, uDriftMix.z + 0.13, warm * 0.5 + 0.5) * uDriftMix.y);
 
   vec3  color = mix(tint, uSunColor * 0.80, F * 0.20);
   // Slightly denser than the summer water so the pool reads as deeper

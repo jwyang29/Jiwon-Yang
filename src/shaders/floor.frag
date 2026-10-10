@@ -6,6 +6,9 @@ uniform vec3  uSunDir;
 uniform float uSwell;
 uniform vec3  uTileBase;    // sRGB fractions, see the note in main()
 uniform vec3  uTileGrout;
+uniform vec3  uDriftCool;   // broad fields the navy drifts toward
+uniform vec3  uDriftWarm;
+uniform vec3  uDriftMix;    // x cool amount, y warm amount, z warm cutoff
 uniform vec2  uRipPos[28];
 uniform float uRipTime[28];
 uniform float uRipAmp[28];
@@ -75,6 +78,21 @@ vec2 waveGrad(vec2 pos, float t, float boost) {
   return vec2(gx, gz);
 }
 
+// ─── Value noise for the slow colour drift ───────────────────────────────────
+// Trig-free hash, same reason as water.frag: fract(sin(dot(...))) loses its low
+// bits out at the far end of a 112-unit pool and the field collapses into
+// stripes, which here would read as banding across the floor.
+vec2 _h2(vec2 p) {
+  vec3 p3 = fract(vec3(p.xyx) * vec3(0.1031, 0.1030, 0.0973));
+  p3 += dot(p3, p3.yzx + 33.33);
+  return -1.0 + 2.0 * fract((p3.xx + p3.yz) * p3.zy);
+}
+float gnoise(vec2 p) {
+  vec2 i = floor(p), f = fract(p), u = f*f*f*(f*(f*6.0-15.0)+10.0);
+  return mix(mix(dot(_h2(i),f),                   dot(_h2(i+vec2(1,0)),f-vec2(1,0)),u.x),
+             mix(dot(_h2(i+vec2(0,1)),f-vec2(0,1)),dot(_h2(i+vec2(1,1)),f-vec2(1,1)),u.x),u.y);
+}
+
 // ─── Tile grid (world-space so tiles stay square on any plane size) ──────────
 float tileGrid(vec2 world, float lw) {
   vec2 p = fract(world * 0.9545);   // ≈1.05 world units per tile
@@ -95,6 +113,37 @@ void main() {
   // in the framebuffer unconverted. Feeding it linear values makes the pool
   // come out near-black. Both are set from POOL in main.js.
   vec3 floorCol = mix(uTileBase, uTileGrout, tileGrid(refractW, 0.048));
+
+  // ── Slow colour drift ─────────────────────────────────────────────────────
+  // Flat navy is the thing being fixed here. Two low-frequency fields pull the
+  // tile toward a cooler and a warmer blue in wide, soft patches. The scales
+  // are deliberately far apart (about 18 and 26 world units per feature) so the
+  // two never line up into a repeating pattern, and they crawl rather than
+  // animate: at these speeds a patch takes most of a minute to cross a tile,
+  // which reads as the body of water rather than as something moving on it.
+  // Two octaves each. One octave alone gives a single smooth blob that fills
+  // the whole frame and reads as a flat shift; the second, at a little over
+  // twice the frequency and a third of the weight, breaks the edge up without
+  // turning it into texture.
+  vec2 dp = vWorldXZ;
+  float cool = gnoise(dp * 0.105 + vec2( t * 0.013, -t * 0.009))
+             + gnoise(dp * 0.240 + vec2(-t * 0.021,  t * 0.015)) * 0.34;
+  float warm = gnoise(dp * 0.082 + vec2(-t * 0.011,  t * 0.016) + 31.7)
+             + gnoise(dp * 0.190 + vec2( t * 0.018,  t * 0.012) + 11.3) * 0.34;
+  cool /= 1.34;
+  warm /= 1.34;
+
+  // Narrow windows on purpose. Value noise is bell shaped around the middle,
+  // so a wide smoothstep spends most of its range on values that never occur
+  // and the field comes out as a near constant half mix. Mapping roughly the
+  // middle third to the full 0 to 1 is what makes the patches actually swing.
+  // The cool field is the common case and carries most of the weight; the warm
+  // one starts above centre so it only surfaces at the peaks, the way the gold
+  // sits in a few bands of the reference rather than everywhere.
+  floorCol = mix(floorCol, uDriftCool,
+                 smoothstep(0.30, 0.70, cool * 0.5 + 0.5) * uDriftMix.x);
+  floorCol = mix(floorCol, uDriftWarm,
+                 smoothstep(uDriftMix.z, uDriftMix.z + 0.13, warm * 0.5 + 0.5) * uDriftMix.y);
 
   // ── Wave-depth darkening — only a ripple reaches this now ─────────────────
   float wh = waveHeight(vWorldXZ, t, boost);

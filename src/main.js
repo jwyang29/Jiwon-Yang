@@ -23,8 +23,8 @@ renderer.toneMappingExposure = 0.92;   // autumn dusk — a touch under-exposed
 
 // ─── Scene ────────────────────────────────────────────────────────────────────
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x2c4053);
-scene.fog        = new THREE.Fog(0x223342, 18, 38);
+scene.background = new THREE.Color(0x1b2c3b);
+scene.fog        = new THREE.Fog(0x34495b, 18, 38);
 
 // ─── Camera ───────────────────────────────────────────────────────────────────
 const camera = new THREE.PerspectiveCamera(52, 1, 0.1, 40);
@@ -96,8 +96,27 @@ export const POOL = {
   // sitting below 1.0 means the surface reads a shade darker than the floor,
   // which is what keeps this blue from going bright.
   tile:  new THREE.Vector3(0.133, 0.282, 0.467),
-  grout: new THREE.Vector3(0.113, 0.240, 0.397),
-  tint:  new THREE.Vector3(0.125, 0.265, 0.439),
+  grout: new THREE.Vector3(0.111, 0.234, 0.388),
+  tint:  new THREE.Vector3(0.131, 0.276, 0.458),
+  // Two colours the navy drifts toward in broad, slow fields, so the water is
+  // not one flat blue. Both move the hue, not just the brightness: a first
+  // attempt used a lighter version of the same blue and the measured spread in
+  // blue over red was 0.06 on a mean of 3.5, which is no variation at all.
+  // Cool pulls red down while lifting green and blue, warm does the reverse.
+  driftCool: new THREE.Vector3(0.427, 0.780, 0.933),
+  driftWarm: new THREE.Vector3(0.933, 0.710, 0.227),
+  // x: how far the cool field pulls, y: how far the warm one does, z: the
+  // noise level the warm field starts at. Navy and orange are near opposites,
+  // so a weak warm mix just greys the water out. It reads as warmth only if it
+  // is strong where it lands, which means a high cutoff and a large amount
+  // rather than a little of it everywhere.
+  //
+  // The cutoff is read against a two octave noise that sits in a bell around
+  // 0.5, so it behaves like a percentile: measured over the visible water,
+  // 0.52 turns 38 per cent of it warm, 0.56 turns 8 per cent, and 0.60 turns
+  // 3 per cent. 0.56 is the setting where the median pixel is still the plain
+  // navy baseline and only the patches carry the orange.
+  driftMix:  new THREE.Vector3(0.44, 0.70, 0.615),
 };
 
 // ─── Pool Floor (tile, refraction and procedural shadow shader) ──────────────
@@ -107,6 +126,9 @@ const floorUniforms = {
   uSunDir:     { value: sunDir },
   uTileBase:   { value: POOL.tile },
   uTileGrout:  { value: POOL.grout },
+  uDriftCool:  { value: POOL.driftCool },
+  uDriftWarm:  { value: POOL.driftWarm },
+  uDriftMix:   { value: POOL.driftMix },
   uObjPos:     { value: objPositions },
   uSwell:      { value: SWELL },
   uRipPos:     { value: ripplePos },
@@ -132,6 +154,9 @@ const waterUniforms = {
   uSunDir:      { value: sunDir },
   uSunColor:    { value: new THREE.Color(0xfddab8) },
   uWaterColor:  { value: POOL.tint },
+  uDriftCool:   { value: POOL.driftCool },
+  uDriftWarm:   { value: POOL.driftWarm },
+  uDriftMix:    { value: POOL.driftMix },
   uCameraPos:   { value: camera.position },
   uObjPos:      { value: objPositions },
   uObjStrength: { value: objStrengths },

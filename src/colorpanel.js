@@ -86,6 +86,9 @@ export function mountColorPanel({ scene, POOL, fishHaze = 0x394e63 }) {
     tile: POOL.tile.clone(),
     grout: POOL.grout.clone(),
     tint: POOL.tint.clone(),
+    cool: POOL.driftCool.clone(),
+    warm: POOL.driftWarm.clone(),
+    mix: POOL.driftMix.clone(),
     bg: '#' + scene.background.getHexString(),
     fog: '#' + scene.fog.color.getHexString(),
   };
@@ -106,11 +109,17 @@ export function mountColorPanel({ scene, POOL, fishHaze = 0x394e63 }) {
     <div class="row"><label>Grid</label><input type="range" min="0.5" max="1" step="0.005" data-grid><span class="val" data-grid-v></span></div>
     <div class="row"><label>Water film</label><input type="range" min="0.8" max="1.6" step="0.005" data-film><span class="val" data-film-v></span></div>
     <hr>
+    <div class="row"><label>Cool drift</label><input type="color" data-cool><span class="val" data-cool-v></span></div>
+    <div class="row"><label>Cool amount</label><input type="range" min="0" max="1" step="0.01" data-coolamt><span class="val" data-coolamt-v></span></div>
+    <div class="row"><label>Warm drift</label><input type="color" data-warm><span class="val" data-warm-v></span></div>
+    <div class="row"><label>Warm amount</label><input type="range" min="0" max="1" step="0.01" data-warmamt><span class="val" data-warmamt-v></span></div>
+    <div class="row"><label>Warm cutoff</label><input type="range" min="0.40" max="0.72" step="0.005" data-warmlo><span class="val" data-warmlo-v></span></div>
+    <hr>
     <div class="row"><label>Background</label><input type="color" data-bg><span class="val" data-bg-v></span></div>
     <div class="row"><label>Fog</label><input type="color" data-fog><span class="val" data-fog-v></span></div>
     <hr>
     <div class="row"><label>Fish fade</label><span class="val" style="flex:1 1 auto;text-align:left" data-fish></span></div>
-    <div class="note">Grid and water film are multiples of the tile, so the hue stays consistent. Fish fade is derived and only applies on reload.</div>
+    <div class="note">Grid and water film are multiples of the tile, so the hue stays consistent. Fish fade is derived and only applies on reload.<br><br>The two drifts are slow fields the water wanders through. Warm cutoff is the noise level the warm one starts at, so raising it makes the warm patches rarer but leaves them just as strong where they land. Orange sits opposite navy, so a small amount spread wide only greys the water.</div>
     <div class="btns"><button data-copy>Copy values</button><button data-reset>Reset</button></div>
   `;
   document.body.appendChild(el);
@@ -118,6 +127,8 @@ export function mountColorPanel({ scene, POOL, fishHaze = 0x394e63 }) {
   const q = (s) => el.querySelector(s);
   const tileIn = q('[data-tile]'), gridIn = q('[data-grid]'), filmIn = q('[data-film]');
   const bgIn = q('[data-bg]'), fogIn = q('[data-fog]');
+  const coolIn = q('[data-cool]'), warmIn = q('[data-warm]');
+  const coolAmtIn = q('[data-coolamt]'), warmAmtIn = q('[data-warmamt]'), warmLoIn = q('[data-warmlo]');
 
   const fishHex = () => scaleFishHaze(fishHaze, start.tile, POOL.tile);
 
@@ -130,6 +141,16 @@ export function mountColorPanel({ scene, POOL, fishHaze = 0x394e63 }) {
     q('[data-tile-v]').textContent = vecToHex(POOL.tile);
     q('[data-grid-v]').textContent = gridRatio.toFixed(2) + '×';
     q('[data-film-v]').textContent = filmRatio.toFixed(2) + '×';
+    coolIn.value = vecToHex(POOL.driftCool);
+    warmIn.value = vecToHex(POOL.driftWarm);
+    coolAmtIn.value = POOL.driftMix.x;
+    warmAmtIn.value = POOL.driftMix.y;
+    warmLoIn.value  = POOL.driftMix.z;
+    q('[data-cool-v]').textContent = vecToHex(POOL.driftCool);
+    q('[data-warm-v]').textContent = vecToHex(POOL.driftWarm);
+    q('[data-coolamt-v]').textContent = POOL.driftMix.x.toFixed(2);
+    q('[data-warmamt-v]').textContent = POOL.driftMix.y.toFixed(2);
+    q('[data-warmlo-v]').textContent  = POOL.driftMix.z.toFixed(2);
     q('[data-bg-v]').textContent = bgIn.value;
     q('[data-fog-v]').textContent = fogIn.value;
     q('[data-fish]').textContent = fishHex();
@@ -140,9 +161,19 @@ export function mountColorPanel({ scene, POOL, fishHaze = 0x394e63 }) {
   filmIn.addEventListener('input', () => { filmRatio = +filmIn.value; apply(); });
   bgIn.addEventListener('input', () => { scene.background.set(bgIn.value); apply(); });
   fogIn.addEventListener('input', () => { scene.fog.color.set(fogIn.value); apply(); });
+  // driftMix is one Vector3 held by both shaders, so set the component in
+  // place rather than replacing it or the uniforms stop tracking.
+  coolIn.addEventListener('input', () => { hexToVec(coolIn.value, POOL.driftCool); apply(); });
+  warmIn.addEventListener('input', () => { hexToVec(warmIn.value, POOL.driftWarm); apply(); });
+  coolAmtIn.addEventListener('input', () => { POOL.driftMix.x = +coolAmtIn.value; apply(); });
+  warmAmtIn.addEventListener('input', () => { POOL.driftMix.y = +warmAmtIn.value; apply(); });
+  warmLoIn.addEventListener('input',  () => { POOL.driftMix.z = +warmLoIn.value;  apply(); });
 
   q('[data-reset]').addEventListener('click', () => {
     POOL.tile.copy(start.tile);
+    POOL.driftCool.copy(start.cool);
+    POOL.driftWarm.copy(start.warm);
+    POOL.driftMix.copy(start.mix);
     gridRatio = start.tile.x ? start.grout.x / start.tile.x : 0.86;
     filmRatio = start.tile.x ? start.tint.x / start.tile.x : 1.15;
     scene.background.set(start.bg);
@@ -157,6 +188,9 @@ export function mountColorPanel({ scene, POOL, fishHaze = 0x394e63 }) {
   tile:  ${vecLine(POOL.tile)},
   grout: ${vecLine(POOL.grout)},
   tint:  ${vecLine(POOL.tint)},
+  driftCool: ${vecLine(POOL.driftCool)},
+  driftWarm: ${vecLine(POOL.driftWarm)},
+  driftMix:  ${vecLine(POOL.driftMix)},
 
 src/main.js — scene
 scene.background = new THREE.Color(0x${bgIn.value.slice(1)});
