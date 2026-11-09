@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Playground: A Line Between Us</title>
+<meta name="description" content="An interactive installation by Jiwon Yang and Chang Hee Lee, shown at the SIGGRAPH Asia 2026 Art Gallery in Kuala Lumpur.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400..600&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="./style.css">
+<script>
+  // Lines draw themselves only when motion is welcome and the script that reveals them actually ran.
+  (function (d) {
+    if (!('IntersectionObserver' in window) || !window.matchMedia || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    d.classList.add('anim');
+    addEventListener('load', function () { if (!window.linesReady) d.classList.remove('anim'); });
+  })(document.documentElement);
+</script>
+</head>
+<body>
+<!-- Layout follows the caption printed for the Korean exhibition: "a line / be;tween us." on top,
+     the steps joined by one wandering line, the description in grey, the wordmark at the foot.
+     Copy sources: the steps translate that caption. The description is the Stage 2 Extended Summary,
+     with the sentence on the machine's own lines expanded at the artist's request (fourth paragraph). -->
+
+<div class="col">
+  <h1 class="sr">Playground: A Line Between Us</h1>
+
+  <div class="title" aria-hidden="true">
+    <span>a line</span>
+    <span class="rule"></span>
+    <span>be;tween us.</span>
+  </div>
+
+  <h2 class="sr">How to take part</h2>
+  <ol class="steps">
+    <li><span>Draw on the fabric with your finger.</span><span>A feeling, a simple shape, anything at all.</span></li>
+    <li style="--x: 58.9%; --h: 36px"><span>Lift your hand and wait a moment.</span><span>The machine draws the shape it felt through the fabric onto the sand.</span></li>
+    <li style="--x: 48.6%; --h: 41px"><span>While it draws,</span><span>the screen shows the feeling it read from your gesture.</span></li>
+    <li style="--x: 42.7%; --h: 39px"><span>Once you have watched it all,</span><span>smooth the sand neatly, ready for the next drawing.</span></li>
+  </ol>
+
+  <div class="trail" id="trail" aria-hidden="true"></div>
+
+  <div class="tray" id="tray" hidden>
+    <canvas role="img" aria-label="A small tray of sand. Draw in it with your finger and it draws back."></canvas>
+  </div>
+  <div class="trayfoot" id="trayfoot" hidden>
+    <p class="reading" id="reading" aria-live="polite"></p>
+    <button type="button" class="smooth" id="smooth">Smooth the sand</button>
+  </div>
+
+  <section class="about">
+    <h2 class="sr">About the work</h2>
+    <p>Playground: A Line Between Us begins with <strong>two games we played as children</strong>. We traced shapes on a friend’s back and waited for them to feel what we meant. We drew in the sand and let it be smoothed away. These were ways of speaking before we had the right words, and they were gone almost as soon as they were made.</p>
+    <p>A visitor draws on a soft fabric with their fingertip. Under the fabric, small sensors sit in a grid form. Each one feels only the small patch above it, so <strong>no single sensor ever sees the whole gesture</strong>. The machine weaves these separate threads together to work out what the hand was doing.</p>
+    <p><strong>Our own skin works this way too.</strong> Touch receptors are scattered across the skin, and the brain stitches their signals into one sensation. What looks like imprecision in the machine is really just how touch works.</p>
+    <p><strong>So it never copies the drawing.</strong> It reads how you drew: tender or rushed, light or pressing. That impression appears as words on a small screen. Then the machine retraces your gesture into the sand. When the tracing is done, it <strong>carries the drawing on with lines of its own</strong>, in the strength and style it read from yours, the way a friend might murmur something back.</p>
+    <p>Before leaving, the visitor smooths the sand and leaves it clear for the next person. Nothing is saved. What you carry away is a feeling more than a picture: <strong>that something tried to understand you, got it a little wrong, and answered anyway.</strong></p>
+  </section>
+
+  <section class="artists">
+    <h2 class="sr">Artists</h2>
+    <div class="artist left">
+      <img class="face" src="./jiwon.jpg" alt="Portrait of Jiwon Yang" width="300" height="400" loading="lazy">
+      <div class="who">
+        <p class="name">Jiwon Yang</p>
+        <p class="aff">Department of Design, Seoul National University</p>
+        <p>Jiwon Yang is a designer working across physical computing, interactive installation, and creative coding, currently completing a B.F.A. in Design at Seoul National University, with an exchange semester in Interaction Design at the University of Sydney. She is presently a student intern at the Affective Systems and Cognition Lab, KAIST. Her work turns sound, touch, and light into experiences that the full body reads.</p>
+        <p class="links"><a href="https://jiwon-yang.com/">jiwon-yang.com</a><br><a href="mailto:jwyang29@snu.ac.kr">jwyang29@snu.ac.kr</a></p>
+      </div>
+    </div>
+    <div class="artist right">
+      <div class="who">
+        <p class="name">Chang Hee Lee</p>
+        <p class="aff">Department of Industrial Design, KAIST</p>
+        <p>Chang Hee Lee is an Associate Professor in the Department of Industrial Design at KAIST. Before joining KAIST, he was a Tutor and 2nd Year Programme Leader (Assistant Professor) in Innovation Design Engineering, jointly run by the Royal College of Art and Imperial College London. His research explores human computer interaction, design engineering, multisensory interaction, and posthuman perspectives.</p>
+        <p class="links"><a href="https://asc.kaist.ac.kr/">asc.kaist.ac.kr</a><br><a href="mailto:changhee.lee@kaist.ac.kr">changhee.lee@kaist.ac.kr</a></p>
+      </div>
+      <img class="face" src="./changhee.jpg" alt="Portrait of Chang Hee Lee" width="300" height="400" loading="lazy">
+    </div>
+  </section>
+
+  <footer class="foot">
+    <p class="wordmark" aria-hidden="true">Playground</p>
+    <p class="event"><a href="https://asia.siggraph.org/2026/" rel="noopener" target="_blank">SIGGRAPH Asia 2026 Art Gallery</a><br>Kuala Lumpur Convention Centre, December 2026</p>
+    <p class="copy">© 2026 Jiwon Yang</p>
+  </footer>
+</div>
+
+<script src="./trail.js"></script>
+<script src="./sand.js"></script>
+<script src="./sprinkle.js"></script>
+</body>
+</html>
